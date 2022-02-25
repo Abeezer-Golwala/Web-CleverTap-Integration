@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<title>Test Web CleverTap</title>
+		<script type="text/javascript">
+			 var clevertap = {event:[], profile:[], account:[], onUserLogin:[], notifications:[], privacy:[]};
+		 // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
+		clevertap.account.push({"id": "TEST-86Z-999-446Z"});
+		clevertap.privacy.push({optOut: false}); //set the flag to true, if the user of the device opts out of sharing their data
+		clevertap.privacy.push({useIP: false}); //set the flag to true, if the user agrees to share their IP data
+		 (function () {
+				 var wzrk = document.createElement('script');
+				 wzrk.type = 'text/javascript';
+				 wzrk.async = true;
+				 wzrk.src = ('https:' == document.location.protocol ? 'https://d2r1yp2w7bby2u.cloudfront.net' : 'http://static.clevertap.com') + '/js/a.js';
+				 var s = document.getElementsByTagName('script')[0];
+				 s.parentNode.insertBefore(wzrk, s);
+		  })();
+		</script>
+		<script type="module">
+		   // Import the functions you need from the SDKs you need
+		  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js";
+		  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-analytics.js";
+		  // TODO: Add SDKs for Firebase products that you want to use
+		  // https://firebase.google.com/docs/web/setup#available-libraries
+
+		  // Your web app's Firebase configuration
+		  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		  const firebaseConfig = {
+			apiKey: "AIzaSyBxlcYq8Sp7zuE6J5E1tbprdFtUV-DXbUA",
+			authDomain: "androidclevertaptest.firebaseapp.com",
+			projectId: "androidclevertaptest",
+			storageBucket: "androidclevertaptest.appspot.com",
+			messagingSenderId: "540192587568",
+			appId: "1:540192587568:web:3eb5fea21d2364ddc3d2f5",
+			measurementId: "G-2K896CT56J"
+		  };
+
+		  // Initialize Firebase
+		  const app = initializeApp(firebaseConfig);
+		  const analytics = getAnalytics(app);
+		</script>
+		<link rel="manifest" href="/manifest.json">  
+	</head>
+	<body>
+		<script type="text/javascript">
+			function createUser() {
+				clevertap.onUserLogin.push({
+				 "Site": {
+				   "Name": "Abeezer",            // String
+				   "Identity": 61026032,              // String or number
+				   "Email": "abeezer@web.com",         // Email address of the user
+				   "Phone": "+918877991100",           // Phone (with the country code)
+				   "Gender": "M",                     // Can be either M or F
+				   "DOB": new Date(),                 // Date of Birth. Date object
+				// optional fields. controls whether the user will be sent email, push etc.
+				   "MSG-email": true,                // Disable email notifications
+				   "MSG-push": true,                  // Enable push notifications
+				   "MSG-sms": true,                   // Enable sms notifications
+				   "MSG-whatsapp": true,              // Enable WhatsApp notifications
+				 }
+				})
+			}
+			function pushevent(){
+				clevertap.event.push("AbWebpush");
+			}
+			function webpopevent(){
+				clevertap.event.push("AbWebpop");
+			}
+			function notifyperm(){
+			clevertap.notifications.push({
+				  "titleText":'Would you like to receive Push Notifications?',
+				  "bodyText":'We promise to only send you relevant content and give you updates on your transactions',
+				  "okButtonText":'Sign me up!',
+				  "rejectButtonText":'No thanks',
+				  "okButtonColor":'#778046'});
+			}
+			function exitintent(){
+				clevertap.event.push("AbexitIntent");
+			}
+		</script>
+		<form>  
+         <input type = "button" onclick = "createUser()" value = "Create User"><br>  
+		 <input type = "button" onclick = "pushevent()" value = "Web Push event"><br> 
+		 <input 
+		 <input type = "button" onclick = "notifyperm()" value = "Request Permission"><br>
+		 <input type = "button" onclick = "webpopevent()" value = "Web Pop event"><br>
+		 <input type = "button" onclick = "exitintent()" value = "Exit Website"><br>
+      </form> 
+	</body>
