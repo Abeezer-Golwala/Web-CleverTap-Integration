@@ -111,7 +111,7 @@ scale=1,user-scalable=no" />
 <body>
     <header class="ccheader">HELLO, BIDDER! PLEASE ENTER YOUR EMAIL ADRESS BELOW TO GET EXCLUSIVE OFFERS AND NEWS ABOUT
         BID WARS! <p>
-            In the next 7 days you will receive a FREE COUPON </p>
+            In the next 8 days you will receive a FREE COUPON </p>
         <i class="ccheader">Don't forget to check your email inbox!</i>
     </header>
     <div class="wrapper">
@@ -128,9 +128,7 @@ scale=1,user-scalable=no" />
     <script type="text/javascript">
         function myFunction() {
             var props = {
-                Test: document.getElementById("Test").value,
                 Test2: document.getElementById("Test2").value,
-                Test3: document.getElementById("Test3").value,
             };
             // for android
             if (window.CleverTap) {
@@ -138,9 +136,7 @@ scale=1,user-scalable=no" />
                 CleverTap.pushEvent("Form Filled", JSON.stringify(props));
             }
             var message = {
-                Name: document.getElementById("Test").value,
                 Email: document.getElementById("Test2").value,
-                Phone: document.getElementById("Test3").value,
             };
             if (window.CleverTap) {
                 //to push profile
@@ -153,9 +149,7 @@ scale=1,user-scalable=no" />
                 props: props,
             };
             var profiledata = {
-                Name: document.getElementById("Test").value,
                 Email: document.getElementById("Test2").value,
-                Phone: document.getElementById("Test3").value,
             };
             if (window.webkit && window.webkit.messageHandlers &&
                 window.webkit.messageHandlers.clevertap) {
