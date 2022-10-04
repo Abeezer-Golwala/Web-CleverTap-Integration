@@ -74,7 +74,17 @@
 				  "bodyText":'We promise to only send you relevant content and give you updates on your transactions',
 				  "okButtonText":'Sign me up!',
 				  "rejectButtonText":'No thanks',
-				  "okButtonColor":'#778046'});
+				  "okButtonColor":'#778046',
+				  "okCallback":function () {
+				   	console.log("hello");
+			       	   },
+				   "rejectCallback":function () {
+				   	console.log("hello");
+			           },
+       				   "subscriptionCallback":function () {
+           				console.log("hello");
+       				   }
+				});
 			console.log(flag);
 			}
 			function exitintent(){
