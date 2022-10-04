@@ -77,13 +77,16 @@
 				  "rejectButtonText":'No thanks',
 				  "okButtonColor":'#778046',
 				  "okCallback":function () {
-				   	flag = 1;	
+				   	flag = 1;
+					 console.log("flag set"+flag);
 			       	   },
 				   "rejectCallback":function () {
 				   	flag = 1;
+					console.log("flag set"+flag);
 			           },
        				   "subscriptionCallback":function () {
            				flag = 1;
+					console.log("flag set"+flag);
        				   }
 				});
 				if(!flag){
