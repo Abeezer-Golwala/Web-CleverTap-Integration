@@ -6,69 +6,106 @@
 	<body>
 		<script type="text/javascript">
 		    const d = new Date(2022, 6, 24);
-		    console.log(d);
-			function event(){
+console.log(d);
 
-          var props = {foo: 'xyz', lang: 'French'};
-          var message = { action:'recordEventWithProps', event:'Product Viewed', props: props};
-          if(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap){
-           // Call iOS interface       
-            window.webkit.messageHandlers.clevertap.postMessage(message);         
-          } 
-          if (window.CleverTap) {
-            // Call Android interface             
-           CleverTap.pushEvent("Product Viewed",JSON.stringify(props));
+function event() {
 
-          }
-			}
-			function login(){
-			   
-        var props = { Name: 'JohnWeb', Email: 'johnWeb@mymail.com' };
-        var message = { action:'onUserLogin', properties: props };
+	var props = {
+		foo: 'xyz',
+		lang: 'French'
+	};
+	var message = {
+		action: 'recordEventWithProps',
+		event: 'Product Viewed',
+		props: props
+	};
+	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+		// Call iOS interface       
+		window.webkit.messageHandlers.clevertap.postMessage(message);
+	}
+	if (window.CleverTap) {
+		// Call Android interface             
+		CleverTap.pushEvent("Product Viewed", JSON.stringify(props));
 
-        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-            window.webkit.messageHandlers.clevertap.postMessage(message);
-        }
-        if (window.CleverTap) {
-          // Call Android interface 
-        CleverTap.onUserLogin(JSON.stringify(props));
-        }
-			}
-			function pushprofile(){
-			  var props = {foo: 'xyz', lang: 'French'};
-                var message = { action:profilePush, properties: props};
-        if(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap){
-          window.webkit.messageHandlers.clevertap.postMessage(message);        
-        }
-        if (window.CleverTap) {
-          // Call Android interface             
-         CleverTap.pushProfile(JSON.stringify(props));          
-        } 
-        
-        
-        
-			}
-			function chargedEvent(){
-			    var chargeDetails = {Amount: 300, Payment: 'Card'};
-          var items = [{Category: 'Books', Name: 'Book name', Quantity: 1},{Category: 'Clothes', Name: 'Cloth name', Quantity: 1},{Category: 'Food', Name: 'Food name', Quantity: 1}]
+	}
+}
 
-          if (window.CleverTap) {
-            // Call Android interface             
+function login() {
 
-          CleverTap.pushChargedEvent(JSON.stringify(chargeDetails),JSON.stringify(items))
+	var props = {
+		Name: 'JohnWeb',
+		Email: 'johnWeb@mymail.com'
+	};
+	var message = {
+		action: 'onUserLogin',
+		properties: props
+	};
 
-          }
-          const message = {
-                 action:'recordChargedEvent',
-                 chargeDetails: chargeDetails,
-                 items: items
-          };
-          if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-               window.webkit.messageHandlers.clevertap.postMessage(message);
-          }
-        
-			}
+	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+		window.webkit.messageHandlers.clevertap.postMessage(message);
+	}
+	if (window.CleverTap) {
+		// Call Android interface 
+		CleverTap.onUserLogin(JSON.stringify(props));
+	}
+}
 
+function pushprofile() {
+	var props = {
+		foo: 'xyz',
+		lang: 'French'
+	};
+	var message = {
+		action: profilePush,
+		properties: props
+	};
+	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+		window.webkit.messageHandlers.clevertap.postMessage(message);
+	}
+	if (window.CleverTap) {
+		// Call Android interface             
+		CleverTap.pushProfile(JSON.stringify(props));
+	}
+
+
+
+}
+
+function chargedEvent() {
+	var chargeDetails = {
+		Amount: 300,
+		Payment: 'Card'
+	};
+	var items = [{
+		Category: 'Books',
+		Name: 'Book name',
+		Quantity: 1
+	}, {
+		Category: 'Clothes',
+		Name: 'Cloth name',
+		Quantity: 1
+	}, {
+		Category: 'Food',
+		Name: 'Food name',
+		Quantity: 1
+	}]
+
+	if (window.CleverTap) {
+		// Call Android interface             
+
+		CleverTap.pushChargedEvent(JSON.stringify(chargeDetails), JSON.stringify(items))
+
+	}
+	const message = {
+		action: 'recordChargedEvent',
+		chargeDetails: chargeDetails,
+		items: items
+	};
+	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+		window.webkit.messageHandlers.clevertap.postMessage(message);
+	}
+
+}
 		</script>
 		<form>  
  		 <input type = "button" onclick = "login()" value = "Push Login to flutter" style="height:250px;font-size: 60px;"><br><br>
