@@ -1,1 +1,87 @@
-test
+<html>
+	<head>
+		<title>Test Web CleverTap</title>
+		<script type="text/javascript">
+			 var clevertap = {event:[], profile:[], account:[], region:'us1', onUserLogin:[], notifications:[], privacy:[]};
+		 // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
+		clevertap.account.push({"id": "W67-774-7Z5Z"});
+		clevertap.privacy.push({optOut: false}); //set the flag to true, if the user of the device opts out of sharing their data
+		clevertap.privacy.push({useIP: false}); //set the flag to true, if the user agrees to share their IP data
+		 (function () {
+				 var wzrk = document.createElement('script');
+				 wzrk.type = 'text/javascript';
+				 wzrk.async = true;
+			 	wzrk.src = 'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js';
+// 				 wzrk.src = ('https:' == document.location.protocol ? 'https://d2r1yp2w7bby2u.cloudfront.net' : 'http://static.clevertap.com') + '/js/a.js';
+				 var s = document.getElementsByTagName('script')[0];
+				 s.parentNode.insertBefore(wzrk, s);
+		  })();
+		</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			function createUser() {
+				clevertap.onUserLogin.push({
+				 "Site": {
+				   "Name": "Abeezer",            // String
+				   "Identity": 61026032,              // String or number
+				   "Email": "abeezer@web.com",         // Email address of the user
+				   "Phone": "+918877991100",           // Phone (with the country code)
+				   "Gender": "M",                     // Can be either M or F
+				   "DOB": new Date(),                 // Date of Birth. Date object
+				// optional fields. controls whether the user will be sent email, push etc.
+				   "MSG-email": true,                // Disable email notifications
+				   "MSG-push": true,                  // Enable push notifications
+				   "MSG-sms": true,                   // Enable sms notifications
+				   "MSG-whatsapp": true,              // Enable WhatsApp notifications
+				 }
+				})
+			}
+			function pushevent(){
+				clevertap.event.push("AbWebpush");
+			}
+			function webpopevent(){
+				clevertap.event.push("AbWebpop1");
+			}
+			function notifyperm(){
+			var flag = 0; 
+			clevertap.notifications.push({
+				  "titleText":'Would you like to receive Push Notifications?',
+				  "bodyText":'We promise to only send you relevant content and give you updates on your transactions',
+				  "okButtonText":'Sign me up!',
+				  "rejectButtonText":'No thanks',
+				  "okButtonColor":'#778046',
+				  "okCallback":function () {
+				   	flag = 1;
+					 console.log("flag set"+flag);
+			       	   },
+				   "rejectCallback":function () {
+				   	flag = 1;
+					console.log("flag set"+flag);
+			           },
+       				   "subscriptionCallback":function () {
+           				flag = 1;
+					console.log("flag set"+flag);
+       				   },
+				   "testvar":function () {
+					   flag = 1;
+					 console.log("flag set"+flag);
+			       	   },
+				});
+				if(!flag){
+					console.log("flag set"+flag);
+				}
+			}
+			function exitintent(){
+				clevertap.event.push("AbexitIntent");
+			}
+		</script>
+		<form>  
+         <input type = "button" onclick = "createUser()" value = "Create User"><br>  
+		 <input type = "button" onclick = "pushevent()" value = "Web Push event"><br> 
+ <a href="https://abeezerwebtest.000webhostapp.com/indexpage2.html?utm_source=CRM&utm_medium=Trigger&utm_campaign=webpopup_onboarding_">click here</a>
+		 <input type = "button" onclick = "notifyperm()" value = "Request Permission"><br>
+		 <input type = "button" onclick = "webpopevent()" value = "Web Pop event"><br>
+		 <input type = "button" onclick = "exitintent()" value = "Exit Website"><br>
+      </form> 
+	</body>
