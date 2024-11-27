@@ -118,6 +118,7 @@
             <button onclick="uploadEvent()">Upload Event</button>
         </div>
     </div>
+    <button onclick="getDataFromAndroid()">CTA for PE</button>
 
     <script>
         // Initialize CleverTap SDK
@@ -159,10 +160,15 @@
             currentIndex = (currentIndex + 1) % totalSlides;
             showSlide(currentIndex);
         }
+        
 
         setInterval(nextSlide, 3000); // Change image every 3 seconds
 
-
+        function getDataFromAndroid() {
+        // Call the Android method
+            const data = SDKBridge.callSDKMethod();
+            console.log("Received from Android: " + data);
+        }
         // Add additional profile and event property functions, omitted for brevity
 
         // ... Add the rest of your event property and profile initialization code here
