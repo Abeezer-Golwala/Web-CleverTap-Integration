@@ -118,7 +118,7 @@
             <button onclick="uploadEvent()">Upload Event</button>
         </div>
     </div>
-    <button onclick="getDataFromAndroid()">CTA for PE</button>
+    <button onclick="getDataFromAndroid()">CTA for PE1</button>
 
     <script>
         // Initialize CleverTap SDK
@@ -167,7 +167,7 @@
         function getDataFromAndroid() {
         // Call the Android method
             const data = SDKBridge.callSDKMethod();
-            console.log("Received from Android: " + data);
+            console.log("CleverTap Received from Android:" + data);
         }
         // Add additional profile and event property functions, omitted for brevity
 
