@@ -124,7 +124,7 @@
         // Initialize CleverTap SDK
         var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
         // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
-        clevertap.account.push({ "id": "W67-774-7Z5Z" , "region":"us1" });
+        clevertap.account.push({ "id": "W67-774-7Z5Z"  },"us1");
         clevertap.enablePersonalization = true;
         clevertap.privacy.push({ optOut: false }); //set the flag to true, if the user of the device opts out of sharing their data
         clevertap.privacy.push({ useIP: true }); //set the flag to true, if the user agrees to share their IP data
