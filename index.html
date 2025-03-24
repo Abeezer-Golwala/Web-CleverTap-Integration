@@ -135,10 +135,11 @@
             var wzrk = document.createElement('script');
             wzrk.type = 'text/javascript';
             wzrk.async = true;
-            wzrk.src = 'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js'; var s = document.getElementsByTagName('script')[0];
+            wzrk.src = 'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js'; 
+            var s = document.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(wzrk, s);
         })();
-          clevertap.enableLocalStorageEncryption(true)
+        
         // Request push permission on page load
         window.onload = function () {
             
@@ -151,6 +152,7 @@
                 "serviceWorkerPath": "./clevertap_sw.js"
 
             });
+              clevertap.enableLocalStorageEncryption(true)
         };
 
         let currentIndex = 0;
