@@ -1,2 +1,12 @@
 {
+  "name": "CleverTap PWA App",
+  "short_name": "CTPWA",
+  "display": "standalone",
+  "theme_color": "#F0F0F0",
+  "background_color": "#your_background_color",
+  "icons": [{
+    "src": "https://picsum.photos/id/237/512/512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }]
 }
