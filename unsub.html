@@ -1,152 +1,120 @@
+
+<!DOCTYPE html>
 <html>
-
-<head>
-  <title>MTF-Emailer - Long Term</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-  <style>
-    .overlay {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.7);
-      transition: opacity 500ms;
-      visibility: hidden;
-      opacity: 0;
-    }
-
-    .overlay:target {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    .popup {
-      margin: 70px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 5px;
-      width: 52%;
-      position: relative;
-    }
-
-    .popup h2 {
-      margin-top: 0;
-      color: #333;
-      font-family: Tahoma, Arial, sans-serif;
-    }
-
-    .popup .close {
-      position: absolute;
-      top: -8px;
-      right: 0px;
-      transition: all 200ms;
-      font-size: 30px;
-      font-weight: bold;
-      text-decoration: none;
-      color: #333;
-    }
-
-    .popup .content {
-      max-height: 100%;
-      overflow: initial;
-      height: auto;
-    }
-
-    .popup .content img {
-      width: 100% !important;
-    }
-
-    @media (max-width: 768px) {
-      .box {
-        width: 70% !important;
+  <head>
+    <meta charset="utf-8" />
+    <title>CleverTap unsubscribe</title>
+    <style>
+      .title {
+        display: flex;
+        border: none;
+        margin: 10px auto;
+        font-size: 24px;
+        font-weight: 600;
+        text-align: center;
       }
-
-      .popup {
-        width: 70% !important;
+      .title:focus {
+        outline: none;
       }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
 
-    }
-  </style>
+    <script type="text/javascript">
+      var clevertap = {
+        event: [],
+        profile: [],
+        account: [],
+        onUserLogin: [],
+        notifications: [],
+      };
 
+      clevertap.account.push({ id: "468-W87-546Z" });
 
-<script type="text/javascript">
-     var clevertap = {event:[], profile:[], account:[], onUserLogin:[], notifications:[], privacy:[]};
- // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
-clevertap.account.push({"id": "468-W87-546Z"},"eu1");
-clevertap.privacy.push({optOut: false}); //set the flag to true, if the user of the device opts out of sharing their data
-clevertap.privacy.push({useIP: false}); //set the flag to true, if the user agrees to share their IP data
- (function () {
-         var wzrk = document.createElement('script');
-         wzrk.type = 'text/javascript';
-         wzrk.async = true;
-         wzrk.src = ('https:' == document.location.protocol ? 'https://d2r1yp2w7bby2u.cloudfront.net' : 'http://static.clevertap.com') + '/js/clevertap.min.js';        
-         var s = document.getElementsByTagName('script')[0];
-         s.parentNode.insertBefore(wzrk, s);
-  })();
-</script>
+      (function () {
+        var wzrk = document.createElement("script");
+        wzrk.type = "text/javascript";
+        wzrk.async = true;
+        wzrk.src = ('https:' == document.location.protocol ? 'https://d2r1yp2w7bby2u.cloudfront.net' : 'http://static.clevertap.com') + '/js/clevertap.min.js';
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(wzrk, s);
+      })();
+    </script>
+  </head>
+  <body>
+    <div
+      id="subscribeform"
+      name="subscribeform"
+      style="line-height: 26px; padding: 15px; text-align: center"
+    >
+      <div class="unsubscribeContent">
 
-</head>
-
-<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-  <!-- Save for Web Slices (MF-GrowthTheme-1.jpg) -->
-  <table cellpadding="0" cellspacing="0" align="center">
-    <tr>
-      <td width="650"><img src="https://d1qzvqecfo5h8o.cloudfront.net/images/46R-K6K-466Z/Web_01.jpg" alt="" width="700"
-          height="519" usemap="#Map" border="0"></td>
-    </tr>
-  </table>
-
-  <map name="Map">
-    <area shape="rect" coords="92,417,313,471" href="#subscribe">
-    <area shape="rect" coords="389,423,604,470" href="#unsubscribe" onclick="unsubscribe(isReEncode)">
-  </map>
-
-  <div id="subscribe" class="overlay">
-    <div class="popup">
-      <a class="close" href="#">&times;</a>
-      <div class="content">
-        <img src="Don't_Unsubscribe.jpg" alt="" srcset="">
+        <div class="mailSubscribe">
+          <strong>
+            <input
+              class="title"
+              type="text"
+              id="email"
+              readonly="readonly"
+            /> </strong
+          ><br />
+          is subscribed to our mailing list(s).
+        </div>
+        <div class="subsInnerContent">
+          <strong class="msgTitle">Unsubscribe from our mailing list</strong
+          ><br />
+        <div style="text-align: center">
+          <button
+            class="primaryBtn"
+            name="unsubscribe"
+            value="Unsubscribe"
+            type="submit"
+            onclick="unsubscribe()"
+          >
+            Submit
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
 
-  <div id="unsubscribe" class="overlay">
-    <div class="popup">
-      <a class="close" href="#">&times;</a>
-      <div class="content">
-        <img src="Unsubscribe.jpg" alt="" srcset="">
-      </div>
-    </div>
-  </div>
-  <script> //Javascript
-    // Should be true only if your server is url encoding the URL on unsubscribe landing page
-    var isReEncode = false
-    // on  page load, fetch the email id of the user.
+  <script>
+    var isReEncode = false;
+    var statusLabel = "";
+    var reasonValue = "";
+    var userEmail = "";
+
     window.onload = function () {
       $WZRK_WR.getEmail(isReEncode);
     };
-    // will be called after the subscription preferences for the user have been updated
-    function wzrk_email_subscription(status) {
-      //status 0 : unsubscribed, status 1 : subscribed
-      // todo - you can show a success message to the user from here
-      var statusLabel = 'subscribed';
-      if (status == 0) {
-        statusLabel = 'unsubscribed';
-      }
-      alert("You've been " + statusLabel);
+
+    function wzrk_email_fetched(emailStr) {
+      userEmail = emailStr;
+      document.getElementById("email").value = emailStr;
+      console.log("Email is", emailStr);
     }
-    // call this function to unsubscribe the user
+
+    function wzrk_email_subscription(status) {
+      if (status == 0) {
+        statusLabel = "You've been Successfully unsubscribed";
+      }
+      document.querySelector(".primaryBtn").innerHTML =
+        "Successfully unsubscribed";
+        console.log("test")
+    }
     function unsubscribe(isReEncode) {
+   
+
       $WZRK_WR.unSubEmail(isReEncode);
     }
-    // call this function to resubscribe the user
+
     function resubscribe(isReEncode) {
       $WZRK_WR.subEmail(isReEncode);
     }
   </script>
-</body>
 
+    </body>
 </html>
