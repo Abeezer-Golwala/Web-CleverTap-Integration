@@ -155,7 +155,15 @@
             });
               clevertap.enableLocalStorageEncryption(true)
         };
-
+        cleverTap.addVariablesChangedCallback(() => {  
+    // implement  
+            console.log("CleverTap addVariablesChangedCallback");
+        });
+        
+        cleverTap.addOneTimeVariablesChangedCallback(() => {  
+            // implement  
+             console.log("CleverTap addOneTimeVariablesChangedCallback");
+        });
         let currentIndex = 0;
         const slides = document.querySelector(".slides");
         const totalSlides = document.querySelectorAll(".slide").length;
