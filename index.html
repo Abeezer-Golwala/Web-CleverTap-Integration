@@ -153,17 +153,16 @@
                 "serviceWorkerPath": "./clevertap_sw.js"
 
             });
-              clevertap.enableLocalStorageEncryption(true)
+            clevertap.enableLocalStorageEncryption(true)
+            clevertap.addVariablesChangedCallback(() => {  
+                console.log("CleverTap addVariablesChangedCallback");
+            });
+            
+            clevertap.addOneTimeVariablesChangedCallback(() => {  
+                 console.log("CleverTap addOneTimeVariablesChangedCallback");
+            });
         };
-        clevertap.addVariablesChangedCallback(() => {  
-    // implement  
-            console.log("CleverTap addVariablesChangedCallback");
-        });
-        
-        clevertap.addOneTimeVariablesChangedCallback(() => {  
-            // implement  
-             console.log("CleverTap addOneTimeVariablesChangedCallback");
-        });
+
         let currentIndex = 0;
         const slides = document.querySelector(".slides");
         const totalSlides = document.querySelectorAll(".slide").length;
