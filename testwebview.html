@@ -10,39 +10,39 @@ console.log(d);
 
 function eventfunc() {
 
-	var props = {
-		foo: 'xyz',
-		lang: 'French'
-	};
-	var message = {
-		action: 'recordEventWithProps',
-		event: 'Product Viewed',
-		props: props
-	};
-	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-		// Call iOS interface       
-		window.webkit.messageHandlers.clevertap.postMessage(message);
-	}
-	if (window.CleverTap) {
-		// Call Android interface             
-		CleverTap.pushEvent("Product Viewed", JSON.stringify(props));
+	// var props = {
+	// 	foo: 'xyz',
+	// 	lang: 'French'
+	// };
+	// var message = {
+	// 	action: 'recordEventWithProps',
+	// 	event: 'Product Viewed',
+	// 	props: props
+	// };
+	// if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+	// 	// Call iOS interface       
+	// 	window.webkit.messageHandlers.clevertap.postMessage(message);
+	// }
+	// if (window.CleverTap) {
+	// 	// Call Android interface             
+	// 	CleverTap.pushEvent("Product Viewed", JSON.stringify(props));
 
-	}
+	// }
 }
 
 function login() {
 
 	var props = {
-		Name: 'JohnWeb',
-		Email: 'johnWeb@mymail.com'
+		Name: 'Test Webview'
+		// Email: 'johnWeb@mymail.com'
 	};
 	var message = {
 		action: 'onUserLogin',
 		properties: props
 	};
 
-	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-		window.webkit.messageHandlers.clevertap.postMessage(message);
+	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.irapp) {
+		window.webkit.messageHandlers.irapp.postMessage(message);
 	}
 	if (window.CleverTap) {
 		// Call Android interface 
@@ -51,59 +51,59 @@ function login() {
 }
 
 function pushprofilefunc() {
-	var props = {
-		foo: 'xyz',
-		lang: 'French'
-	};
-	var message = {
-		action: 'profilePush',
-		properties: props
-	};
-	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-		window.webkit.messageHandlers.clevertap.postMessage(message);
-	}
-	if (window.CleverTap) {
-		// Call Android interface             
-		CleverTap.pushProfile(JSON.stringify(props));
-	}
+	// var props = {
+	// 	foo: 'xyz',
+	// 	lang: 'French'
+	// };
+	// var message = {
+	// 	action: 'profilePush',
+	// 	properties: props
+	// };
+	// if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+	// 	window.webkit.messageHandlers.clevertap.postMessage(message);
+	// }
+	// if (window.CleverTap) {
+	// 	// Call Android interface             
+	// 	CleverTap.pushProfile(JSON.stringify(props));
+	// }
 
 
 
 }
 
 function chargedEvent() {
-	var chargeDetails = {
-		Amount: 300,
-		Payment: 'Card'
-	};
-	var items = [{
-		Category: 'Books',
-		Name: 'Book name',
-		Quantity: 1
-	}, {
-		Category: 'Clothes',
-		Name: 'Cloth name',
-		Quantity: 1
-	}, {
-		Category: 'Food',
-		Name: 'Food name',
-		Quantity: 1
-	}]
+	// var chargeDetails = {
+	// 	Amount: 300,
+	// 	Payment: 'Card'
+	// };
+	// var items = [{
+	// 	Category: 'Books',
+	// 	Name: 'Book name',
+	// 	Quantity: 1
+	// }, {
+	// 	Category: 'Clothes',
+	// 	Name: 'Cloth name',
+	// 	Quantity: 1
+	// }, {
+	// 	Category: 'Food',
+	// 	Name: 'Food name',
+	// 	Quantity: 1
+	// }]
 
-	if (window.CleverTap) {
-		// Call Android interface             
+	// if (window.CleverTap) {
+	// 	// Call Android interface             
 
-		CleverTap.pushChargedEvent(JSON.stringify(chargeDetails), JSON.stringify(items))
+	// 	CleverTap.pushChargedEvent(JSON.stringify(chargeDetails), JSON.stringify(items))
 
-	}
-	const message = {
-		action: 'recordChargedEvent',
-		chargeDetails: chargeDetails,
-		items: items
-	};
-	if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-		window.webkit.messageHandlers.clevertap.postMessage(message);
-	}
+	// }
+	// const message = {
+	// 	action: 'recordChargedEvent',
+	// 	chargeDetails: chargeDetails,
+	// 	items: items
+	// };
+	// if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+	// 	window.webkit.messageHandlers.clevertap.postMessage(message);
+	// }
 
 }
 		</script>
