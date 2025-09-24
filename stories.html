@@ -2,210 +2,121 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>image ad</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CleverTap Popup</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
       rel="stylesheet"
     />
+    <script>
+      var redirectURL = "";
+      var imageURL =
+        "https://i.pinimg.com/736x/d1/cf/d7/d1cfd726f334ebbfca08ab29975e1942.jpg";
+    </script>
     <style>
-      body,
-      * {
-        margin: 0;
-        padding: 0;
-        font-family: "Inter", serif;
-        box-sizing: border-box;
-      }
-
-      .popup-overlay {
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: absolute;
-        bottom: 0;
-      }
-
       .popup {
-        background: #141425;
-        overflow: hidden;
-        width: 100%;
-        max-height: 70%;
-        max-width: 700px;
-        text-align: center;
         position: fixed;
-        bottom: 0;
+        top: 0;
         left: 0;
-        padding-bottom: 44px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        margin: 0 auto;
-        border-radius: 12px;
-      }
-
-      .pop-up-image {
-        position: relative;
-        width: 100%;
-        height: 200px;
-      }
-
-      .pop-up-image img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        border-radius: 12px 12px 0 0;
-      }
-
-      .popup-content {
-        padding: 16px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      .popup-title {
-        font-size: 16px;
-        font-weight: 500;
-        line-height: 24px;
-        color: #ffffff;
-      }
-
-      .popup-subtitle {
-        font-size: 14px;
-        line-height: 22px;
-        color: #acacac;
-        margin-bottom: 16px;
-      }
-
-      .popup-button {
+        background-color: transparent;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 8px;
-        background: #fff;
-        width: 100%;
-        color: #000;
-        font-weight: 600;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
+        opacity: 1;
       }
 
-      .popup-close {
+      @keyframes fadeOut {
+        0% {
+          opacity: 1; /* Start with full opacity */
+        }
+
+        100% {
+          opacity: 0; /* Fade out to completely transparent */
+          visibility: hidden; /* Hide the element after fading out */
+        }
+      }
+
+      .image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.5rem;
+        margin: 1rem auto;
+      }
+
+      .image-container img {
+        width: 100%;
+      }
+
+      .book-now {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        background: rgba(0, 0, 0, 0.5);
-        border: none;
-        color: #fff;
-        font-size: 16px;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: transparent;
+        color: white;
+        border: 2px solid white;
+        border-radius: 2rem;
+        padding: 0.5rem 1rem;
         cursor: pointer;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-        z-index: 2;
+        font-size: 1.5rem;
+        z-index: 1; /* Ensure it's above the image */
+      }
+
+      .progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 10px;
+        background-color: #ffffff;
+        z-index: 2; /* Ensure it's above the image */
+        animation: progress 5s linear forwards;
+      }
+
+      @keyframes progress {
+        0% {
+          width: 0%;
+        }
+
+        100% {
+          width: 100%;
+        }
       }
     </style>
   </head>
+
   <body>
-    <div class="popup-overlay" id="popupOverlay">
-      <div class="popup">
-        <button class="popup-close" id="popupClose">X</button>
-        <div class="pop-up-image">
-          <img id="popup-img" src="" alt="Popup Image" />
-        </div>
-        <div class="popup-content">
-          <div class="popup-title">
-            We believe you will like this! Complete what you started
-          </div>
-          <div class="popup-subtitle" id="popup-subtitle">
-            Recommendation based on shows which you have enjoyed. It only gets
-            exciting from here...
-          </div>
-          <button class="popup-button" id="resume-btn">
-            <span>Watch Now</span>
-          </button>
-        </div>
+    <div class="popup">
+      <div class="image-container">
+        <div class="progress-bar"></div>
+        <img id="myImage" />
+        <div class="book-now">Claim Now</div>
       </div>
     </div>
 
     <script>
+      var image = document.getElementById("myImage");
+      image.setAttribute("src", imageURL);
       document.addEventListener("DOMContentLoaded", function () {
+        const progressBar = document.querySelector(".progress-bar");
+        progressBar.addEventListener("animationend", function () {
+          const popup = document.querySelector(".popup");
+          popup.style.animation = "fadeOut 1.5s forwards";
+          setTimeout(function () {
+            // Redirect user after 1 second (adjust this time accordingly)
+            window.location.href = "wzrk://exit"; // Replace "https://example.com" with your desired URL
+          }, 1500); // 1000 milliseconds = 1 second
+        });
 
-      {% assign assetId = "" %}
-      {% for img in Profile.Bundle_Image %}
-      {% if forloop.index == 2%}
-      {% assign image = img | strip %}
-      {% endif %}
-      {% endfor %}
-
-      var imageUrl = "{{ image | default: "https://files.catbox.moe/j6q76x.jpg" }}";
-
-      {% assign assetId = "" %}
-      {% for id in Profile.GOB_ID %}
-      {% if forloop.index == 2 %}
-      {% assign assetId = id | strip %}
-      {% endif %}
-      {% endfor %}
-
-      var assetId = "{{ assetId | default: "1090427563" }}";
-
-      var imgElement = document.getElementById("popup-img");
-      var resumeBtn = document.getElementById("resume-btn");
-      var subtitleElement = document.getElementById("popup-subtitle");
-
-      if (imageUrl && imgElement) {
-      imgElement.src = imageUrl;
-
-      } else {
-      console.error("Image URL not found or element missing.");
-      }
-
-      document.getElementById("resume-btn").onclick = function () {
-      window.location.href = `sony://asset/${assetId}`;
-      };
-
-      // Event tracking for CleverTap
-      resumeBtn.addEventListener("click", function () {
-      var props = {
-      event_type: "Personalized Reco",
-      campaign_id: '{{ Campaign.campaignId | default: "0_0" }}',
-      CP_ID: '{{ Profile.Identity | default: "No ID" }}',
-      segment_name: '{{ Profile.EXP_SEGMENT | default: "No segment" }}',
-      campaign_name: "SVOD Lapser"
-      };
-
-      if (window.CleverTap) {
-      CleverTap.pushEvent("custom_html_click", JSON.stringify(props));
-      }
-
-      var message = { action: "recordEventWithProps", event: "custom_html_click", properties: props };
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
-      window.webkit.messageHandlers.clevertap.postMessage(message);
-      }
-      });
-
-      // Close popup handling
-      const closeButton = document.getElementById("popupClose");
-      const popupOverlay = document.getElementById("popupOverlay");
-
-      closeButton.addEventListener("click", () => {
-      if (window.CleverTap && typeof CleverTap.dismissInAppNotification === "function") {
-      CleverTap.dismissInAppNotification();
-      } else {
-      window.location.href = "wzrk://thisleadstonowhere";
-      }
-      popupOverlay.style.display = "none";
-      });
+        const bookButton = document.querySelector(".book-now");
+        bookButton.onclick = function () {
+          window.location.href = redirectURL;
+        };
       });
     </script>
   </body>
