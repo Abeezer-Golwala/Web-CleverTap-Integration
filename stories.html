@@ -1,1201 +1,171 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <link
-      href="https://fonts.googleapis.com/css?family=Rubik"
-      rel="stylesheet"
-    />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    />
+{% capture HEADER_IMAGE %}
+<svg
+  width="100"
+  height="100"
+  viewBox="0 0 100 100"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M59.0566 98.4574L63.8034 100L69.0551 83.8404L64.3071 82.2981L59.0566 98.4574Z"
+    fill="white"
+  />
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M42.0063 85.3264L37.2595 83.7838L42.51 67.6245L47.2567 69.1671L42.0063 85.3264Z"
+    fill="white"
+  />
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M11 82.8428L15.7468 84.3853L20.9985 68.2257L16.2504 66.6835L11 82.8428Z"
+    fill="white"
+  />
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M16.094 58.9359C16.094 58.9359 13.7289 58.1673 14.4981 55.8021L24.9668 23.5821C24.9668 23.5821 25.7351 21.2172 28.0993 21.9852L34.2017 23.9683C34.2017 23.9683 36.5662 24.7362 37.3355 22.3714L40.4083 12.9126C40.4083 12.9126 41.1766 10.5486 43.5408 11.3169L51.3033 13.8387C51.3033 13.8387 53.6675 14.607 54.4355 12.2412L57.3179 3.37353C57.3179 3.37353 58.0859 1.00867 60.4504 1.77791L71.4471 5.35062C71.4471 5.35062 73.8113 6.11891 73.043 8.48314L70.1619 17.3518C70.1619 17.3518 69.3939 19.7157 71.7578 20.484L79.5212 23.007C79.5212 23.007 81.8867 23.775 81.1175 26.1399L78.0443 35.599C78.0443 35.599 77.276 37.9639 79.6403 38.7325L85.742 40.7149C85.742 40.7149 88.1063 41.4829 87.338 43.8477L76.869 76.0675C76.869 76.0675 76.0998 78.4324 73.7358 77.6647L63.9969 74.5006C63.9969 74.5006 61.6324 73.732 62.4007 71.3668L67.0413 57.0845C67.0413 57.0845 67.8096 54.719 65.4445 53.9507L61.0106 52.5098C61.0106 52.5098 58.6451 51.7422 57.8771 54.1074L55.524 61.3466C55.524 61.3466 54.7557 63.7121 52.3915 62.9435L42.0144 59.5719C42.0144 59.5719 39.6501 58.8033 40.4184 56.4384L42.7707 49.1983C42.7707 49.1983 43.5389 46.8334 41.1747 46.0654L36.756 44.6287C36.756 44.6287 34.3905 43.8607 33.6222 46.2259L28.9816 60.5085C28.9816 60.5085 28.2133 62.874 25.8491 62.1044L16.094 58.9359Z"
+    fill="#FA1E41"
+  />
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M73.2344 79.207L63.4955 76.0423C61.9258 75.5323 59.9259 73.7324 60.8578 70.8654L65.4985 56.5828C65.7356 55.751 65.1805 55.5701 64.9433 55.4934L60.5085 54.0528C59.6774 53.8147 59.4968 54.3708 59.4201 54.6076L57.0669 61.8484C57.0154 62.0069 56.7208 62.8396 56.0008 63.5716C54.9177 64.6711 53.4579 64.9951 51.8903 64.4864L41.5132 61.1142C39.9426 60.6036 37.9446 58.8046 38.8755 55.9377L41.2284 48.6975C41.4649 47.8645 40.9095 47.6848 40.6733 47.6071L36.2546 46.1716C35.4219 45.9345 35.2422 46.4896 35.1655 46.7267L30.5245 61.0094C30.473 61.1688 30.1774 62.0019 29.4578 62.7326C28.3753 63.8321 26.9158 64.1571 25.3479 63.6474L15.5929 60.4786C14.0219 59.9676 12.0234 58.1686 12.9549 55.3007L23.4236 23.081C23.9336 21.51 25.7345 19.5121 28.6005 20.443L34.7032 22.4254C35.5349 22.6629 35.7156 22.1065 35.7923 21.8703L38.8654 12.4112C39.3761 10.8402 41.176 8.84255 44.0433 9.77346L51.8044 12.2949C52.6371 12.5324 52.8159 11.9773 52.8936 11.7408L55.7747 2.87245C55.8262 2.71267 56.1221 1.87996 56.8417 1.14893C57.9242 0.0497118 59.3837 -0.274276 60.9525 0.235389L71.9482 3.8081C72.1077 3.85957 72.9407 4.15451 73.6714 4.87417C74.771 5.95729 75.0959 7.41713 74.5862 8.98497L71.7051 17.8523C71.4676 18.6844 72.0228 18.8641 72.2602 18.9418L80.0224 21.4636C80.1818 21.516 81.0148 21.8109 81.7459 22.5306C82.8451 23.614 83.17 25.0726 82.6604 26.6404L79.5872 36.0996C79.3501 36.9313 79.9052 37.1123 80.1414 37.1887L86.2432 39.1714C86.4017 39.2242 87.2344 39.5188 87.9654 40.2388C89.0647 41.3206 89.3899 42.7805 88.8809 44.3483L78.4113 76.569C78.3598 76.7288 78.0648 77.5615 77.3452 78.2925C76.5962 79.0526 75.6675 79.4423 74.6478 79.4423C74.1925 79.4423 73.7191 79.3646 73.2344 79.207ZM61.5118 50.9667L65.9466 52.4085C68.8126 53.3391 69.0945 56.0144 68.5846 57.5851L63.9429 71.8677C63.7661 72.414 63.9527 72.7803 64.4981 72.9572L74.237 76.1219C74.7609 76.2911 74.9181 76.132 75.0334 76.0158C75.2191 75.8282 75.3252 75.5686 75.3261 75.5667L85.7948 43.3457C85.8725 43.1086 86.0521 42.5544 85.2153 42.2484L79.1391 40.2738C77.5713 39.7651 76.581 38.6447 76.3518 37.1183C76.1996 36.1037 76.4496 35.2567 76.5024 35.097L79.5752 25.6378C79.7448 25.114 79.5863 24.9567 79.4691 24.8424C79.2815 24.6567 79.0229 24.5497 79.0201 24.5497L71.2579 22.0269C69.6901 21.5179 68.6998 20.3965 68.4696 18.871C68.3171 17.8564 68.5675 17.0095 68.6199 16.85L71.5011 7.98237C71.6716 7.45755 71.5112 7.30092 71.395 7.18598C71.2071 7.0003 70.9478 6.8942 70.9456 6.89325L59.9493 3.32054C59.4242 3.1497 59.2675 3.30949 59.1526 3.42538C58.9679 3.61327 58.8608 3.87284 58.8599 3.87473L55.9787 12.7434C55.47 14.3112 54.3484 15.3015 52.8228 15.5304C51.8095 15.6829 50.9613 15.4325 50.8018 15.381L43.0397 12.8592C42.4956 12.6827 42.1281 12.8684 41.9506 13.4138L38.8784 22.8729C37.9456 25.7398 35.2703 26.0206 33.7006 25.5106L27.5982 23.5281C26.9186 23.3068 26.6309 23.7078 26.5087 24.0833L16.0401 56.303C15.9633 56.5392 15.7846 57.0906 16.6085 57.3969L16.5952 57.3934L16.6126 57.3985C16.6154 57.3994 16.6173 57.4004 16.6205 57.4013L16.6287 57.4035L26.3502 60.5622C26.5877 60.639 27.1419 60.8196 27.4475 59.9828L32.0794 45.7245C32.589 44.1566 33.7097 43.1663 35.2349 42.9371C36.2495 42.7836 37.0977 43.034 37.2572 43.0865L41.6759 44.522C44.5419 45.4538 44.8235 48.1288 44.3136 49.6998L41.9604 56.94C41.884 57.1762 41.704 57.7316 42.5411 58.0373L52.8926 61.4013C53.1298 61.478 53.684 61.6577 53.9899 60.8205L56.334 53.6057C56.8439 52.0369 57.9643 51.0475 59.4898 50.8173C59.7219 50.782 59.9449 50.769 60.152 50.769C60.8556 50.769 61.3886 50.9263 61.5118 50.9667Z"
+    fill="#00D1F9"
+  />
+</svg>
 
-    <title>CSAT</title>
+{% endcapture %} {% capture HEADLINE %} Unlock More Power With Every Click that
+you do. {% endcapture %} {% capture TEXT %} Discover new ideas, unlock growth,
+and turn vision into reality. {% endcapture %} {% assign HEADER_BACKGROUND_COLOR
+= "#FA1E41" %} {% assign HEADLINE_COLOR = "#FA1E41" %} {% assign TEXT_COLOR =
+"#222222" %} {% assign BUTTON_TEXT_COLOR = "#1487C8" %} {% assign
+BUTTON_BORDER_COLOR = "#D9D9D9" %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.cdnfonts.com/css/apercu-pro" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
       :root {
-        --primary-color: #ff6700;
+      --header-background-color: {{ HEADER_BACKGROUND_COLOR }};
+      --headline-color: {{ HEADLINE_COLOR }};
+      --text-color: {{ TEXT_COLOR }};
+      --button-text-color: {{ BUTTON_TEXT_COLOR }};
+      --button-border-color: {{ BUTTON_BORDER_COLOR }};
       }
 
-      .bf-container,
-      .container {
-        position: relative;
-        display: flex;
-      }
-      .container,
-      .popup,
-      body {
-        display: flex;
-      }
-      .container,
-      .popup-content {
-        border-radius: 10px;
-        text-align: center;
-      }
-      .btn,
-      .container,
-      .feedback-button,
-      .popup-content {
-        text-align: center;
-      }
-      .container h3,
-      .good-rating-container p {
-        font-weight: 700;
-      }
-      .bad-rating-container button,
-      .positive-rating-container button,
-      .finish-rating-container button {
-        background-color: var(--primary-color);
-        transition: background 0.3s;
-      }
-      body {
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: rgba(0, 0, 0, 0);
-        font-family: Rubik, Arial, sans-serif;
-        overflow: hidden;
-        width: 100%;
-      }
-      .bf-container {
-        min-height: 100vh;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-      }
-      .container {
-        flex-direction: column;
-        align-items: center;
-        transition: opacity 0.3s ease-in-out;
-      }
-      .container h3 {
-        color: #002953;
-        font-size: 19px;
-      }
-      .popup {
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        overflow: auto;
-      }
-      .popup-content {
-        background-color: #fff;
-        width: 100%;
-        max-width: 540px;
-        margin: 0 auto;
-        height: auto;
-        padding: 12px 16px 24px;
-        position: relative;
-        display: block;
-      }
-      .popup button.close {
-        display: inline-block;
-        background-color: rgba(116, 116, 128, 0.08);
-        border: none;
-        outline: 0;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        z-index: 1;
-        width: 25px;
-        height: 25px;
-        border-radius: 100%;
-        line-height: 25px;
-      }
-      .feedback-button-container {
-        display: flex;
-        justify-content: center;
-        width: auto;
-      }
-      .feedback-button {
-        width: 70px;
-        height: 70px;
-        border: none;
-        cursor: pointer;
-        background-color: rgba(236, 211, 211, 0);
-        color: #d0cdcd;
-      }
-      .btn,
-      .cat {
-        border-radius: 40px;
-        cursor: pointer;
-      }
-      .star-container {
-        position: relative;
-        width: 70px;
-        height: 70px;
-        cursor: pointer;
-      }
-      .btn {
-        width: 200px;
-        height: 40px;
-        padding: 10px;
-        gap: 10px;
-        opacity: 1px;
-        background-color: var(--primary-color);
-        font-family: Rubik;
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 17px;
-        color: #fff;
-        transition: 0.3s;
-      }
-      .btn:hover {
-        color: #fff;
-      }
-      button:focus {
-        outline: 0;
-      }
-      .bad-rating-container,
-      .positive-rating-container {
-        display: none;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        position: relative;
-        align-items: flex-end;
-        transition: opacity 0.3s ease-in-out;
-        overflow: hidden;
-      }
-      .good-rating-content {
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 10px;
-        box-sizing: border-box;
-        margin: 10px 0;
-      }
-      .good-rating-container h3 {
-        margin: 10px 0;
-      }
-      .positive-rating-container button {
-        margin: 20px 0 0;
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        width: fit;
-        text-transform: uppercase;
-        padding: 10px 20px;
-        font-weight: 600;
-        font-size: small;
-        background-color: var(--primary-color);
-      }
-      .bad-rating-container button:hover,
-      .positive-rating-container button:hover,
-      .finish-rating-container button:hover {
-        background-color: var(--primary-color);
-      }
-      .bad-rating-container h6 {
-        text-align: left;
-        font-weight: bolder;
-        font-size: small;
-        margin-top: -10px;
-      }
-      .bad-rating-container button,
-      .bad-rating-container input,
-      .bad-rating-container textarea {
-        margin: 10px 0;
-        text-align: left;
-        font-size: small;
-        color: #333333;
-      }
-      .bad-rating-container label {
-        margin-bottom: 0;
-        text-align: left;
-        display: block;
-        font-size: small;
-        padding-left: 0;
-        border-radius: 5px;
-      }
-      .bad-rating-container input[type="checkbox"] {
-        transform: scale(1);
-        margin-right: 5px;
-        vertical-align: middle;
-      }
-      .bad-rating-container p {
-        text-align: center;
-        font-weight: 700;
-        font-size: small;
-        margin-top: -2%;
-        margin-bottom: 5px;
-      }
-      .bad-rating-container textarea {
-        width: 100%;
-        padding: 5px;
-        box-sizing: border-box;
-        resize: vertical;
-        margin-top: -2px;
-        font-size: small;
-        margin-bottom: -10px;
-      }
-      .bad-rating-container button {
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        width: auto;
-        padding: 10px 20px;
-        margin-bottom: 0;
-        background-color: var(--primary-color);
-      }
-      .bad-rating-container textarea::placeholder {
-        font-family: Rubik, Arial, sans-serif;
-        font-size: small;
-      }
-      .bad-additional-details {
-        display: none;
-      }
-      .bad-additional-details p {
-        margin-top: 8px;
-        text-align: left;
-        margin-bottom: 10px;
-      }
-      .finish-rating-container {
-        display: none;
-        background-color: rgb(255, 255, 255, 0);
-        padding: 0;
-        border-radius: 10px;
-        text-align: center;
-        position: relative;
-        align-items: flex-end;
-        transition: opacity 0.3s ease-in-out;
-        overflow: hidden;
-      }
-      .finish-rating-container h3 {
-        margin-top: 0;
-        position: relative;
-      }
-      .finish-rating-content {
-        border-radius: 10px;
-        box-sizing: border-box;
-        margin: 10px 0 0;
-      }
-      .finish-rating-container p {
-        font-size: 14px;
-        color: grey;
-      }
-      .finish-rating-container button {
-        margin: 10px 0 0;
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        width: 150px;
-        padding: 13px 23px;
-        background-color: var(--primary-color);
-      }
-      .finish-rating-container h5 {
-        color: #002953;
-        font-weight: 700;
-      }
-      .cat label input + span,
-      .pop textarea {
-        color: #333333;
-      }
-      .finish-rating-container img {
-        margin-bottom: 5px;
-      }
-      label.label-clicked {
-        border-color: orange;
-      }
-      .top-head {
-        position: relative;
-      }
-      div label input {
-        margin-right: 100px;
-      }
-      .cat {
-        margin: 4px;
-        background-color: transparent;
-        border: 1px solid #d3dae1;
-        overflow: hidden;
-        float: left;
-      }
-      .cat label {
-        float: left;
-        line-height: 2em;
-        width: 210px;
-        height: 32px;
-        border-radius: 40px;
-        cursor: pointer;
-      }
-      .cat label span {
-        text-align: center;
-        padding: 3px 0;
-        display: block;
-        font-size: 14px;
-        line-height: 28px;
-      }
-      .cat label input {
-        position: absolute;
-        display: none;
-        color: #104068 !important;
-      }
-      .cat label input:checked + span {
-        color: #fff;
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-      }
-      .cat input:checked + span {
-        color: #fff;
-        text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-      }
-      .pop textarea {
-        border: 1px solid #e5eaf7;
-        padding: 12px;
-        border-radius: 5px;
-        width: 100%;
-        margin-top: 10px;
-      }
-      .rotatable.rotate-180 {
-        transform: rotate(360deg);
-      }
-      .best img,
-      .fair img,
-      .good img,
-      .poor img,
-      .worst img {
-        transition: 0.5s ease-out;
-        outline: #fff solid 5px;
-        border-radius: 50%;
-        margin-bottom: 5px;
-      }
-      .worst.active img {
-        outline-color: #b80302;
-        background: #b80302;
-      }
-      .worst.active span {
-        color: #b80302 !important;
-        font-weight: 500 !important;
-      }
-      .poor.active img {
-        outline-color: #5365ce;
-        background: #5365ce;
-      }
-      .poor.active span {
-        color: #5365ce !important;
-        font-weight: 500 !important;
-      }
-      .fair.active img {
-        outline-color: #f8b40a;
-        background: #f8b40a;
-      }
-      .fair.active span {
-        color: #f8b40a !important;
-        font-weight: 500 !important;
-      }
-      .good.active img {
-        outline-color: #00b5cf;
-        background: #00b5cf;
-      }
-      .good.active span {
-        color: #00b5cf !important;
-      }
-      .best.active img {
-        outline-color: #04a47e;
-        background: #04a47e;
-      }
-      .best.active span {
-        color: #04a47e !important;
-      }
-      textarea::-webkit-input-placeholder {
-        color: #4a6784;
-      }
-      textarea:-moz-placeholder {
-        color: #4a6784;
-      }
-      textarea::-moz-placeholder {
-        color: #4a6784;
-      }
-      textarea:-ms-input-placeholder {
-        color: #4a6784;
-      }
-      .action input:checked + span {
-        background-color: var(--primary-color) !important;
-        border-color: var(--primary-color) !important;
-        color: white !important;
-        display: block;
-      }
-      .thanks {
-        width: 191px;
-        height: 191px;
-        margin-right: auto;
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 23px;
-      }
-      @media (max-width: 1024) {
-        body {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-      }
-      @media (max-width: 576px) {
-        .cat label,
-        .thanks {
-          margin-right: auto;
-          margin-left: auto;
-        }
-        .thanks,
-        body {
-          display: flex;
-        }
-        body {
-          justify-content: center;
-          align-items: end;
-        }
-        .bf-container {
-          display: flex;
-          justify-content: end;
-          align-items: center;
-        }
-        .container {
-          margin-bottom: 0;
-          padding: 0;
-        }
-        .popup {
-          justify-content: end;
-          align-items: center;
-        }
-        .popup-content {
-          border-radius: 10px 10px 0 0;
-        }
-        .feedback-button {
-          width: 60px;
-          height: 70px;
-        }
-        .bad-rating-container {
-          padding: 0;
-          text-align: center;
-        }
-        .bad-rating-content h6 {
-          text-align: center;
-        }
-        .cat label {
-          width: 145px;
-        }
-        .thanks {
-          width: 179px;
-          height: 179px;
-          align-items: center;
-          justify-content: center;
-          padding: 14px 23px;
-        }
-        .cat label span {
-          font-size: 12px;
-          line-height: 26px;
-        }
-        .cat label input {
-          position: absolute;
-          display: none;
-          color: #104068 !important;
-        }
-        .pop {
-          margin-bottom: 10px;
-        }
-      }
-      @media (max-width: 320px) {
-        .feedback-button {
-          width: 60px;
-          height: 70px;
-        }
-        .cat label {
-          width: 125px;
-        }
-        .cat label span {
-          font-size: 12px;
-          line-height: 26px;
-        }
-      }
-      @keyframes slideUp {
-        from {
-          transform: translateY(100%);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
+      .main {
+      font-family: "Apercu Pro", sans-serif;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0px 8px 16px rgba(34, 34, 34, 0.15);
+      background-color: white;
+      border: 2px solid #FFFFFF;
+      margin-top: 85px;
       }
 
-      .popup {
-        display: none; /* Initially hidden */
+      .header {
+      display: flex;
+      justify-content: center;
+      background: var(--header-background-color);
+      padding: 20.5px 0;
       }
 
-      .popup-content {
-        background-color: #fff;
-        transform: translateY(100%); /* Start off-screen */
-        /* opacity: 0; */
-        transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+      .content {
+      display: flex;
+      gap: 12px;
+      flex-flow: column;
+      padding: 24px 16px;
+      text-align: center;
       }
 
-      .popup.show .popup-content {
-        animation: slideUp 0.5s ease-out forwards;
+      .headline {
+      color: var(--headline-color);
+      font-weight: 700;
+      font-size: 20px;
       }
 
-      /* New styles for the option buttons */
-      .cat.action {
-        float: none;
-        display: inline-block;
-        margin: 4px;
-        width: calc(50% - 12px);
+      .text {
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 16px;
       }
 
-      .action-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-        margin: 0 auto;
+      .button-footer {
+      display: flex;
+      border-top: 1px solid var(--button-border-color);
+      text-align: center;
       }
 
-      .action-row {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-bottom: 8px;
+      .button-footer a {
+      color: var(--button-text-color);
+      text-decoration: none;
+      flex: 1;
+      padding: 11px 16px;
+      font-size: 18px;
+      font-weight: 600;
       }
 
-      .cat label {
-        width: 100%;
-        float: none;
-      }
-
-      /* Updated styles for buttons */
-      .cat label span {
-        background-color: white !important;
-        color: #333333 !important;
-        border: 1px solid #d3dae1;
-      }
-
-      .cat input:not(:checked) + span {
-        background-color: white !important;
-        color: #333333 !important;
-      }
-
-      .cat input:checked + span {
-        background-color: var(--primary-color);
-        color: white;
-        border: 1px solid var(--primary-color);
+      .button-footer a:not(:first-child) {
+      border-left: 1px solid var(--button-border-color);
       }
     </style>
   </head>
-
   <body>
-    <div class="bf-container">
-      <div class="container">
-        <div id="myPopup" class="popup" style="display: none">
-          <div class="popup-content">
-            <button id="close" class="close">
-              <img
-                src="https://files.catbox.moe/jf8in6.svg"
-                width="22"
-                height="22"
-              />
-            </button>
-            <div
-              class="top-heading"
-              style="margin-top: 24px; margin-bottom: 20px"
-            >
-              <h5
-                style="
-                  font-family: Rubik;
-                  font-size: 20px;
-                  line-height: 24px;
-                  font-weight: 600;
-                  text-align: center;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  color: rgba(31, 41, 55, 1);
-                "
-              >
-                Feedback Survey
-              </h5>
-              <p
-                style="
-                  font-family: Rubik;
-                  font-size: 14px;
-                  line-height: 20px;
-                  font-weight: 400;
-                  text-align: center;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  color: rgba(75, 85, 99, 1);
-                "
-              >
-                Please rate your experience
-              </p>
-            </div>
+    <div class="main">
+      <div class="header">{{ HEADER_IMAGE }}</div>
 
-            <div class="feedback-button-container">
-              <div class="star-container" onclick="handleStarSel(1)">
-                <button class="feedback-button worst" value="1">
-                  <img
-                    src="https://files.catbox.moe/p2t7g0.svg"
-                    class="rotatable"
-                    id="rotateImage"
-                    width="40"
-                    height="40"
-                    alt="Worst"
-                  /><br /><span
-                    style="
-                      font-family: Rubik;
-                      font-size: 14px;
-                      line-height: 20px;
-                      font-weight: 400;
-                      text-align: center;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow: hidden;
-                      color: rgba(63, 63, 63, 1);
-                    "
-                    >Worst</span
-                  >
-                </button>
-              </div>
-              <div class="star-container" onclick="handleStarSel(2)">
-                <button class="feedback-button poor" value="2">
-                  <img
-                    src="https://files.catbox.moe/72mx8r.svg"
-                    class="rotatable"
-                    id="rotateImage1"
-                    width="40"
-                    height="40"
-                    alt="Poor"
-                  /><br /><span
-                    style="
-                      font-family: Rubik;
-                      font-size: 14px;
-                      line-height: 20px;
-                      font-weight: 400;
-                      text-align: center;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow: hidden;
-                      color: rgba(63, 63, 63, 1);
-                    "
-                    >Poor</span
-                  >
-                </button>
-              </div>
-              <div class="star-container" onclick="handleStarSel(3)">
-                <button class="feedback-button fair" value="3">
-                  <img
-                    src="https://files.catbox.moe/r8qcgc.svg"
-                    class="rotatable"
-                    id="rotateImage2"
-                    width="40"
-                    height="40"
-                    alt="Fair"
-                  /><br /><span
-                    style="
-                      font-family: Rubik;
-                      font-size: 14px;
-                      line-height: 20px;
-                      font-weight: 400;
-                      text-align: center;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow: hidden;
-                      color: rgba(63, 63, 63, 1);
-                    "
-                    >Fair</span
-                  >
-                </button>
-              </div>
-              <div class="star-container" onclick="handleStarSel(4)">
-                <button class="feedback-button good" value="4">
-                  <img
-                    src="https://files.catbox.moe/965evq.svg"
-                    class="rotatable"
-                    id="rotateImage3"
-                    width="40"
-                    height="40"
-                    alt="Good"
-                  /><br /><span
-                    style="
-                      font-family: Rubik;
-                      font-size: 14px;
-                      line-height: 20px;
-                      font-weight: 400;
-                      text-align: center;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow: hidden;
-                      color: rgba(63, 63, 63, 1);
-                    "
-                  >
-                    Good</span
-                  >
-                </button>
-              </div>
-              <div class="star-container" onclick="handleStarSel(5)">
-                <button class="feedback-button best" value="5">
-                  <img
-                    src="https://files.catbox.moe/31g2s7.svg"
-                    class="rotatable"
-                    id="rotateImage4"
-                    width="40"
-                    height="40"
-                    alt="Best"
-                  /><br /><span
-                    style="
-                      font-family: Rubik;
-                      font-size: 14px;
-                      line-height: 20px;
-                      font-weight: 400;
-                      text-align: center;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow: hidden;
-                      color: rgba(63, 63, 63, 1);
-                    "
-                  >
-                    Great</span
-                  >
-                </button>
-              </div>
-            </div>
+      <div class="content">
+        <span class="headline">{{ HEADLINE }}</span>
+        <span class="text">{{ TEXT }}</span>
+      </div>
 
-            <div class="bad-rating-container">
-              <div
-                style="
-                  width: 100%;
-                  display: block;
-                  border-bottom: 1px dashed rgba(179, 203, 227, 1);
-                  margin-bottom: 30px;
-                "
-              ></div>
-              <div class="bad-rating-content">
-                <h6>Sorry to know that. Tell us what went wrong</h6>
-                <div class="action-container">
-                  <div class="action-row">
-                    <div class="cat action">
-                      <label>
-                        <input
-                          type="checkbox"
-                          name="options"
-                          class="checkBtn first"
-                          value="option1"
-                        /><span data-option="option1"></span>
-                      </label>
-                    </div>
-                    <div class="cat action">
-                      <label>
-                        <input
-                          type="checkbox"
-                          name="options"
-                          class="checkBtn second"
-                          value="option2"
-                        /><span data-option="option2"></span>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="action-row">
-                    <div class="cat action">
-                      <label>
-                        <input
-                          type="checkbox"
-                          name="options"
-                          class="checkBtn third"
-                          value="option3"
-                        /><span data-option="option3"></span>
-                      </label>
-                    </div>
-                    <div class="cat action">
-                      <label>
-                        <input
-                          type="checkbox"
-                          name="options"
-                          class="checkBtn fourth"
-                          value="option4"
-                        /><span data-option="option4"></span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="pop">
-                  <textarea
-                    id="additionalDetails"
-                    name="additionalDetails"
-                    minlength="20"
-                    maxlength="200"
-                    placeholder="Tell us more upto 200 characters.."
-                    class=""
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-            <div
-              id="error-message"
-              class="error-message"
-              style="
-                color: red;
-                display: none;
-                margin-top: 10px;
-                margin-bottom: 6px;
-              "
-            >
-              ⚠ Please select any of the options
-            </div>
-            <div class="rating-butn" style="margin-top: 10px">
-              <button id="submit" class="btn submit">
-                <strong>SUBMIT </strong>
-              </button>
-            </div>
-
-            <!-- Combined positive rating container for both Good and Great ratings -->
-            <div class="positive-rating-container" style="padding-bottom: 0px">
-              <div class="thanks">
-                <div>
-                  <img
-                    class="good-tick-mark"
-                    src="https://i.pinimg.com/736x/c3/52/17/c3521795cc7a931e6a2d7510eaf99bd1.jpg"
-                    alt="Thanks"
-                    width="140"
-                  />
-                </div>
-              </div>
-              <button
-                class="btn submit"
-                onclick="handlegoodSubmit()"
-                style="
-                  white-space: nowrap;
-                  min-width: 200px;
-                  background-color: var(--primary-color);
-                "
-              >
-                Rate us on App Store
-              </button>
-            </div>
-
-            <div
-              class="finish-rating-container"
-              style="
-                background-size: auto;
-                background-position: top center;
-                background-repeat: no-repeat;
-              "
-            >
-              <img
-                src="https://files.catbox.moe/r8qcgc.svg"
-                alt="tick mark"
-                width="78"
-                height="78"
-              />
-              <h5>Thank you for your feedback!</h5>
-              <div class="finish-rating-content">
-                <p>We'll use this to serve you better</p>
-                <button
-                  onclick="window.location.href=isIOS ? appStoreLink : playStoreLink"
-                  class="btn submit"
-                  style="background-color: var(--primary-color)"
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="button-footer">
+        <a href="wzrk://noware">Close</a>
+        <a onclick="copyToClipboard()">Click Here.</a>
       </div>
     </div>
-
     <script>
-      // Store links
-      const playStoreLink = "https://play.google.com/";
-      const appStoreLink = "https://www.apple.com/app-store/";
+      function copyToClipboard() {
+        var text = "PC100";
+        let input = document.createElement("input");
+        input.value = text;
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        input.setSelectionRange(0, input.value.length);
 
-      // Detect platform
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-      // Define option text in one place only
-      const optionMap = {
-        option1: "Difficult navigation",
-        option2: "Process is not easy",
-        option3: "Steps are not simple",
-        option4: "Technical issue",
-      };
-
-      // Global variable for event name
-      const eventName = "NPS_SUBMITTED";
-
-      // Populate the spans with the option text on page load
-      document.addEventListener("DOMContentLoaded", function () {
-        // Fill in option text in the spans
-        document.querySelectorAll("[data-option]").forEach((span) => {
-          const optionKey = span.getAttribute("data-option");
-          span.textContent = optionMap[optionKey];
-        });
-
-        let popup = document.getElementById("myPopup");
-        let closeButton = document.getElementById("close");
-
-        function openPopup() {
-          popup.style.display = "flex"; // Make it visible
-          setTimeout(() => popup.classList.add("show"), 50); // Start animation
-        }
-        openPopup();
-      });
-
-      document.querySelector("#close").addEventListener("click", function () {
-        if (window.CleverTap) {
-          CleverTap.dismissInAppNotification();
-        }
-      });
-
-      // Get the modal
-      var modal = document.getElementById("myPopup");
-
-      // When the user clicks anywhere outside of the modal, close it
-      window.onclick = function (event) {
-        if (event.target == modal) {
-          modal.style.display = "none";
-        }
-      };
-
-      let starval = 0;
-      let campaign_name = "SERVICE-B2B-E-Agreement-5STAR-1";
-      const labels = document.querySelectorAll('label input[type="checkbox"]');
-      const checkButton = document.querySelectorAll(".checkBtn");
-      let isReasonChecked = 0;
-      const errorMessage = document.getElementById("error-message");
-
-      document.getElementById("submit").addEventListener("click", function () {
-        const selectedReasons = document.querySelectorAll(
-          'input[name="options"]:checked'
-        );
-        const messageDetails =
-          document.getElementById("additionalDetails").value;
-        const messegeText = messageDetails.trim();
-
-        console.log(messageDetails, "text lenght");
-        // Check if no checkboxes are selected
-        if (isReasonChecked === 0) {
-          errorMessage.style.display = "block";
-          return;
-        } else {
-          errorMessage.style.display = "none"; // Hide the error message if validation passes
-        }
-
-        if (
-          (messageDetails.length > 0 && messegeText.length < 20) ||
-          messegeText.length > 200
-        ) {
-          errorMessage.innerHTML = "Only 20 to 200 characters are accepted";
-          errorMessage.style.display = "block";
-          return;
-        } else {
-          errorMessage.style.display = "none";
-        }
-
-        var props = {
-          EP_NPS_SCORE: starval,
-          EP_NPS_JOURNEY: campaign_name,
-          EP_COMMENT1: messageDetails,
-        };
-
-        if (selectedReasons.length === 0) {
-          errorMessage.style.display = "block";
-          return;
-        } else {
-          errorMessage.style.display = "none"; // Hide the error message if validation passes
-        }
-
-        const additionalDetailsTextarea =
-          document.getElementById("additionalDetails");
-
-        // Add selected reasons to props
-        selectedReasons.forEach(function (checkbox) {
-          const optionKey = checkbox.value;
-          const reasonText = optionMap[optionKey];
-
-          switch (optionKey) {
-            case "option1":
-              props["EP_REASON1"] = reasonText;
-              break;
-            case "option2":
-              props["EP_REASON2"] = reasonText;
-              break;
-            case "option3":
-              props["EP_REASON3"] = reasonText;
-              break;
-            case "option4":
-              props["EP_REASON4"] = reasonText;
-              break;
-            default:
-              break;
-          }
-        });
-
-        console.log(props);
-
-        if (window.CleverTap) {
-          CleverTap.pushEvent(eventName, JSON.stringify(props));
-        }
-
-        // Hide the feedback container and show the finish-rating container
-        document.querySelector(".bad-rating-container").style.display = "none";
-        document.querySelector(".feedback-button-container").style.display =
-          "none";
-        document.querySelector(".top-heading").style.display = "none";
-        document.getElementById("submit").style.display = "none";
-        document.querySelector(".finish-rating-container").style.display =
-          "block";
-      });
-
-      // Handle good submit function for store redirect
-      function handlegoodSubmit() {
-        window.location.href = isIOS ? appStoreLink : playStoreLink;
-      }
-
-      function handleStarSel(starValue) {
-        let feedbackbutton = document.querySelector(
-          ".feedback-button-container"
-        );
-        feedbackbutton.style.transformOrigin = "top";
-        feedbackbutton.style.margin = "0";
-        feedbackbutton.style.padding = "0";
-
-        let badRatingContainer = document.querySelector(
-          ".bad-rating-container"
-        );
-        badRatingContainer.style.width = "95%";
-        badRatingContainer.style.border = "0px solid gray";
-        badRatingContainer.style.margin = "0 auto";
-        badRatingContainer.style.padding = "5";
-        badRatingContainer.style.display = "block";
-        badRatingContainer.style.marginBottom = "0";
-        feedbackbutton.style.marginTop = "0";
-
-        starval = starValue;
-
-        if (starValue < 4) {
-          if (starValue === 0) {
-            document.querySelector(".bad-rating-container").style.display =
-              "none";
-            document.querySelector(".positive-rating-container").style.display =
-              "none";
-          }
-          document.querySelector(".positive-rating-container").style.display =
-            "none";
-          document.querySelector(".rating-butn").style.display = "block";
-        } else {
-          document.querySelector(".bad-rating-container").style.display =
-            "none";
-          document.querySelector(".rating-butn").style.display = "none";
-          document.querySelector(".error-message").style.display = "none";
-          document.querySelector(".positive-rating-container").style.display =
-            "block";
-        }
-      }
-
-      if (starval === 0) {
-        handleStarSel(starval);
-      }
-
-      function handleStarClick(starValue) {
-        const starContainers = document.querySelectorAll(".star-container");
-
-        starContainers.forEach((container, index) => {
-          const starButtons = container.querySelectorAll(".feedback-button");
-          starButtons.forEach((button) => {
-            if (index === starValue) {
-              button.classList.add("active");
-            } else {
-              button.classList.remove("active");
-            }
-          });
-        });
-      }
-
-      const images = document.querySelectorAll(".rotatable");
-
-      images.forEach((image) => {
-        image.onclick = function () {
-          if (image.classList.contains("rotate-180")) {
-            image.classList.remove("rotate-180");
+        try {
+          let successful = document.execCommand("copy");
+          if (successful) {
+            document.querySelector(".main").style.display = "none";
+            swal
+              .fire({
+                title: "Copied!",
+                text: "Coupon code copied to clipboard.",
+                icon: "success",
+                confirmButtonText: "OK",
+              })
+              .then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = "wzrk://nowhere";
+                }
+              });
+            console.log("Copied!");
           } else {
-            image.classList.add("rotate-180");
+            console.error("Copyy failed.");
           }
-        };
-      });
-
-      const starContainers = document.querySelectorAll(".star-container");
-
-      starContainers.forEach((container, index) => {
-        container.addEventListener("click", () => {
-          handleStarClick(index);
-        });
-      });
-
-      function handleStarHover(starValue) {
-        const starContainers = document.querySelectorAll(".star-container");
-
-        starContainers.forEach((container, index) => {
-          const starButtons = container.querySelectorAll(".feedback-button");
-          starButtons.forEach((button, buttonIndex) => {
-            if (buttonIndex <= starValue && index <= starValue - 1) {
-              button.classList.add("star-hover");
-            } else {
-              button.classList.remove("star-hover");
-            }
-          });
-        });
-      }
-
-      starContainers.forEach((container, index) => {
-        container.addEventListener("mouseover", () => {
-          handleStarHover(index);
-        });
-
-        container.addEventListener("mouseout", () => {
-          handleStarHover(-1);
-        });
-      });
-
-      starContainers.forEach((container, index) => {
-        container.addEventListener("touchstart", () => {
-          handleStarHover(index);
-        });
-
-        container.addEventListener("touchend", () => {
-          handleStarHover(-1);
-        });
-      });
-
-      starContainers.forEach((container, index) => {
-        container.addEventListener("click", () => {
-          handleStarClick(index);
-        });
-      });
-
-      document.addEventListener("DOMContentLoaded", function () {
-        function updateLabelBorder(event) {
-          if (event.target.checked) {
-            errorMessage.style.display = "none";
-            isReasonChecked = 1;
-          }
+        } catch (err) {
+          console.error("Error copying textt: ", err);
         }
-        checkButton.forEach(function (checkbox) {
-          checkbox.addEventListener("change", updateLabelBorder);
-        });
-      });
+        document.body.removeChild(input);
+      }
     </script>
   </body>
 </html>
