@@ -3,198 +3,230 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carousel</title>
+    <title>Draggable & Zoomable Video</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
+      * {
         margin: 0;
         padding: 0;
-        text-align: center;
-        position: relative;
-        min-height: 100vh;
-      }
-
-      .container {
-        width: 100%;
-        margin: 0 auto;
-        background-color: #ffffff;
-        padding: 0px;
         box-sizing: border-box;
-        border-radius: 15px;
-        position: absolute;
-        bottom: 6px;
-        left: 0;
-        right: 0;
       }
 
-      .carousel {
-        width: 100%;
-        height: 50%;
-        border-radius: 15px;
+      body {
+        background: transparent;
+        color: #fff;
+        height: 100vh;
         overflow: hidden;
       }
 
-      .carousel-inner {
+      .video-container {
+        position: fixed;
+        width: 35%;
+        height: 30%;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.8);
+        touch-action: none;
+        transition: transform 0.3s ease-in-out;
+        cursor: grab;
         display: flex;
-        flex-wrap: nowrap;
-        transition: transform 0.5s ease-in-out;
+        align-items: center;
+        justify-content: center;
       }
 
-      .carousel-item {
-        flex: 0 0 100%;
+      video {
         width: 100%;
-        background-color: #ffffff;
-        text-align: center;
-        padding: 0;
-        overflow: hidden;
-      }
-
-      .carousel-item img {
-        width: 100%;
-        height: 150px;
+        height: 100%;
         object-fit: contain;
-        margin: 0 auto;
-        margin-bottom: 5px;
       }
 
-      .close-button {
+      .btn {
         position: absolute;
+        padding: 5px;
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+      }
+
+      .fullscreen-btn {
+        bottom: 10px;
+        right: 10px;
+      }
+
+      .mute-btn {
+        bottom: 10px;
+        left: 10px;
+      }
+
+      .close-btn {
         top: 10px;
         right: 10px;
-        font-size: 20px;
-        cursor: pointer;
-        z-index: 1;
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 20%;
-        padding: 6px;
-        color: #fff;
-      }
-
-      .cta-button {
-        display: inline-block;
-        padding: 7px 2px;
-        font-size: 15px;
-        background-color: #f8af0d;
-        color: #fff;
-        text-decoration: none;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 0px;
-        width: 300px;
-      }
-
-      @media only screen and (max-width: 768px) {
-        .container {
-          padding: 10px;
-        }
-
-        .carousel-item {
-          height: 90%;
-        }
-      }
-
-      @media only screen and (max-width: 480px) {
-        .container {
-          padding: 5px;
-        }
-
-        .carousel-item {
-          height: 90%;
-        }
       }
     </style>
   </head>
-
   <body>
-    <div class="container">
-      <div class="carousel">
-        <span class="close-button" onclick="closeBox()">X</span>
-        <div class="carousel-inner">
-          <div class="carousel-item">
-            <img
-              src="https://mir-s3-cdn-cf.behance.net/project_modules/hd/89670937352801.573d3df298ad9.jpg"
-              alt="Image 1"
-              onclick="imageClick('https://google.com/')"
-            />
-          </div>
-          <div class="carousel-item">
-            <img
-              src="https://www.hindustantimes.com/ht-img/img/2024/09/20/550x309/Screenshot_2024-09-10_083252_1725938024590_1726819371596.png"
-              alt="Image 2"
-              onclick="imageClick('https://youtube.com/')"
-            />
-          </div>
-          <div class="carousel-item">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc0lYZ3NmJ0NKq266pW193uJ-BRkIkhrH9ig&s"
-              alt="Image 3"
-              onclick="imageClick('https://mail.google.com/mail/u/0/')"
-            />
-          </div>
-        </div>
-      </div>
-      <a href="#" class="cta-button" id="cta-button">Upto 70% OFF</a>
+    <div class="video-container" id="video-container">
+      <video id="video" autoplay muted loop playsinline disablePictureInPicture>
+        <source src="https://files.catbox.moe/xv4xan.mp4" type="video/mp4" />
+        Your browser does not support HTML5 video.
+      </video>
+
+      <button id="mute-btn" class="btn mute-btn">
+        <img
+          id="mute-icon"
+          src="https://cdn-icons-png.flaticon.com/512/727/727240.png"
+          width="20"
+          height="20"
+        />
+      </button>
+
+      <button id="fullscreen-btn" class="btn fullscreen-btn">
+        <img
+          id="fullscreen-icon"
+          src="https://cdn-icons-png.flaticon.com/512/3917/3917215.png"
+          width="20"
+          height="20"
+        />
+      </button>
+
+      <button id="close-btn" class="btn close-btn">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/1828/1828774.png"
+          width="20"
+          height="20"
+        />
+      </button>
     </div>
+
     <script>
-      const carouselInner = document.querySelector(".carousel-inner");
-      const carouselItems = document.querySelectorAll(".carousel-item");
-      const ctaButton = document.querySelector("#cta-button");
-      let currentIndex = 0;
+      const videoContainer = document.getElementById("video-container");
+      const video = document.getElementById("video");
+      const fullscreenBtn = document.getElementById("fullscreen-btn");
+      const fullscreenIcon = document.getElementById("fullscreen-icon");
+      const muteBtn = document.getElementById("mute-btn");
+      const muteIcon = document.getElementById("mute-icon");
+      const closeBtn = document.getElementById("close-btn");
 
-      setInterval(() => {
-        currentIndex++;
-        if (currentIndex >= carouselItems.length) {
-          currentIndex = 0;
-        }
-        carouselInner.style.transform = `translateX(${currentIndex * -100}%)`;
-        if (currentIndex === 0) {
-          ctaButton.textContent = "Upto 70% OFF";
-        } else if (currentIndex === 1) {
-          ctaButton.textContent = "No cost EMI !";
-        } else if (currentIndex === 2) {
-          ctaButton.textContent = "Stock clearance";
-        }
-      }, 2500);
-      function closeBox() {
-        document.location.href = "wzrk://thisleadstonowhere";
+      let isZoomed = false;
+      let isDragging = false;
+      let startX, startY;
+
+      function resetPosition() {
+        const screenHeight = window.innerHeight;
+        videoContainer.style.left = "20px";
+        videoContainer.style.top = `${
+          screenHeight - videoContainer.offsetHeight - 20
+        }px`;
       }
 
-      function imageClick(uri) {
-        // Code to handle image click action
-        var evtProps = { campaign_id: "1707543619" };
-        // for android
+      window.addEventListener("load", resetPosition);
+      window.addEventListener("resize", resetPosition);
+
+      fullscreenBtn.addEventListener("click", () => {
+        if (!isZoomed) {
+          videoContainer.style.width = "90%";
+          videoContainer.style.height = "80%";
+          fullscreenIcon.src =
+            "https://cdn-icons-png.flaticon.com/512/1828/1828778.png";
+
+          video.muted = false;
+          video.play();
+          muteIcon.src =
+            "https://cdn-icons-png.flaticon.com/512/2088/2088090.png";
+        } else {
+          videoContainer.style.width = "35%";
+          videoContainer.style.height = "30%";
+          fullscreenIcon.src =
+            "https://cdn-icons-png.flaticon.com/512/3917/3917215.png";
+
+          video.muted = true;
+          muteIcon.src =
+            "https://cdn-icons-png.flaticon.com/512/727/727240.png";
+        }
+        isZoomed = !isZoomed;
+        resetPosition();
+      });
+
+      muteBtn.addEventListener("click", () => {
+        video.muted = !video.muted;
+        muteIcon.src = video.muted
+          ? "https://cdn-icons-png.flaticon.com/512/727/727240.png"
+          : "https://cdn-icons-png.flaticon.com/512/2088/2088090.png";
+      });
+
+      closeBtn.addEventListener("click", () => {
+        console.log("Close button triggered");
         if (window.CleverTap) {
-          CleverTap.pushEvent("Image Clicked", JSON.stringify(evtProps));
+          CleverTap.dismissInAppNotification();
+        } else {
+          window.location.href = "wzrk://thisleads";
         }
+      });
 
-        var evtMessage = {
-          action: "recordEventWithProps",
-          event: "Image Clicked",
-          properties: evtProps,
-        };
-        if (
-          window.webkit &&
-          window.webkit.messageHandlers &&
-          window.webkit.messageHandlers.clevertap
-        ) {
-          window.webkit.messageHandlers.clevertap.postMessage(evtMessage);
-        }
-
-        // Redirect the user to custom URI
-        handleURI(uri);
+      // Dragging logic
+      function startDrag(e) {
+        isDragging = true;
+        startX =
+          (e.touches ? e.touches[0].clientX : e.clientX) -
+          videoContainer.offsetLeft;
+        startY =
+          (e.touches ? e.touches[0].clientY : e.clientY) -
+          videoContainer.offsetTop;
+        videoContainer.style.cursor = "grabbing";
       }
 
-      function handleURI(uri) {
-        if (uri.startsWith("wzrk://")) {
-          // Handle CleverTap-specific URI
-          document.location.href = uri;
-        } else if (uri.startsWith("mosl://")) {
-          //Handle custom URI for your app
-          // Example: Navigate to 'osl://superapp.com/mflanding'
-          window.location.href = uri;
-        }
+      function dragMove(e) {
+        if (!isDragging) return;
+
+        let newX = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+        let newY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const containerWidth = videoContainer.offsetWidth;
+        const containerHeight = videoContainer.offsetHeight;
+
+        newX = Math.max(0, Math.min(screenWidth - containerWidth, newX));
+        newY = Math.max(0, Math.min(screenHeight - containerHeight, newY));
+
+        videoContainer.style.left = `${newX}px`;
+        videoContainer.style.top = `${newY}px`;
       }
+
+      function stopDrag() {
+        isDragging = false;
+        videoContainer.style.cursor = "grab";
+      }
+
+      videoContainer.addEventListener("mousedown", startDrag);
+      document.addEventListener("mousemove", dragMove);
+      document.addEventListener("mouseup", stopDrag);
+
+      videoContainer.addEventListener("touchstart", startDrag, {
+        passive: true,
+      });
+      document.addEventListener("touchmove", dragMove, { passive: true });
+      document.addEventListener("touchend", stopDrag);
+
+      // Detect clicks outside the video container
+      document.addEventListener("touchstart", (e) => {
+        if (!videoContainer.contains(e.target)) {
+          if (window.CleverTap) {
+            CleverTap.dismissInAppNotification();
+          }
+
+          // Call IOS interface
+          else {
+            window.location.href = "wzrk://thisleadstonowhere";
+          }
+        }
+      });
     </script>
   </body>
 </html>
