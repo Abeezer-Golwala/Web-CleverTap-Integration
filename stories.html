@@ -3,82 +3,198 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Carousel with Close Button</title>
+    <title>Carousel</title>
     <style>
-      .carousel-container {
-        width: 100%;
-        overflow: hidden;
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
         position: relative;
+        min-height: 100vh;
+      }
+
+      .container {
+        width: 100%;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 0px;
+        box-sizing: border-box;
+        border-radius: 15px;
+        position: absolute;
+        bottom: 6px;
+        left: 0;
+        right: 0;
       }
 
       .carousel {
-        display: flex;
-        transition: transform 0.5s ease;
-      }
-
-      .carousel img {
         width: 100%;
-        height: auto;
+        height: 50%;
+        border-radius: 15px;
+        overflow: hidden;
       }
 
-      /* Close icon fixed to the top-right corner of the carousel */
-      .close-icon {
+      .carousel-inner {
+        display: flex;
+        flex-wrap: nowrap;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .carousel-item {
+        flex: 0 0 100%;
+        width: 100%;
+        background-color: #ffffff;
+        text-align: center;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .carousel-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: contain;
+        margin: 0 auto;
+        margin-bottom: 5px;
+      }
+
+      .close-button {
         position: absolute;
         top: 10px;
         right: 10px;
-        font-size: 24px;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.2);
-        padding: 5px;
+        font-size: 20px;
         cursor: pointer;
-        border-radius: 25%;
-        z-index: 1000;
+        z-index: 1;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 20%;
+        padding: 6px;
+        color: #fff;
       }
 
-      .close-icon:hover {
-        background-color: rgba(0, 0, 0, 0.8);
+      .cta-button {
+        display: inline-block;
+        padding: 7px 2px;
+        font-size: 15px;
+        background-color: #f8af0d;
+        color: #fff;
+        text-decoration: none;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0px;
+        width: 300px;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .carousel-item {
+          height: 90%;
+        }
+      }
+
+      @media only screen and (max-width: 480px) {
+        .container {
+          padding: 5px;
+        }
+
+        .carousel-item {
+          height: 90%;
+        }
       }
     </style>
   </head>
+
   <body>
-    <div class="carousel-container">
-      <span class="close-icon" onclick="closepop()">X</span>
-      <!-- Close icon here -->
+    <div class="container">
       <div class="carousel">
-        <img
-          src="https://pbs.twimg.com/media/FBY0AfEVgAUU8km.jpg:large"
-          alt="Image 1"
-        />
-        <img
-          src="https://rukminim2.flixcart.com/image/850/1000/xif0q/watch/4/w/1/1-crystal-studded-rose-gold-carlington-women-original-imagvxy984krxgue.jpeg?q=20&crop=false"
-          alt="Image 2"
-        />
-        <img
-          src="https://img.pikbest.com/origin/08/95/90/94npIkbEsTV3c.jpg!w700wp"
-          alt="Image 3"
-        />
+        <span class="close-button" onclick="closeBox()">X</span>
+        <div class="carousel-inner">
+          <div class="carousel-item">
+            <img
+              src="https://mir-s3-cdn-cf.behance.net/project_modules/hd/89670937352801.573d3df298ad9.jpg"
+              alt="Image 1"
+              onclick="imageClick('https://google.com/')"
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="https://www.hindustantimes.com/ht-img/img/2024/09/20/550x309/Screenshot_2024-09-10_083252_1725938024590_1726819371596.png"
+              alt="Image 2"
+              onclick="imageClick('https://youtube.com/')"
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc0lYZ3NmJ0NKq266pW193uJ-BRkIkhrH9ig&s"
+              alt="Image 3"
+              onclick="imageClick('https://mail.google.com/mail/u/0/')"
+            />
+          </div>
+        </div>
       </div>
+      <a href="#" class="cta-button" id="cta-button">Upto 70% OFF</a>
     </div>
-
     <script>
-      const carousel = document.querySelector(".carousel");
-      const images = document.querySelectorAll(".carousel img");
-      let counter = 0;
-      const intervalTime = 2000;
+      const carouselInner = document.querySelector(".carousel-inner");
+      const carouselItems = document.querySelectorAll(".carousel-item");
+      const ctaButton = document.querySelector("#cta-button");
+      let currentIndex = 0;
 
-      function nextSlide() {
-        counter++;
-        if (counter === images.length) {
-          counter = 0;
+      setInterval(() => {
+        currentIndex++;
+        if (currentIndex >= carouselItems.length) {
+          currentIndex = 0;
         }
-        carousel.style.transform = `translateX(-${counter * 100}%)`;
+        carouselInner.style.transform = `translateX(${currentIndex * -100}%)`;
+        if (currentIndex === 0) {
+          ctaButton.textContent = "Upto 70% OFF";
+        } else if (currentIndex === 1) {
+          ctaButton.textContent = "No cost EMI !";
+        } else if (currentIndex === 2) {
+          ctaButton.textContent = "Stock clearance";
+        }
+      }, 2500);
+      function closeBox() {
+        document.location.href = "wzrk://thisleadstonowhere";
       }
 
-      function closepop() {
-        CleverTap.dismissInAppNotification();
+      function imageClick(uri) {
+        // Code to handle image click action
+        var evtProps = { campaign_id: "1707543619" };
+        // for android
+        if (window.CleverTap) {
+          CleverTap.pushEvent("Image Clicked", JSON.stringify(evtProps));
+        }
+
+        var evtMessage = {
+          action: "recordEventWithProps",
+          event: "Image Clicked",
+          properties: evtProps,
+        };
+        if (
+          window.webkit &&
+          window.webkit.messageHandlers &&
+          window.webkit.messageHandlers.clevertap
+        ) {
+          window.webkit.messageHandlers.clevertap.postMessage(evtMessage);
+        }
+
+        // Redirect the user to custom URI
+        handleURI(uri);
       }
 
-      setInterval(nextSlide, intervalTime);
+      function handleURI(uri) {
+        if (uri.startsWith("wzrk://")) {
+          // Handle CleverTap-specific URI
+          document.location.href = uri;
+        } else if (uri.startsWith("mosl://")) {
+          //Handle custom URI for your app
+          // Example: Navigate to 'osl://superapp.com/mflanding'
+          window.location.href = uri;
+        }
+      }
     </script>
   </body>
 </html>
