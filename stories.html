@@ -3,229 +3,209 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Draggable & Zoomable Video</title>
+    <title>CleverTap Popup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      body,
       * {
         margin: 0;
         padding: 0;
+        font-family: "Inter", serif;
         box-sizing: border-box;
       }
 
-      body {
-        background: transparent;
-        color: #fff;
+      .popup-overlay {
+        width: 100vw;
         height: 100vh;
-        overflow: hidden;
-      }
-
-      .video-container {
-        position: fixed;
-        width: 35%;
-        height: 30%;
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        border-radius: 10px;
-        overflow: hidden;
         background: rgba(0, 0, 0, 0.8);
-        touch-action: none;
-        transition: transform 0.3s ease-in-out;
-        cursor: grab;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 0;
       }
 
-      video {
+      .popup {
+        background: #141425;
+        overflow: hidden;
+        width: 100%;
+        max-height: 70%;
+        max-width: 700px;
+        text-align: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        padding-bottom: 44px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin: 0 auto;
+        border-radius: 12px;
+      }
+
+      .pop-up-image {
+        position: relative;
+        width: 100%;
+        height: 200px;
+      }
+
+      .pop-up-image img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
+        border-radius: 12px 12px 0 0;
       }
 
-      .btn {
-        position: absolute;
-        padding: 5px;
-        background: rgba(255, 255, 255, 0.3);
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
+      .popup-content {
+        padding: 16px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .popup-title {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        color: #ffffff;
+      }
+
+      .popup-subtitle {
+        font-size: 14px;
+        line-height: 22px;
+        color: #acacac;
+        margin-bottom: 16px;
+      }
+
+      .popup-button {
         display: flex;
-        align-items: center;
         justify-content: center;
-        width: 30px;
-        height: 30px;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        width: 100%;
+        color: #000;
+        font-weight: 600;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
       }
 
-      .fullscreen-btn {
-        bottom: 10px;
-        right: 10px;
-      }
-
-      .mute-btn {
-        bottom: 10px;
-        left: 10px;
-      }
-
-      .close-btn {
-        top: 10px;
-        right: 10px;
+      .popup-close {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        z-index: 2;
       }
     </style>
   </head>
   <body>
-    <div class="video-container" id="video-container">
-      <video id="video" autoplay muted loop playsinline disablePictureInPicture>
-        <source src="https://files.catbox.moe/xv4xan.mp4" type="video/mp4" />
-        Your browser does not support HTML5 video.
-      </video>
-
-      <button id="mute-btn" class="btn mute-btn">
-        <img
-          id="mute-icon"
-          src="https://cdn-icons-png.flaticon.com/512/727/727240.png"
-          width="20"
-          height="20"
-        />
-      </button>
-
-      <button id="fullscreen-btn" class="btn fullscreen-btn">
-        <img
-          id="fullscreen-icon"
-          src="https://cdn-icons-png.flaticon.com/512/3917/3917215.png"
-          width="20"
-          height="20"
-        />
-      </button>
-
-      <button id="close-btn" class="btn close-btn">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/1828/1828774.png"
-          width="20"
-          height="20"
-        />
-      </button>
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup">
+        <button class="popup-close" id="popupClose">X</button>
+        <div class="pop-up-image">
+          <img id="popup-img" src="" alt="Popup Image" />
+        </div>
+        <div class="popup-content">
+          <div class="popup-title">
+            We believe you will like this! Complete what you started
+          </div>
+          <div class="popup-subtitle" id="popup-subtitle">
+            Recommendation based on shows which you have enjoyed. It only gets
+            exciting from here...
+          </div>
+          <button class="popup-button" id="resume-btn">
+            <span>Watch Now</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-      const videoContainer = document.getElementById("video-container");
-      const video = document.getElementById("video");
-      const fullscreenBtn = document.getElementById("fullscreen-btn");
-      const fullscreenIcon = document.getElementById("fullscreen-icon");
-      const muteBtn = document.getElementById("mute-btn");
-      const muteIcon = document.getElementById("mute-icon");
-      const closeBtn = document.getElementById("close-btn");
+      document.addEventListener("DOMContentLoaded", function () {
 
-      let isZoomed = false;
-      let isDragging = false;
-      let startX, startY;
+      {% assign assetId = "" %}
+      {% for img in Profile.Bundle_Image %}
+      {% if forloop.index == 2%}
+      {% assign image = img | strip %}
+      {% endif %}
+      {% endfor %}
 
-      function resetPosition() {
-        const screenHeight = window.innerHeight;
-        videoContainer.style.left = "20px";
-        videoContainer.style.top = `${
-          screenHeight - videoContainer.offsetHeight - 20
-        }px`;
+      var imageUrl = "{{ image | default: "https://files.catbox.moe/j6q76x.jpg" }}";
+
+      {% assign assetId = "" %}
+      {% for id in Profile.GOB_ID %}
+      {% if forloop.index == 2 %}
+      {% assign assetId = id | strip %}
+      {% endif %}
+      {% endfor %}
+
+      var assetId = "{{ assetId | default: "1090427563" }}";
+
+      var imgElement = document.getElementById("popup-img");
+      var resumeBtn = document.getElementById("resume-btn");
+      var subtitleElement = document.getElementById("popup-subtitle");
+
+      if (imageUrl && imgElement) {
+      imgElement.src = imageUrl;
+
+      } else {
+      console.error("Image URL not found or element missing.");
       }
 
-      window.addEventListener("load", resetPosition);
-      window.addEventListener("resize", resetPosition);
+      document.getElementById("resume-btn").onclick = function () {
+      window.location.href = `sony://asset/${assetId}`;
+      };
 
-      fullscreenBtn.addEventListener("click", () => {
-        if (!isZoomed) {
-          videoContainer.style.width = "90%";
-          videoContainer.style.height = "80%";
-          fullscreenIcon.src =
-            "https://cdn-icons-png.flaticon.com/512/1828/1828778.png";
+      // Event tracking for CleverTap
+      resumeBtn.addEventListener("click", function () {
+      var props = {
+      event_type: "Personalized Reco",
+      campaign_id: '{{ Campaign.campaignId | default: "0_0" }}',
+      CP_ID: '{{ Profile.Identity | default: "No ID" }}',
+      segment_name: '{{ Profile.EXP_SEGMENT | default: "No segment" }}',
+      campaign_name: "SVOD Lapser"
+      };
 
-          video.muted = false;
-          video.play();
-          muteIcon.src =
-            "https://cdn-icons-png.flaticon.com/512/2088/2088090.png";
-        } else {
-          videoContainer.style.width = "35%";
-          videoContainer.style.height = "30%";
-          fullscreenIcon.src =
-            "https://cdn-icons-png.flaticon.com/512/3917/3917215.png";
-
-          video.muted = true;
-          muteIcon.src =
-            "https://cdn-icons-png.flaticon.com/512/727/727240.png";
-        }
-        isZoomed = !isZoomed;
-        resetPosition();
-      });
-
-      muteBtn.addEventListener("click", () => {
-        video.muted = !video.muted;
-        muteIcon.src = video.muted
-          ? "https://cdn-icons-png.flaticon.com/512/727/727240.png"
-          : "https://cdn-icons-png.flaticon.com/512/2088/2088090.png";
-      });
-
-      closeBtn.addEventListener("click", () => {
-        console.log("Close button triggered");
-        if (window.CleverTap) {
-          CleverTap.dismissInAppNotification();
-        } else {
-          window.location.href = "wzrk://thisleads";
-        }
-      });
-
-      // Dragging logic
-      function startDrag(e) {
-        isDragging = true;
-        startX =
-          (e.touches ? e.touches[0].clientX : e.clientX) -
-          videoContainer.offsetLeft;
-        startY =
-          (e.touches ? e.touches[0].clientY : e.clientY) -
-          videoContainer.offsetTop;
-        videoContainer.style.cursor = "grabbing";
+      if (window.CleverTap) {
+      CleverTap.pushEvent("custom_html_click", JSON.stringify(props));
       }
 
-      function dragMove(e) {
-        if (!isDragging) return;
-
-        let newX = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
-        let newY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
-
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const containerWidth = videoContainer.offsetWidth;
-        const containerHeight = videoContainer.offsetHeight;
-
-        newX = Math.max(0, Math.min(screenWidth - containerWidth, newX));
-        newY = Math.max(0, Math.min(screenHeight - containerHeight, newY));
-
-        videoContainer.style.left = `${newX}px`;
-        videoContainer.style.top = `${newY}px`;
+      var message = { action: "recordEventWithProps", event: "custom_html_click", properties: props };
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap) {
+      window.webkit.messageHandlers.clevertap.postMessage(message);
       }
-
-      function stopDrag() {
-        isDragging = false;
-        videoContainer.style.cursor = "grab";
-      }
-
-      videoContainer.addEventListener("mousedown", startDrag);
-      document.addEventListener("mousemove", dragMove);
-      document.addEventListener("mouseup", stopDrag);
-
-      videoContainer.addEventListener("touchstart", startDrag, {
-        passive: true,
       });
-      document.addEventListener("touchmove", dragMove, { passive: true });
-      document.addEventListener("touchend", stopDrag);
 
-      // Detect clicks outside the video container
-      document.addEventListener("touchstart", (e) => {
-        if (!videoContainer.contains(e.target)) {
-          if (window.CleverTap) {
-            CleverTap.dismissInAppNotification();
-          }
+      // Close popup handling
+      const closeButton = document.getElementById("popupClose");
+      const popupOverlay = document.getElementById("popupOverlay");
 
-          // Call IOS interface
-          else {
-            window.location.href = "wzrk://thisleadstonowhere";
-          }
-        }
+      closeButton.addEventListener("click", () => {
+      if (window.CleverTap && typeof CleverTap.dismissInAppNotification === "function") {
+      CleverTap.dismissInAppNotification();
+      } else {
+      window.location.href = "wzrk://thisleadstonowhere";
+      }
+      popupOverlay.style.display = "none";
+      });
       });
     </script>
   </body>
