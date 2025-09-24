@@ -1,853 +1,1201 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    <link
+      href="https://fonts.googleapis.com/css?family=Rubik"
+      rel="stylesheet"
     />
-    <title>Stories Carousel</title>
-    <script>
-      // Simple appConfiguration
-      const appConfig = {
-        autoAdvance: true,
-        imageViewDuration: 5000,
-        videoBuffer: 1000,
-        cardWidth: "360px",
-        cardHeight: "640px",
-        cardBorderRadius: "24px",
-        theme: "dark",
-        buttonColor: "#ffffff",
-        buttonTextColor: "#333333",
-        captionColor: "#ffffff",
-        captionShadow: true,
-      };
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
 
-      // Stories content
-      const storiesData = [
-        {
-          src: "https://i.pinimg.com/originals/1e/59/0a/1e590a487aa837bc0802dc7b6186067e.gif",
-          type: "image",
-          link: "",
-          caption: "Explore New Trends",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://assets.vogue.com/photos/62f6a408b2e176a484ef7c6a/3:4/w_748%2Cc_limit/slide_15.jpg",
-          type: "image",
-          link: "",
-          caption: "Premium mascara for fuller lashes",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://static.beautytocare.com/cdn-cgi/image/width=1600,height=1600,f=auto/media/catalog/product//n/e/neve-cosmetics-single-blush-teacup-3g_1.jpg",
-          type: "image",
-          link: "",
-          caption: "Natural blush for healthy glow",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://img.buzzfeed.com/buzzfeed-static/static/2019-06/14/11/asset/buzzfeed-prod-web-02/sub-buzz-7763-1560526406-1.png?crop=499%3A654%3B0%2C0&downsize=900:*&output-format=auto&output-quality=auto",
-          type: "image",
-          link: "",
-          caption: "Find your perfect shade",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://d2hy56m2o6qi9y.cloudfront.net/wp-content/uploads/2020/10/12171309/1-Natural-Glow.jpg",
-          type: "image",
-          link: "",
-          caption: "Achieve a natural glow",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://www.w3schools.com/html/mov_bbb.mp4",
-          type: "video",
-          link: "https://www.glamour.com/story/2025-fashion-trends",
-          caption: "Watch our tutorial",
-          buttonText: "Learn More",
-        },
-      ];
-      // Limit the number of stories if maxStories is set
-      // if (
-      // appConfig.maxStories &&
-      // appConfig.maxStories > 0 &&
-      // appConfig.maxStories < stories.length
-      // ) {
-      // stories = stories.slice(0, appConfig.maxStories);
-      // }
-    </script>
+    <title>CSAT</title>
     <style>
-      /* Reset and base styles */
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
       :root {
-        --text-light: #ffffff;
-        --text-dark: #333333;
-        --bg-light: #ffffff;
-        --bg-dark: #121212;
-        --shadow-light: 0 8px 30px rgba(0, 0, 0, 0.12);
-        --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.25);
-        --button-color: #ffffff;
-        --button-text-color: #333333;
-        --caption-color: #ffffff;
+        --primary-color: #ff6700;
       }
 
-      html,
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        position: fixed;
-        touch-action: none;
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-        user-select: none;
+      .bf-container,
+      .container {
+        position: relative;
+        display: flex;
       }
-
+      .container,
+      .popup,
       body {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        background: var(--bg-light);
       }
-
-      body.dark-theme {
-        background: var(--bg-dark);
-        color: var(--text-light);
-      }
-
-      /* Main carousel card */
-      .stories-card {
-        position: relative;
-        width: 360px;
-        height: 640px;
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: var(--shadow-light);
-        background: var(--bg-light);
-      }
-
-      .dark-theme .stories-card {
-        background: var(--bg-dark);
-        box-shadow: var(--shadow-dark);
-      }
-
-      /* Header with indicators */
-      .stories-header {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 20;
-        padding: 16px;
-        display: flex;
-        align-items: center;
-        background: linear-gradient(
-          180deg,
-          rgba(0, 0, 0, 0.6) 0%,
-          rgba(0, 0, 0, 0) 100%
-        );
-      }
-
-      /* Progress indicators */
-      .story-indicators {
-        display: flex;
-        flex: 1;
-        gap: 4px;
-        margin-right: 12px;
-      }
-
-      .story-indicator {
-        height: 4px;
-        border-radius: 2px;
-        background: rgba(255, 255, 255, 0.3);
-        flex: 1;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .story-indicator-progress {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 0%;
-        background: #ffffff;
-        border-radius: 2px;
-      }
-
-      .story-indicator.complete .story-indicator-progress {
-        width: 100%;
-      }
-
-      /* Control buttons */
-      .icon-button {
-        background: rgba(0, 0, 0, 0.3);
-        border: none;
-        color: white;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      /* Media container */
-      .story-container {
-        width: 100%;
-        height: 100%;
-        position: relative;
-      }
-
-      .story-item {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        transform: scale(1.05);
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        pointer-events: none;
-      }
-
-      .story-item.active {
-        opacity: 1;
-        transform: scale(1);
-        pointer-events: auto;
-      }
-
-      .story-item img,
-      .story-item video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      /* Caption and action area */
-      .story-footer {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 24px;
-        background: linear-gradient(
-          0deg,
-          rgba(0, 0, 0, 0.7) 0%,
-          rgba(0, 0, 0, 0) 100%
-        );
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .story-caption {
-        color: var(--caption-color);
-        font-size: 16px;
-        font-weight: 500;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-      }
-
-      .caption-no-shadow {
-        text-shadow: none;
-      }
-
-      .action-button {
-        background: var(--button-color);
-        color: var(--button-text-color);
-        border: none;
-        padding: 14px 24px;
-        font-size: 16px;
-        font-weight: 600;
-        border-radius: 30px;
-        cursor: pointer;
+      .container,
+      .popup-content {
+        border-radius: 10px;
         text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        -webkit-tap-highlight-color: transparent;
       }
-
-      /* Video controls */
-      .video-controls {
-        position: absolute;
-        bottom: 90px;
-        right: 20px;
-        z-index: 15;
+      .btn,
+      .container,
+      .feedback-button,
+      .popup-content {
+        text-align: center;
       }
-
-      /* Navigation overlay */
-      .navigation-overlay {
-        position: absolute;
-        top: 60px;
-        bottom: 100px;
+      .container h3,
+      .good-rating-container p {
+        font-weight: 700;
+      }
+      .bad-rating-container button,
+      .positive-rating-container button,
+      .finish-rating-container button {
+        background-color: var(--primary-color);
+        transition: background 0.3s;
+      }
+      body {
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0);
+        font-family: Rubik, Arial, sans-serif;
+        overflow: hidden;
         width: 100%;
-        z-index: 10;
+      }
+      .bf-container {
+        min-height: 100vh;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+      }
+      .container {
+        flex-direction: column;
+        align-items: center;
+        transition: opacity 0.3s ease-in-out;
+      }
+      .container h3 {
+        color: #002953;
+        font-size: 19px;
+      }
+      .popup {
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+      }
+      .popup-content {
+        background-color: #fff;
+        width: 100%;
+        max-width: 540px;
+        margin: 0 auto;
+        height: auto;
+        padding: 12px 16px 24px;
+        position: relative;
+        display: block;
+      }
+      .popup button.close {
+        display: inline-block;
+        background-color: rgba(116, 116, 128, 0.08);
+        border: none;
+        outline: 0;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        z-index: 1;
+        width: 25px;
+        height: 25px;
+        border-radius: 100%;
+        line-height: 25px;
+      }
+      .feedback-button-container {
         display: flex;
+        justify-content: center;
+        width: auto;
+      }
+      .feedback-button {
+        width: 70px;
+        height: 70px;
+        border: none;
+        cursor: pointer;
+        background-color: rgba(236, 211, 211, 0);
+        color: #d0cdcd;
+      }
+      .btn,
+      .cat {
+        border-radius: 40px;
+        cursor: pointer;
+      }
+      .star-container {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        cursor: pointer;
+      }
+      .btn {
+        width: 200px;
+        height: 40px;
+        padding: 10px;
+        gap: 10px;
+        opacity: 1px;
+        background-color: var(--primary-color);
+        font-family: Rubik;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 17px;
+        color: #fff;
+        transition: 0.3s;
+      }
+      .btn:hover {
+        color: #fff;
+      }
+      button:focus {
+        outline: 0;
+      }
+      .bad-rating-container,
+      .positive-rating-container {
+        display: none;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        position: relative;
+        align-items: flex-end;
+        transition: opacity 0.3s ease-in-out;
+        overflow: hidden;
+      }
+      .good-rating-content {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 10px;
+        box-sizing: border-box;
+        margin: 10px 0;
+      }
+      .good-rating-container h3 {
+        margin: 10px 0;
+      }
+      .positive-rating-container button {
+        margin: 20px 0 0;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        width: fit;
+        text-transform: uppercase;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: small;
+        background-color: var(--primary-color);
+      }
+      .bad-rating-container button:hover,
+      .positive-rating-container button:hover,
+      .finish-rating-container button:hover {
+        background-color: var(--primary-color);
+      }
+      .bad-rating-container h6 {
+        text-align: left;
+        font-weight: bolder;
+        font-size: small;
+        margin-top: -10px;
+      }
+      .bad-rating-container button,
+      .bad-rating-container input,
+      .bad-rating-container textarea {
+        margin: 10px 0;
+        text-align: left;
+        font-size: small;
+        color: #333333;
+      }
+      .bad-rating-container label {
+        margin-bottom: 0;
+        text-align: left;
+        display: block;
+        font-size: small;
+        padding-left: 0;
+        border-radius: 5px;
+      }
+      .bad-rating-container input[type="checkbox"] {
+        transform: scale(1);
+        margin-right: 5px;
+        vertical-align: middle;
+      }
+      .bad-rating-container p {
+        text-align: center;
+        font-weight: 700;
+        font-size: small;
+        margin-top: -2%;
+        margin-bottom: 5px;
+      }
+      .bad-rating-container textarea {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        resize: vertical;
+        margin-top: -2px;
+        font-size: small;
+        margin-bottom: -10px;
+      }
+      .bad-rating-container button {
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        width: auto;
+        padding: 10px 20px;
+        margin-bottom: 0;
+        background-color: var(--primary-color);
+      }
+      .bad-rating-container textarea::placeholder {
+        font-family: Rubik, Arial, sans-serif;
+        font-size: small;
+      }
+      .bad-additional-details {
+        display: none;
+      }
+      .bad-additional-details p {
+        margin-top: 8px;
+        text-align: left;
+        margin-bottom: 10px;
+      }
+      .finish-rating-container {
+        display: none;
+        background-color: rgb(255, 255, 255, 0);
+        padding: 0;
+        border-radius: 10px;
+        text-align: center;
+        position: relative;
+        align-items: flex-end;
+        transition: opacity 0.3s ease-in-out;
+        overflow: hidden;
+      }
+      .finish-rating-container h3 {
+        margin-top: 0;
+        position: relative;
+      }
+      .finish-rating-content {
+        border-radius: 10px;
+        box-sizing: border-box;
+        margin: 10px 0 0;
+      }
+      .finish-rating-container p {
+        font-size: 14px;
+        color: grey;
+      }
+      .finish-rating-container button {
+        margin: 10px 0 0;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        width: 150px;
+        padding: 13px 23px;
+        background-color: var(--primary-color);
+      }
+      .finish-rating-container h5 {
+        color: #002953;
+        font-weight: 700;
+      }
+      .cat label input + span,
+      .pop textarea {
+        color: #333333;
+      }
+      .finish-rating-container img {
+        margin-bottom: 5px;
+      }
+      label.label-clicked {
+        border-color: orange;
+      }
+      .top-head {
+        position: relative;
+      }
+      div label input {
+        margin-right: 100px;
+      }
+      .cat {
+        margin: 4px;
+        background-color: transparent;
+        border: 1px solid #d3dae1;
+        overflow: hidden;
+        float: left;
+      }
+      .cat label {
+        float: left;
+        line-height: 2em;
+        width: 210px;
+        height: 32px;
+        border-radius: 40px;
+        cursor: pointer;
+      }
+      .cat label span {
+        text-align: center;
+        padding: 3px 0;
+        display: block;
+        font-size: 14px;
+        line-height: 28px;
+      }
+      .cat label input {
+        position: absolute;
+        display: none;
+        color: #104068 !important;
+      }
+      .cat label input:checked + span {
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+      .cat input:checked + span {
+        color: #fff;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+      }
+      .pop textarea {
+        border: 1px solid #e5eaf7;
+        padding: 12px;
+        border-radius: 5px;
+        width: 100%;
+        margin-top: 10px;
+      }
+      .rotatable.rotate-180 {
+        transform: rotate(360deg);
+      }
+      .best img,
+      .fair img,
+      .good img,
+      .poor img,
+      .worst img {
+        transition: 0.5s ease-out;
+        outline: #fff solid 5px;
+        border-radius: 50%;
+        margin-bottom: 5px;
+      }
+      .worst.active img {
+        outline-color: #b80302;
+        background: #b80302;
+      }
+      .worst.active span {
+        color: #b80302 !important;
+        font-weight: 500 !important;
+      }
+      .poor.active img {
+        outline-color: #5365ce;
+        background: #5365ce;
+      }
+      .poor.active span {
+        color: #5365ce !important;
+        font-weight: 500 !important;
+      }
+      .fair.active img {
+        outline-color: #f8b40a;
+        background: #f8b40a;
+      }
+      .fair.active span {
+        color: #f8b40a !important;
+        font-weight: 500 !important;
+      }
+      .good.active img {
+        outline-color: #00b5cf;
+        background: #00b5cf;
+      }
+      .good.active span {
+        color: #00b5cf !important;
+      }
+      .best.active img {
+        outline-color: #04a47e;
+        background: #04a47e;
+      }
+      .best.active span {
+        color: #04a47e !important;
+      }
+      textarea::-webkit-input-placeholder {
+        color: #4a6784;
+      }
+      textarea:-moz-placeholder {
+        color: #4a6784;
+      }
+      textarea::-moz-placeholder {
+        color: #4a6784;
+      }
+      textarea:-ms-input-placeholder {
+        color: #4a6784;
+      }
+      .action input:checked + span {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: white !important;
+        display: block;
+      }
+      .thanks {
+        width: 191px;
+        height: 191px;
+        margin-right: auto;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 23px;
+      }
+      @media (max-width: 1024) {
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+      @media (max-width: 576px) {
+        .cat label,
+        .thanks {
+          margin-right: auto;
+          margin-left: auto;
+        }
+        .thanks,
+        body {
+          display: flex;
+        }
+        body {
+          justify-content: center;
+          align-items: end;
+        }
+        .bf-container {
+          display: flex;
+          justify-content: end;
+          align-items: center;
+        }
+        .container {
+          margin-bottom: 0;
+          padding: 0;
+        }
+        .popup {
+          justify-content: end;
+          align-items: center;
+        }
+        .popup-content {
+          border-radius: 10px 10px 0 0;
+        }
+        .feedback-button {
+          width: 60px;
+          height: 70px;
+        }
+        .bad-rating-container {
+          padding: 0;
+          text-align: center;
+        }
+        .bad-rating-content h6 {
+          text-align: center;
+        }
+        .cat label {
+          width: 145px;
+        }
+        .thanks {
+          width: 179px;
+          height: 179px;
+          align-items: center;
+          justify-content: center;
+          padding: 14px 23px;
+        }
+        .cat label span {
+          font-size: 12px;
+          line-height: 26px;
+        }
+        .cat label input {
+          position: absolute;
+          display: none;
+          color: #104068 !important;
+        }
+        .pop {
+          margin-bottom: 10px;
+        }
+      }
+      @media (max-width: 320px) {
+        .feedback-button {
+          width: 60px;
+          height: 70px;
+        }
+        .cat label {
+          width: 125px;
+        }
+        .cat label span {
+          font-size: 12px;
+          line-height: 26px;
+        }
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
       }
 
-      .nav-prev,
-      .nav-next {
-        width: 50%;
-        height: 100%;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
+      .popup {
+        display: none; /* Initially hidden */
+      }
+
+      .popup-content {
+        background-color: #fff;
+        transform: translateY(100%); /* Start off-screen */
+        /* opacity: 0; */
+        transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+      }
+
+      .popup.show .popup-content {
+        animation: slideUp 0.5s ease-out forwards;
+      }
+
+      /* New styles for the option buttons */
+      .cat.action {
+        float: none;
+        display: inline-block;
+        margin: 4px;
+        width: calc(50% - 12px);
+      }
+
+      .action-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .action-row {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      .cat label {
+        width: 100%;
+        float: none;
+      }
+
+      /* Updated styles for buttons */
+      .cat label span {
+        background-color: white !important;
+        color: #333333 !important;
+        border: 1px solid #d3dae1;
+      }
+
+      .cat input:not(:checked) + span {
+        background-color: white !important;
+        color: #333333 !important;
+      }
+
+      .cat input:checked + span {
+        background-color: var(--primary-color);
+        color: white;
+        border: 1px solid var(--primary-color);
       }
     </style>
-
-    <script>
-      // Dynamic content configuration
-      const config = {
-        autoAdvance: true,
-        imageViewDuration: 5000,
-        videoBuffer: 1000,
-        cardWidth: "360px",
-        cardHeight: "640px",
-        cardBorderRadius: "24px",
-        theme: "dark",
-        buttonColor: "#ffffff",
-        buttonTextColor: "#333333",
-        captionColor: "#ffffff",
-        captionShadow: true,
-      };
-
-      const stories = [
-        {
-          src: "https://i.pinimg.com/originals/1e/59/0a/1e590a487aa837bc0802dc7b6186067e.gif",
-          type: "image",
-          link: "",
-          caption: "Explore New Trends",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://assets.vogue.com/photos/62f6a408b2e176a484ef7c6a/3:4/w_748%2Cc_limit/slide_15.jpg",
-          type: "image",
-          link: "",
-          caption: "Premium mascara for fuller lashes",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://static.beautytocare.com/cdn-cgi/image/width=1600,height=1600,f=auto/media/catalog/product//n/e/neve-cosmetics-single-blush-teacup-3g_1.jpg",
-          type: "image",
-          link: "",
-          caption: "Natural blush for healthy glow",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://img.buzzfeed.com/buzzfeed-static/static/2019-06/14/11/asset/buzzfeed-prod-web-02/sub-buzz-7763-1560526406-1.png?crop=499%3A654%3B0%2C0&downsize=900:*&output-format=auto&output-quality=auto",
-          type: "image",
-          link: "",
-          caption: "Find your perfect shade",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://d2hy56m2o6qi9y.cloudfront.net/wp-content/uploads/2020/10/12171309/1-Natural-Glow.jpg",
-          type: "image",
-          link: "",
-          caption: "Achieve a natural glow",
-          buttonText: "Learn More",
-        },
-        {
-          src: "https://www.w3schools.com/html/mov_bbb.mp4",
-          type: "video",
-          link: "https://www.glamour.com/story/2025-fashion-trends",
-          caption: "Watch our tutorial",
-          buttonText: "Learn More",
-        },
-      ];
-    </script>
   </head>
 
   <body>
-    <div class="stories-card" id="stories-card">
-      <div class="stories-header">
-        <div class="story-indicators" id="story-indicators"></div>
-        <button id="close-btn" class="icon-button">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path
-              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-            />
-          </svg>
-        </button>
-      </div>
+    <div class="bf-container">
+      <div class="container">
+        <div id="myPopup" class="popup" style="display: none">
+          <div class="popup-content">
+            <button id="close" class="close">
+              <img
+                src="https://files.catbox.moe/jf8in6.svg"
+                width="22"
+                height="22"
+              />
+            </button>
+            <div
+              class="top-heading"
+              style="margin-top: 24px; margin-bottom: 20px"
+            >
+              <h5
+                style="
+                  font-family: Rubik;
+                  font-size: 20px;
+                  line-height: 24px;
+                  font-weight: 600;
+                  text-align: center;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  color: rgba(31, 41, 55, 1);
+                "
+              >
+                Feedback Survey
+              </h5>
+              <p
+                style="
+                  font-family: Rubik;
+                  font-size: 14px;
+                  line-height: 20px;
+                  font-weight: 400;
+                  text-align: center;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  color: rgba(75, 85, 99, 1);
+                "
+              >
+                Please rate your experience
+              </p>
+            </div>
 
-      <div class="story-container" id="story-container"></div>
+            <div class="feedback-button-container">
+              <div class="star-container" onclick="handleStarSel(1)">
+                <button class="feedback-button worst" value="1">
+                  <img
+                    src="https://files.catbox.moe/p2t7g0.svg"
+                    class="rotatable"
+                    id="rotateImage"
+                    width="40"
+                    height="40"
+                    alt="Worst"
+                  /><br /><span
+                    style="
+                      font-family: Rubik;
+                      font-size: 14px;
+                      line-height: 20px;
+                      font-weight: 400;
+                      text-align: center;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      color: rgba(63, 63, 63, 1);
+                    "
+                    >Worst</span
+                  >
+                </button>
+              </div>
+              <div class="star-container" onclick="handleStarSel(2)">
+                <button class="feedback-button poor" value="2">
+                  <img
+                    src="https://files.catbox.moe/72mx8r.svg"
+                    class="rotatable"
+                    id="rotateImage1"
+                    width="40"
+                    height="40"
+                    alt="Poor"
+                  /><br /><span
+                    style="
+                      font-family: Rubik;
+                      font-size: 14px;
+                      line-height: 20px;
+                      font-weight: 400;
+                      text-align: center;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      color: rgba(63, 63, 63, 1);
+                    "
+                    >Poor</span
+                  >
+                </button>
+              </div>
+              <div class="star-container" onclick="handleStarSel(3)">
+                <button class="feedback-button fair" value="3">
+                  <img
+                    src="https://files.catbox.moe/r8qcgc.svg"
+                    class="rotatable"
+                    id="rotateImage2"
+                    width="40"
+                    height="40"
+                    alt="Fair"
+                  /><br /><span
+                    style="
+                      font-family: Rubik;
+                      font-size: 14px;
+                      line-height: 20px;
+                      font-weight: 400;
+                      text-align: center;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      color: rgba(63, 63, 63, 1);
+                    "
+                    >Fair</span
+                  >
+                </button>
+              </div>
+              <div class="star-container" onclick="handleStarSel(4)">
+                <button class="feedback-button good" value="4">
+                  <img
+                    src="https://files.catbox.moe/965evq.svg"
+                    class="rotatable"
+                    id="rotateImage3"
+                    width="40"
+                    height="40"
+                    alt="Good"
+                  /><br /><span
+                    style="
+                      font-family: Rubik;
+                      font-size: 14px;
+                      line-height: 20px;
+                      font-weight: 400;
+                      text-align: center;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      color: rgba(63, 63, 63, 1);
+                    "
+                  >
+                    Good</span
+                  >
+                </button>
+              </div>
+              <div class="star-container" onclick="handleStarSel(5)">
+                <button class="feedback-button best" value="5">
+                  <img
+                    src="https://files.catbox.moe/31g2s7.svg"
+                    class="rotatable"
+                    id="rotateImage4"
+                    width="40"
+                    height="40"
+                    alt="Best"
+                  /><br /><span
+                    style="
+                      font-family: Rubik;
+                      font-size: 14px;
+                      line-height: 20px;
+                      font-weight: 400;
+                      text-align: center;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      color: rgba(63, 63, 63, 1);
+                    "
+                  >
+                    Great</span
+                  >
+                </button>
+              </div>
+            </div>
 
-      <div class="navigation-overlay">
-        <div class="nav-prev" id="nav-prev"></div>
-        <div class="nav-next" id="nav-next"></div>
-      </div>
+            <div class="bad-rating-container">
+              <div
+                style="
+                  width: 100%;
+                  display: block;
+                  border-bottom: 1px dashed rgba(179, 203, 227, 1);
+                  margin-bottom: 30px;
+                "
+              ></div>
+              <div class="bad-rating-content">
+                <h6>Sorry to know that. Tell us what went wrong</h6>
+                <div class="action-container">
+                  <div class="action-row">
+                    <div class="cat action">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="options"
+                          class="checkBtn first"
+                          value="option1"
+                        /><span data-option="option1"></span>
+                      </label>
+                    </div>
+                    <div class="cat action">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="options"
+                          class="checkBtn second"
+                          value="option2"
+                        /><span data-option="option2"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="action-row">
+                    <div class="cat action">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="options"
+                          class="checkBtn third"
+                          value="option3"
+                        /><span data-option="option3"></span>
+                      </label>
+                    </div>
+                    <div class="cat action">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="options"
+                          class="checkBtn fourth"
+                          value="option4"
+                        /><span data-option="option4"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="pop">
+                  <textarea
+                    id="additionalDetails"
+                    name="additionalDetails"
+                    minlength="20"
+                    maxlength="200"
+                    placeholder="Tell us more upto 200 characters.."
+                    class=""
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div
+              id="error-message"
+              class="error-message"
+              style="
+                color: red;
+                display: none;
+                margin-top: 10px;
+                margin-bottom: 6px;
+              "
+            >
+              ⚠ Please select any of the options
+            </div>
+            <div class="rating-butn" style="margin-top: 10px">
+              <button id="submit" class="btn submit">
+                <strong>SUBMIT </strong>
+              </button>
+            </div>
 
-      <div class="video-controls">
-        <button id="mute-btn" class="icon-button">
-          <svg
-            id="mute-icon"
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="currentColor"
-          >
-            <path
-              d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"
-            />
-          </svg>
-        </button>
-      </div>
+            <!-- Combined positive rating container for both Good and Great ratings -->
+            <div class="positive-rating-container" style="padding-bottom: 0px">
+              <div class="thanks">
+                <div>
+                  <img
+                    class="good-tick-mark"
+                    src="https://i.pinimg.com/736x/c3/52/17/c3521795cc7a931e6a2d7510eaf99bd1.jpg"
+                    alt="Thanks"
+                    width="140"
+                  />
+                </div>
+              </div>
+              <button
+                class="btn submit"
+                onclick="handlegoodSubmit()"
+                style="
+                  white-space: nowrap;
+                  min-width: 200px;
+                  background-color: var(--primary-color);
+                "
+              >
+                Rate us on App Store
+              </button>
+            </div>
 
-      <div class="story-footer">
-        <div class="story-caption" id="story-caption"></div>
-        <a
-          id="action-btn"
-          class="action-button"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Learn More</a
-        >
+            <div
+              class="finish-rating-container"
+              style="
+                background-size: auto;
+                background-position: top center;
+                background-repeat: no-repeat;
+              "
+            >
+              <img
+                src="https://files.catbox.moe/r8qcgc.svg"
+                alt="tick mark"
+                width="78"
+                height="78"
+              />
+              <h5>Thank you for your feedback!</h5>
+              <div class="finish-rating-content">
+                <p>We'll use this to serve you better</p>
+                <button
+                  onclick="window.location.href=isIOS ? appStoreLink : playStoreLink"
+                  class="btn submit"
+                  style="background-color: var(--primary-color)"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <script>
-      // DOM Elements
-      const storyCard = document.getElementById("stories-card");
-      const storyContainer = document.getElementById("story-container");
-      const storyIndicators = document.getElementById("story-indicators");
-      const storyCaption = document.getElementById("story-caption");
-      const actionBtn = document.getElementById("action-btn");
-      const muteBtn = document.getElementById("mute-btn");
-      const closeBtn = document.getElementById("close-btn");
-      const navPrev = document.getElementById("nav-prev");
-      const navNext = document.getElementById("nav-next");
-      const muteIcon = document.getElementById("mute-icon");
+      // Store links
+      const playStoreLink = "https://play.google.com/";
+      const appStoreLink = "https://www.apple.com/app-store/";
 
-      // Apply styling from appConfig
-      document.documentElement.style.setProperty(
-        "--button-color",
-        appConfig.buttonColor
-      );
-      document.documentElement.style.setProperty(
-        "--button-text-color",
-        appConfig.buttonTextColor
-      );
-      document.documentElement.style.setProperty(
-        "--caption-color",
-        appConfig.captionColor
-      );
+      // Detect platform
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      if (!appConfig.captionShadow) {
-        storyCaption.classList.add("caption-no-shadow");
-      }
+      // Define option text in one place only
+      const optionMap = {
+        option1: "Difficult navigation",
+        option2: "Process is not easy",
+        option3: "Steps are not simple",
+        option4: "Technical issue",
+      };
 
-      if (appConfig.theme === "dark") {
-        document.body.classList.add("dark-theme");
-      }
+      // Global variable for event name
+      const eventName = "NPS_SUBMITTED";
 
-      storyCard.style.width = appConfig.cardWidth;
-      storyCard.style.height = appConfig.cardHeight;
-      storyCard.style.borderRadius = appConfig.cardBorderRadius;
+      // Populate the spans with the option text on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        // Fill in option text in the spans
+        document.querySelectorAll("[data-option]").forEach((span) => {
+          const optionKey = span.getAttribute("data-option");
+          span.textContent = optionMap[optionKey];
+        });
 
-      // State variables
-      let currentStoryIndex = 0;
-      let isMuted = true;
-      let autoAdvanceTimer = null;
-      let animationFrame = null;
-      let analyticsAlreadySent = false;
-      let viewedStories = new Set();
-      let buttonClicked = false;
+        let popup = document.getElementById("myPopup");
+        let closeButton = document.getElementById("close");
 
-      // Disable zooming
-      document.addEventListener(
-        "touchmove",
-        function (e) {
-          if (e.scale !== 1) e.preventDefault();
-        },
-        { passive: false }
-      );
-
-      // Create story indicators
-      stories.forEach(() => {
-        const indicator = document.createElement("div");
-        indicator.className = "story-indicator";
-
-        const progress = document.createElement("div");
-        progress.className = "story-indicator-progress";
-
-        indicator.appendChild(progress);
-        storyIndicators.appendChild(indicator);
+        function openPopup() {
+          popup.style.display = "flex"; // Make it visible
+          setTimeout(() => popup.classList.add("show"), 50); // Start animation
+        }
+        openPopup();
       });
 
-      // Create story elements
-      stories.forEach((story, index) => {
-        const storyItem = document.createElement("div");
-        storyItem.className = `story-item ${index === 0 ? "active" : ""}`;
-
-        if (story.type === "video") {
-          const video = document.createElement("video");
-          video.src = story.src;
-          video.loop = true;
-          video.muted = true;
-          video.playsInline = true;
-          video.preload = "auto";
-          storyItem.appendChild(video);
-        } else {
-          const img = document.createElement("img");
-          img.src = story.src;
-          img.alt = story.caption || `Story ${index + 1}`;
-          storyItem.appendChild(img);
-        }
-
-        storyContainer.appendChild(storyItem);
-      });
-
-      // Send analytics to CleverTap
-      function sendToCleverTap(eventName, props) {
-        try {
-          if (window.CleverTap) {
-            // Android interface
-            CleverTap.pushEvent(eventName, JSON.stringify(props));
-          } else if (
-            window.webkit &&
-            window.webkit.messageHandlers &&
-            window.webkit.messageHandlers.clevertap
-          ) {
-            // iOS interface
-            window.webkit.messageHandlers.clevertap.postMessage({
-              action: "recordEventWithProps",
-              event: eventName,
-              properties: props,
-            });
-          } else if (typeof clevertap !== "undefined") {
-            // Web interface
-            clevertap.event.push(eventName, props);
-          } else {
-            console.log("CleverTap event:", eventName, props);
-          }
-        } catch (e) {
-          console.log("Error sending to CleverTap:", e);
-        }
-      }
-
-      // Send carousel completed event (with stats)
-      function sendCarouselCompletionEvent() {
-        if (analyticsAlreadySent) return;
-
-        const props = {
-          totalStories: stories.length,
-          viewedCount: viewedStories.size,
-          buttonClicked: buttonClicked,
-        };
-
-        sendToCleverTap("StoryView", props);
-        analyticsAlreadySent = true;
-      }
-
-      // Send CTA clicked event
-      function sendCTAClickedEvent(link) {
-        sendToCleverTap("StoryCTA", {
-          storyIndex: currentStoryIndex + 1,
-          destination: link,
-        });
-      }
-
-      // Animate progress bar
-      function animateProgress(progressElement, duration) {
-        if (animationFrame) {
-          cancelAnimationFrame(animationFrame);
-        }
-
-        const startTime = Date.now();
-
-        function step() {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-
-          progressElement.style.width = `${progress * 100}%`;
-
-          if (progress < 1) {
-            animationFrame = requestAnimationFrame(step);
-          }
-        }
-
-        animationFrame = requestAnimationFrame(step);
-      }
-
-      // Update the display for the current story
-      function updateStoryView() {
-        // Track story view
-        viewedStories.add(currentStoryIndex);
-
-        // if (viewedStories.size === 1) {
-        // sendCarouselOpenedEvent();
-        // }
-
-        // Clear timers
-        if (autoAdvanceTimer) {
-          clearTimeout(autoAdvanceTimer);
-        }
-        if (animationFrame) {
-          cancelAnimationFrame(animationFrame);
-        }
-
-        const allStories = storyContainer.querySelectorAll(".story-item");
-        const allIndicators =
-          storyIndicators.querySelectorAll(".story-indicator");
-        const currentStory = stories[currentStoryIndex];
-
-        // Update indicators
-        allIndicators.forEach((indicator, idx) => {
-          const progress = indicator.querySelector(".story-indicator-progress");
-          if (idx < currentStoryIndex) {
-            indicator.classList.add("complete");
-            progress.style.width = "100%";
-          } else if (idx > currentStoryIndex) {
-            indicator.classList.remove("complete");
-            progress.style.width = "0%";
-          } else {
-            indicator.classList.remove("complete");
-            progress.style.width = "0%";
-
-            let duration = appConfig.imageViewDuration;
-
-            if (currentStory.type === "video") {
-              const videoElement =
-                allStories[currentStoryIndex].querySelector("video");
-              if (videoElement && videoElement.duration) {
-                duration = videoElement.duration * 1000 + appConfig.videoBuffer;
-              }
-            }
-
-            if (appConfig.autoAdvance) {
-              animateProgress(progress, duration);
-            }
-          }
-        });
-
-        // Update story visibility
-        allStories.forEach((item, index) => {
-          item.classList.toggle("active", index === currentStoryIndex);
-        });
-
-        // Stop all videos
-        const allVideos = storyContainer.querySelectorAll("video");
-        allVideos.forEach((video) => video.pause());
-
-        // Handle current media
-        if (currentStory.type === "video") {
-          const currentVideo =
-            allStories[currentStoryIndex].querySelector("video");
-          if (currentVideo) {
-            currentVideo.muted = isMuted;
-            currentVideo.currentTime = 0;
-            currentVideo.play();
-            muteBtn.style.display = "flex";
-          }
-        } else {
-          muteBtn.style.display = "none";
-        }
-
-        // Update caption and action button
-        storyCaption.textContent = currentStory.caption || "";
-
-        if (currentStory.link) {
-          actionBtn.style.display = "inline-block";
-          actionBtn.href = currentStory.link;
-          // actionBtn.textContent = currentStory.buttonText || appConfig.defaultButtonText;
-        } else {
-          actionBtn.style.display = "none";
-        }
-
-        // Set auto advance
-        if (appConfig.autoAdvance) {
-          let duration = appConfig.imageViewDuration;
-
-          if (currentStory.type === "video") {
-            const videoElement =
-              allStories[currentStoryIndex].querySelector("video");
-            if (videoElement && videoElement.duration) {
-              duration = videoElement.duration * 1000 + appConfig.videoBuffer;
-            }
-          }
-
-          autoAdvanceTimer = setTimeout(goToNextStory, duration);
-        }
-      }
-
-      function goToNextStory() {
-        if (currentStoryIndex < stories.length - 1) {
-          currentStoryIndex++;
-          updateStoryView();
-        } else {
-          closeStories();
-        }
-      }
-
-      function goToPrevStory() {
-        if (currentStoryIndex > 0) {
-          currentStoryIndex--;
-          updateStoryView();
-        }
-      }
-
-      function closeStories() {
-        sendCarouselCompletionEvent();
+      document.querySelector("#close").addEventListener("click", function () {
         if (window.CleverTap) {
           CleverTap.dismissInAppNotification();
+        }
+      });
+
+      // Get the modal
+      var modal = document.getElementById("myPopup");
+
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      let starval = 0;
+      let campaign_name = "SERVICE-B2B-E-Agreement-5STAR-1";
+      const labels = document.querySelectorAll('label input[type="checkbox"]');
+      const checkButton = document.querySelectorAll(".checkBtn");
+      let isReasonChecked = 0;
+      const errorMessage = document.getElementById("error-message");
+
+      document.getElementById("submit").addEventListener("click", function () {
+        const selectedReasons = document.querySelectorAll(
+          'input[name="options"]:checked'
+        );
+        const messageDetails =
+          document.getElementById("additionalDetails").value;
+        const messegeText = messageDetails.trim();
+
+        console.log(messageDetails, "text lenght");
+        // Check if no checkboxes are selected
+        if (isReasonChecked === 0) {
+          errorMessage.style.display = "block";
+          return;
         } else {
-          document.location.href = "wzrk://thisleadstonowhere";
+          errorMessage.style.display = "none"; // Hide the error message if validation passes
+        }
+
+        if (
+          (messageDetails.length > 0 && messegeText.length < 20) ||
+          messegeText.length > 200
+        ) {
+          errorMessage.innerHTML = "Only 20 to 200 characters are accepted";
+          errorMessage.style.display = "block";
+          return;
+        } else {
+          errorMessage.style.display = "none";
+        }
+
+        var props = {
+          EP_NPS_SCORE: starval,
+          EP_NPS_JOURNEY: campaign_name,
+          EP_COMMENT1: messageDetails,
+        };
+
+        if (selectedReasons.length === 0) {
+          errorMessage.style.display = "block";
+          return;
+        } else {
+          errorMessage.style.display = "none"; // Hide the error message if validation passes
+        }
+
+        const additionalDetailsTextarea =
+          document.getElementById("additionalDetails");
+
+        // Add selected reasons to props
+        selectedReasons.forEach(function (checkbox) {
+          const optionKey = checkbox.value;
+          const reasonText = optionMap[optionKey];
+
+          switch (optionKey) {
+            case "option1":
+              props["EP_REASON1"] = reasonText;
+              break;
+            case "option2":
+              props["EP_REASON2"] = reasonText;
+              break;
+            case "option3":
+              props["EP_REASON3"] = reasonText;
+              break;
+            case "option4":
+              props["EP_REASON4"] = reasonText;
+              break;
+            default:
+              break;
+          }
+        });
+
+        console.log(props);
+
+        if (window.CleverTap) {
+          CleverTap.pushEvent(eventName, JSON.stringify(props));
+        }
+
+        // Hide the feedback container and show the finish-rating container
+        document.querySelector(".bad-rating-container").style.display = "none";
+        document.querySelector(".feedback-button-container").style.display =
+          "none";
+        document.querySelector(".top-heading").style.display = "none";
+        document.getElementById("submit").style.display = "none";
+        document.querySelector(".finish-rating-container").style.display =
+          "block";
+      });
+
+      // Handle good submit function for store redirect
+      function handlegoodSubmit() {
+        window.location.href = isIOS ? appStoreLink : playStoreLink;
+      }
+
+      function handleStarSel(starValue) {
+        let feedbackbutton = document.querySelector(
+          ".feedback-button-container"
+        );
+        feedbackbutton.style.transformOrigin = "top";
+        feedbackbutton.style.margin = "0";
+        feedbackbutton.style.padding = "0";
+
+        let badRatingContainer = document.querySelector(
+          ".bad-rating-container"
+        );
+        badRatingContainer.style.width = "95%";
+        badRatingContainer.style.border = "0px solid gray";
+        badRatingContainer.style.margin = "0 auto";
+        badRatingContainer.style.padding = "5";
+        badRatingContainer.style.display = "block";
+        badRatingContainer.style.marginBottom = "0";
+        feedbackbutton.style.marginTop = "0";
+
+        starval = starValue;
+
+        if (starValue < 4) {
+          if (starValue === 0) {
+            document.querySelector(".bad-rating-container").style.display =
+              "none";
+            document.querySelector(".positive-rating-container").style.display =
+              "none";
+          }
+          document.querySelector(".positive-rating-container").style.display =
+            "none";
+          document.querySelector(".rating-butn").style.display = "block";
+        } else {
+          document.querySelector(".bad-rating-container").style.display =
+            "none";
+          document.querySelector(".rating-butn").style.display = "none";
+          document.querySelector(".error-message").style.display = "none";
+          document.querySelector(".positive-rating-container").style.display =
+            "block";
         }
       }
 
-      function toggleMute() {
-        isMuted = !isMuted;
+      if (starval === 0) {
+        handleStarSel(starval);
+      }
 
-        // Update mute icon
-        muteIcon.innerHTML = isMuted
-          ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
-          : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+      function handleStarClick(starValue) {
+        const starContainers = document.querySelectorAll(".star-container");
 
-        // Update current video
-        if (stories[currentStoryIndex].type === "video") {
-          const currentVideo = storyContainer.querySelector(
-            ".story-item.active video"
-          );
-          if (currentVideo) currentVideo.muted = isMuted;
-        }
-
-        // Restart auto-advance timer and animation to prevent pause
-        // This ensures the story continues to progress after mute toggle
-        if (appConfig.autoAdvance) {
-          // Clear existing timers first
-          if (autoAdvanceTimer) {
-            clearTimeout(autoAdvanceTimer);
-          }
-          if (animationFrame) {
-            cancelAnimationFrame(animationFrame);
-          }
-
-          // Calculate remaining duration based on current story type
-          let duration = appConfig.imageViewDuration;
-          if (stories[currentStoryIndex].type === "video") {
-            const videoElement = storyContainer.querySelector(
-              ".story-item.active video"
-            );
-            if (videoElement && videoElement.duration) {
-              const elapsed = videoElement.currentTime * 1000;
-              duration =
-                videoElement.duration * 1000 + appConfig.videoBuffer - elapsed;
+        starContainers.forEach((container, index) => {
+          const starButtons = container.querySelectorAll(".feedback-button");
+          starButtons.forEach((button) => {
+            if (index === starValue) {
+              button.classList.add("active");
+            } else {
+              button.classList.remove("active");
             }
-          }
-
-          // Restart progress animation
-          const progressElement = storyIndicators
-            .querySelectorAll(".story-indicator")
-            [currentStoryIndex].querySelector(".story-indicator-progress");
-
-          // Get current width percentage to continue from where it left off
-          const currentWidth = parseFloat(progressElement.style.width || "0");
-          const remainingDuration = duration * (1 - currentWidth / 100);
-
-          animateProgress(progressElement, remainingDuration);
-
-          // Restart auto advance timer
-          autoAdvanceTimer = setTimeout(goToNextStory, remainingDuration);
-        }
+          });
+        });
       }
 
-      // Event listeners
-      actionBtn.addEventListener("click", () => {
-        buttonClicked = true;
-        sendCTAClickedEvent(actionBtn.href);
-        sendCarouselCompletionEvent();
-      });
+      const images = document.querySelectorAll(".rotatable");
 
-      navPrev.addEventListener("click", (e) => {
-        e.preventDefault();
-        goToPrevStory();
-      });
-
-      navNext.addEventListener("click", (e) => {
-        e.preventDefault();
-        goToNextStory();
-      });
-
-      muteBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        toggleMute();
-      });
-
-      closeBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        closeStories();
-      });
-
-      // Disable context menu
-      document.addEventListener("contextmenu", (e) => e.preventDefault());
-
-      // Handle touch events
-      let touchStartX = 0;
-
-      storyCard.addEventListener(
-        "touchstart",
-        (e) => {
-          touchStartX = e.changedTouches[0].screenX;
-
-          // Pause auto advance while touching
-          if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
-          if (animationFrame) cancelAnimationFrame(animationFrame);
-        },
-        { passive: true }
-      );
-
-      storyCard.addEventListener(
-        "touchend",
-        (e) => {
-          const touchEndX = e.changedTouches[0].screenX;
-          const swipeThreshold = 50;
-
-          if (touchEndX < touchStartX - swipeThreshold) {
-            goToNextStory();
-          } else if (touchEndX > touchStartX + swipeThreshold) {
-            goToPrevStory();
+      images.forEach((image) => {
+        image.onclick = function () {
+          if (image.classList.contains("rotate-180")) {
+            image.classList.remove("rotate-180");
+          } else {
+            image.classList.add("rotate-180");
           }
-        },
-        { passive: true }
-      );
+        };
+      });
 
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-          // User has switched away - pause videos and timers
-          const currentVideo = storyContainer.querySelector(
-            ".story-item.active video"
-          );
-          if (currentVideo) currentVideo.pause();
+      const starContainers = document.querySelectorAll(".star-container");
 
-          if (autoAdvanceTimer) {
-            clearTimeout(autoAdvanceTimer);
+      starContainers.forEach((container, index) => {
+        container.addEventListener("click", () => {
+          handleStarClick(index);
+        });
+      });
+
+      function handleStarHover(starValue) {
+        const starContainers = document.querySelectorAll(".star-container");
+
+        starContainers.forEach((container, index) => {
+          const starButtons = container.querySelectorAll(".feedback-button");
+          starButtons.forEach((button, buttonIndex) => {
+            if (buttonIndex <= starValue && index <= starValue - 1) {
+              button.classList.add("star-hover");
+            } else {
+              button.classList.remove("star-hover");
+            }
+          });
+        });
+      }
+
+      starContainers.forEach((container, index) => {
+        container.addEventListener("mouseover", () => {
+          handleStarHover(index);
+        });
+
+        container.addEventListener("mouseout", () => {
+          handleStarHover(-1);
+        });
+      });
+
+      starContainers.forEach((container, index) => {
+        container.addEventListener("touchstart", () => {
+          handleStarHover(index);
+        });
+
+        container.addEventListener("touchend", () => {
+          handleStarHover(-1);
+        });
+      });
+
+      starContainers.forEach((container, index) => {
+        container.addEventListener("click", () => {
+          handleStarClick(index);
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        function updateLabelBorder(event) {
+          if (event.target.checked) {
+            errorMessage.style.display = "none";
+            isReasonChecked = 1;
           }
-          if (animationFrame) {
-            cancelAnimationFrame(animationFrame);
-          }
-
-          // Don't send completion event here, as it could just be notification panel
-        } else {
-          // User has returned - resume current story
-          updateStoryView();
         }
+        checkButton.forEach(function (checkbox) {
+          checkbox.addEventListener("change", updateLabelBorder);
+        });
       });
-
-      // Initialize
-      updateStoryView();
     </script>
   </body>
 </html>
