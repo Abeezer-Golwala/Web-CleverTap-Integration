@@ -1,171 +1,84 @@
-{% capture HEADER_IMAGE %}
-<svg
-  width="100"
-  height="100"
-  viewBox="0 0 100 100"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M59.0566 98.4574L63.8034 100L69.0551 83.8404L64.3071 82.2981L59.0566 98.4574Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M42.0063 85.3264L37.2595 83.7838L42.51 67.6245L47.2567 69.1671L42.0063 85.3264Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M11 82.8428L15.7468 84.3853L20.9985 68.2257L16.2504 66.6835L11 82.8428Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M16.094 58.9359C16.094 58.9359 13.7289 58.1673 14.4981 55.8021L24.9668 23.5821C24.9668 23.5821 25.7351 21.2172 28.0993 21.9852L34.2017 23.9683C34.2017 23.9683 36.5662 24.7362 37.3355 22.3714L40.4083 12.9126C40.4083 12.9126 41.1766 10.5486 43.5408 11.3169L51.3033 13.8387C51.3033 13.8387 53.6675 14.607 54.4355 12.2412L57.3179 3.37353C57.3179 3.37353 58.0859 1.00867 60.4504 1.77791L71.4471 5.35062C71.4471 5.35062 73.8113 6.11891 73.043 8.48314L70.1619 17.3518C70.1619 17.3518 69.3939 19.7157 71.7578 20.484L79.5212 23.007C79.5212 23.007 81.8867 23.775 81.1175 26.1399L78.0443 35.599C78.0443 35.599 77.276 37.9639 79.6403 38.7325L85.742 40.7149C85.742 40.7149 88.1063 41.4829 87.338 43.8477L76.869 76.0675C76.869 76.0675 76.0998 78.4324 73.7358 77.6647L63.9969 74.5006C63.9969 74.5006 61.6324 73.732 62.4007 71.3668L67.0413 57.0845C67.0413 57.0845 67.8096 54.719 65.4445 53.9507L61.0106 52.5098C61.0106 52.5098 58.6451 51.7422 57.8771 54.1074L55.524 61.3466C55.524 61.3466 54.7557 63.7121 52.3915 62.9435L42.0144 59.5719C42.0144 59.5719 39.6501 58.8033 40.4184 56.4384L42.7707 49.1983C42.7707 49.1983 43.5389 46.8334 41.1747 46.0654L36.756 44.6287C36.756 44.6287 34.3905 43.8607 33.6222 46.2259L28.9816 60.5085C28.9816 60.5085 28.2133 62.874 25.8491 62.1044L16.094 58.9359Z"
-    fill="#FA1E41"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M73.2344 79.207L63.4955 76.0423C61.9258 75.5323 59.9259 73.7324 60.8578 70.8654L65.4985 56.5828C65.7356 55.751 65.1805 55.5701 64.9433 55.4934L60.5085 54.0528C59.6774 53.8147 59.4968 54.3708 59.4201 54.6076L57.0669 61.8484C57.0154 62.0069 56.7208 62.8396 56.0008 63.5716C54.9177 64.6711 53.4579 64.9951 51.8903 64.4864L41.5132 61.1142C39.9426 60.6036 37.9446 58.8046 38.8755 55.9377L41.2284 48.6975C41.4649 47.8645 40.9095 47.6848 40.6733 47.6071L36.2546 46.1716C35.4219 45.9345 35.2422 46.4896 35.1655 46.7267L30.5245 61.0094C30.473 61.1688 30.1774 62.0019 29.4578 62.7326C28.3753 63.8321 26.9158 64.1571 25.3479 63.6474L15.5929 60.4786C14.0219 59.9676 12.0234 58.1686 12.9549 55.3007L23.4236 23.081C23.9336 21.51 25.7345 19.5121 28.6005 20.443L34.7032 22.4254C35.5349 22.6629 35.7156 22.1065 35.7923 21.8703L38.8654 12.4112C39.3761 10.8402 41.176 8.84255 44.0433 9.77346L51.8044 12.2949C52.6371 12.5324 52.8159 11.9773 52.8936 11.7408L55.7747 2.87245C55.8262 2.71267 56.1221 1.87996 56.8417 1.14893C57.9242 0.0497118 59.3837 -0.274276 60.9525 0.235389L71.9482 3.8081C72.1077 3.85957 72.9407 4.15451 73.6714 4.87417C74.771 5.95729 75.0959 7.41713 74.5862 8.98497L71.7051 17.8523C71.4676 18.6844 72.0228 18.8641 72.2602 18.9418L80.0224 21.4636C80.1818 21.516 81.0148 21.8109 81.7459 22.5306C82.8451 23.614 83.17 25.0726 82.6604 26.6404L79.5872 36.0996C79.3501 36.9313 79.9052 37.1123 80.1414 37.1887L86.2432 39.1714C86.4017 39.2242 87.2344 39.5188 87.9654 40.2388C89.0647 41.3206 89.3899 42.7805 88.8809 44.3483L78.4113 76.569C78.3598 76.7288 78.0648 77.5615 77.3452 78.2925C76.5962 79.0526 75.6675 79.4423 74.6478 79.4423C74.1925 79.4423 73.7191 79.3646 73.2344 79.207ZM61.5118 50.9667L65.9466 52.4085C68.8126 53.3391 69.0945 56.0144 68.5846 57.5851L63.9429 71.8677C63.7661 72.414 63.9527 72.7803 64.4981 72.9572L74.237 76.1219C74.7609 76.2911 74.9181 76.132 75.0334 76.0158C75.2191 75.8282 75.3252 75.5686 75.3261 75.5667L85.7948 43.3457C85.8725 43.1086 86.0521 42.5544 85.2153 42.2484L79.1391 40.2738C77.5713 39.7651 76.581 38.6447 76.3518 37.1183C76.1996 36.1037 76.4496 35.2567 76.5024 35.097L79.5752 25.6378C79.7448 25.114 79.5863 24.9567 79.4691 24.8424C79.2815 24.6567 79.0229 24.5497 79.0201 24.5497L71.2579 22.0269C69.6901 21.5179 68.6998 20.3965 68.4696 18.871C68.3171 17.8564 68.5675 17.0095 68.6199 16.85L71.5011 7.98237C71.6716 7.45755 71.5112 7.30092 71.395 7.18598C71.2071 7.0003 70.9478 6.8942 70.9456 6.89325L59.9493 3.32054C59.4242 3.1497 59.2675 3.30949 59.1526 3.42538C58.9679 3.61327 58.8608 3.87284 58.8599 3.87473L55.9787 12.7434C55.47 14.3112 54.3484 15.3015 52.8228 15.5304C51.8095 15.6829 50.9613 15.4325 50.8018 15.381L43.0397 12.8592C42.4956 12.6827 42.1281 12.8684 41.9506 13.4138L38.8784 22.8729C37.9456 25.7398 35.2703 26.0206 33.7006 25.5106L27.5982 23.5281C26.9186 23.3068 26.6309 23.7078 26.5087 24.0833L16.0401 56.303C15.9633 56.5392 15.7846 57.0906 16.6085 57.3969L16.5952 57.3934L16.6126 57.3985C16.6154 57.3994 16.6173 57.4004 16.6205 57.4013L16.6287 57.4035L26.3502 60.5622C26.5877 60.639 27.1419 60.8196 27.4475 59.9828L32.0794 45.7245C32.589 44.1566 33.7097 43.1663 35.2349 42.9371C36.2495 42.7836 37.0977 43.034 37.2572 43.0865L41.6759 44.522C44.5419 45.4538 44.8235 48.1288 44.3136 49.6998L41.9604 56.94C41.884 57.1762 41.704 57.7316 42.5411 58.0373L52.8926 61.4013C53.1298 61.478 53.684 61.6577 53.9899 60.8205L56.334 53.6057C56.8439 52.0369 57.9643 51.0475 59.4898 50.8173C59.7219 50.782 59.9449 50.769 60.152 50.769C60.8556 50.769 61.3886 50.9263 61.5118 50.9667Z"
-    fill="#00D1F9"
-  />
-</svg>
-
-{% endcapture %} {% capture HEADLINE %} Unlock More Power With Every Click that
-you do. {% endcapture %} {% capture TEXT %} Discover new ideas, unlock growth,
-and turn vision into reality. {% endcapture %} {% assign HEADER_BACKGROUND_COLOR
-= "#FA1E41" %} {% assign HEADLINE_COLOR = "#FA1E41" %} {% assign TEXT_COLOR =
-"#222222" %} {% assign BUTTON_TEXT_COLOR = "#1487C8" %} {% assign
-BUTTON_BORDER_COLOR = "#D9D9D9" %}
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <link href="https://fonts.cdnfonts.com/css/apercu-pro" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Carousel with Close Button</title>
     <style>
-      :root {
-      --header-background-color: {{ HEADER_BACKGROUND_COLOR }};
-      --headline-color: {{ HEADLINE_COLOR }};
-      --text-color: {{ TEXT_COLOR }};
-      --button-text-color: {{ BUTTON_TEXT_COLOR }};
-      --button-border-color: {{ BUTTON_BORDER_COLOR }};
+      .carousel-container {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
       }
 
-      .main {
-      font-family: "Apercu Pro", sans-serif;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0px 8px 16px rgba(34, 34, 34, 0.15);
-      background-color: white;
-      border: 2px solid #FFFFFF;
-      margin-top: 85px;
+      .carousel {
+        display: flex;
+        transition: transform 0.5s ease;
       }
 
-      .header {
-      display: flex;
-      justify-content: center;
-      background: var(--header-background-color);
-      padding: 20.5px 0;
+      .carousel img {
+        width: 100%;
+        height: auto;
       }
 
-      .content {
-      display: flex;
-      gap: 12px;
-      flex-flow: column;
-      padding: 24px 16px;
-      text-align: center;
+      /* Close icon fixed to the top-right corner of the carousel */
+      .close-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 5px;
+        cursor: pointer;
+        border-radius: 25%;
+        z-index: 1000;
       }
 
-      .headline {
-      color: var(--headline-color);
-      font-weight: 700;
-      font-size: 20px;
-      }
-
-      .text {
-      color: var(--text-color);
-      font-weight: 600;
-      font-size: 16px;
-      }
-
-      .button-footer {
-      display: flex;
-      border-top: 1px solid var(--button-border-color);
-      text-align: center;
-      }
-
-      .button-footer a {
-      color: var(--button-text-color);
-      text-decoration: none;
-      flex: 1;
-      padding: 11px 16px;
-      font-size: 18px;
-      font-weight: 600;
-      }
-
-      .button-footer a:not(:first-child) {
-      border-left: 1px solid var(--button-border-color);
+      .close-icon:hover {
+        background-color: rgba(0, 0, 0, 0.8);
       }
     </style>
   </head>
   <body>
-    <div class="main">
-      <div class="header">{{ HEADER_IMAGE }}</div>
-
-      <div class="content">
-        <span class="headline">{{ HEADLINE }}</span>
-        <span class="text">{{ TEXT }}</span>
-      </div>
-
-      <div class="button-footer">
-        <a href="wzrk://noware">Close</a>
-        <a onclick="copyToClipboard()">Click Here.</a>
+    <div class="carousel-container">
+      <span class="close-icon" onclick="closepop()">X</span>
+      <!-- Close icon here -->
+      <div class="carousel">
+        <img
+          src="https://pbs.twimg.com/media/FBY0AfEVgAUU8km.jpg:large"
+          alt="Image 1"
+        />
+        <img
+          src="https://rukminim2.flixcart.com/image/850/1000/xif0q/watch/4/w/1/1-crystal-studded-rose-gold-carlington-women-original-imagvxy984krxgue.jpeg?q=20&crop=false"
+          alt="Image 2"
+        />
+        <img
+          src="https://img.pikbest.com/origin/08/95/90/94npIkbEsTV3c.jpg!w700wp"
+          alt="Image 3"
+        />
       </div>
     </div>
-    <script>
-      function copyToClipboard() {
-        var text = "PC100";
-        let input = document.createElement("input");
-        input.value = text;
-        document.body.appendChild(input);
-        input.focus();
-        input.select();
-        input.setSelectionRange(0, input.value.length);
 
-        try {
-          let successful = document.execCommand("copy");
-          if (successful) {
-            document.querySelector(".main").style.display = "none";
-            swal
-              .fire({
-                title: "Copied!",
-                text: "Coupon code copied to clipboard.",
-                icon: "success",
-                confirmButtonText: "OK",
-              })
-              .then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href = "wzrk://nowhere";
-                }
-              });
-            console.log("Copied!");
-          } else {
-            console.error("Copyy failed.");
-          }
-        } catch (err) {
-          console.error("Error copying textt: ", err);
+    <script>
+      const carousel = document.querySelector(".carousel");
+      const images = document.querySelectorAll(".carousel img");
+      let counter = 0;
+      const intervalTime = 2000;
+
+      function nextSlide() {
+        counter++;
+        if (counter === images.length) {
+          counter = 0;
         }
-        document.body.removeChild(input);
+        carousel.style.transform = `translateX(-${counter * 100}%)`;
       }
+
+      function closepop() {
+        CleverTap.dismissInAppNotification();
+      }
+
+      setInterval(nextSlide, intervalTime);
     </script>
   </body>
 </html>
