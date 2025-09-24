@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Stories Carousel</title>
+    <script>
+      // Simple appConfiguration
+      const appConfig = {
+        autoAdvance: true,
+        imageViewDuration: 5000,
+        videoBuffer: 1000,
+        cardWidth: "360px",
+        cardHeight: "640px",
+        cardBorderRadius: "24px",
+        theme: "dark",
+        buttonColor: "#ffffff",
+        buttonTextColor: "#333333",
+        captionColor: "#ffffff",
+        captionShadow: true,
+      };
+
+      // Stories content
+      const storiesData = [
+        {
+          src: "https://i.pinimg.com/originals/1e/59/0a/1e590a487aa837bc0802dc7b6186067e.gif",
+          type: "image",
+          link: "",
+          caption: "Explore New Trends",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://assets.vogue.com/photos/62f6a408b2e176a484ef7c6a/3:4/w_748%2Cc_limit/slide_15.jpg",
+          type: "image",
+          link: "",
+          caption: "Premium mascara for fuller lashes",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://static.beautytocare.com/cdn-cgi/image/width=1600,height=1600,f=auto/media/catalog/product//n/e/neve-cosmetics-single-blush-teacup-3g_1.jpg",
+          type: "image",
+          link: "",
+          caption: "Natural blush for healthy glow",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://img.buzzfeed.com/buzzfeed-static/static/2019-06/14/11/asset/buzzfeed-prod-web-02/sub-buzz-7763-1560526406-1.png?crop=499%3A654%3B0%2C0&downsize=900:*&output-format=auto&output-quality=auto",
+          type: "image",
+          link: "",
+          caption: "Find your perfect shade",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://d2hy56m2o6qi9y.cloudfront.net/wp-content/uploads/2020/10/12171309/1-Natural-Glow.jpg",
+          type: "image",
+          link: "",
+          caption: "Achieve a natural glow",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://www.w3schools.com/html/mov_bbb.mp4",
+          type: "video",
+          link: "https://www.glamour.com/story/2025-fashion-trends",
+          caption: "Watch our tutorial",
+          buttonText: "Learn More",
+        },
+      ];
+      // Limit the number of stories if maxStories is set
+      // if (
+      // appConfig.maxStories &&
+      // appConfig.maxStories > 0 &&
+      // appConfig.maxStories < stories.length
+      // ) {
+      // stories = stories.slice(0, appConfig.maxStories);
+      // }
+    </script>
+    <style>
+      /* Reset and base styles */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --text-light: #ffffff;
+        --text-dark: #333333;
+        --bg-light: #ffffff;
+        --bg-dark: #121212;
+        --shadow-light: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.25);
+        --button-color: #ffffff;
+        --button-text-color: #333333;
+        --caption-color: #ffffff;
+      }
+
+      html,
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        position: fixed;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: var(--bg-light);
+      }
+
+      body.dark-theme {
+        background: var(--bg-dark);
+        color: var(--text-light);
+      }
+
+      /* Main carousel card */
+      .stories-card {
+        position: relative;
+        width: 360px;
+        height: 640px;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-light);
+        background: var(--bg-light);
+      }
+
+      .dark-theme .stories-card {
+        background: var(--bg-dark);
+        box-shadow: var(--shadow-dark);
+      }
+
+      /* Header with indicators */
+      .stories-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 20;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.6) 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
+      }
+
+      /* Progress indicators */
+      .story-indicators {
+        display: flex;
+        flex: 1;
+        gap: 4px;
+        margin-right: 12px;
+      }
+
+      .story-indicator {
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.3);
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .story-indicator-progress {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0%;
+        background: #ffffff;
+        border-radius: 2px;
+      }
+
+      .story-indicator.complete .story-indicator-progress {
+        width: 100%;
+      }
+
+      /* Control buttons */
+      .icon-button {
+        background: rgba(0, 0, 0, 0.3);
+        border: none;
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Media container */
+      .story-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .story-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transform: scale(1.05);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        pointer-events: none;
+      }
+
+      .story-item.active {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+
+      .story-item img,
+      .story-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Caption and action area */
+      .story-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 24px;
+        background: linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.7) 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .story-caption {
+        color: var(--caption-color);
+        font-size: 16px;
+        font-weight: 500;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .caption-no-shadow {
+        text-shadow: none;
+      }
+
+      .action-button {
+        background: var(--button-color);
+        color: var(--button-text-color);
+        border: none;
+        padding: 14px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 30px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Video controls */
+      .video-controls {
+        position: absolute;
+        bottom: 90px;
+        right: 20px;
+        z-index: 15;
+      }
+
+      /* Navigation overlay */
+      .navigation-overlay {
+        position: absolute;
+        top: 60px;
+        bottom: 100px;
+        width: 100%;
+        z-index: 10;
+        display: flex;
+      }
+
+      .nav-prev,
+      .nav-next {
+        width: 50%;
+        height: 100%;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
+
+    <script>
+      // Dynamic content configuration
+      const config = {
+        autoAdvance: true,
+        imageViewDuration: 5000,
+        videoBuffer: 1000,
+        cardWidth: "360px",
+        cardHeight: "640px",
+        cardBorderRadius: "24px",
+        theme: "dark",
+        buttonColor: "#ffffff",
+        buttonTextColor: "#333333",
+        captionColor: "#ffffff",
+        captionShadow: true,
+      };
+
+      const stories = [
+        {
+          src: "https://i.pinimg.com/originals/1e/59/0a/1e590a487aa837bc0802dc7b6186067e.gif",
+          type: "image",
+          link: "",
+          caption: "Explore New Trends",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://assets.vogue.com/photos/62f6a408b2e176a484ef7c6a/3:4/w_748%2Cc_limit/slide_15.jpg",
+          type: "image",
+          link: "",
+          caption: "Premium mascara for fuller lashes",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://static.beautytocare.com/cdn-cgi/image/width=1600,height=1600,f=auto/media/catalog/product//n/e/neve-cosmetics-single-blush-teacup-3g_1.jpg",
+          type: "image",
+          link: "",
+          caption: "Natural blush for healthy glow",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://img.buzzfeed.com/buzzfeed-static/static/2019-06/14/11/asset/buzzfeed-prod-web-02/sub-buzz-7763-1560526406-1.png?crop=499%3A654%3B0%2C0&downsize=900:*&output-format=auto&output-quality=auto",
+          type: "image",
+          link: "",
+          caption: "Find your perfect shade",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://d2hy56m2o6qi9y.cloudfront.net/wp-content/uploads/2020/10/12171309/1-Natural-Glow.jpg",
+          type: "image",
+          link: "",
+          caption: "Achieve a natural glow",
+          buttonText: "Learn More",
+        },
+        {
+          src: "https://www.w3schools.com/html/mov_bbb.mp4",
+          type: "video",
+          link: "https://www.glamour.com/story/2025-fashion-trends",
+          caption: "Watch our tutorial",
+          buttonText: "Learn More",
+        },
+      ];
+    </script>
+  </head>
+
+  <body>
+    <div class="stories-card" id="stories-card">
+      <div class="stories-header">
+        <div class="story-indicators" id="story-indicators"></div>
+        <button id="close-btn" class="icon-button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="story-container" id="story-container"></div>
+
+      <div class="navigation-overlay">
+        <div class="nav-prev" id="nav-prev"></div>
+        <div class="nav-next" id="nav-next"></div>
+      </div>
+
+      <div class="video-controls">
+        <button id="mute-btn" class="icon-button">
+          <svg
+            id="mute-icon"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="currentColor"
+          >
+            <path
+              d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="story-footer">
+        <div class="story-caption" id="story-caption"></div>
+        <a
+          id="action-btn"
+          class="action-button"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Learn More</a
+        >
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const storyCard = document.getElementById("stories-card");
+      const storyContainer = document.getElementById("story-container");
+      const storyIndicators = document.getElementById("story-indicators");
+      const storyCaption = document.getElementById("story-caption");
+      const actionBtn = document.getElementById("action-btn");
+      const muteBtn = document.getElementById("mute-btn");
+      const closeBtn = document.getElementById("close-btn");
+      const navPrev = document.getElementById("nav-prev");
+      const navNext = document.getElementById("nav-next");
+      const muteIcon = document.getElementById("mute-icon");
+
+      // Apply styling from appConfig
+      document.documentElement.style.setProperty(
+        "--button-color",
+        appConfig.buttonColor
+      );
+      document.documentElement.style.setProperty(
+        "--button-text-color",
+        appConfig.buttonTextColor
+      );
+      document.documentElement.style.setProperty(
+        "--caption-color",
+        appConfig.captionColor
+      );
+
+      if (!appConfig.captionShadow) {
+        storyCaption.classList.add("caption-no-shadow");
+      }
+
+      if (appConfig.theme === "dark") {
+        document.body.classList.add("dark-theme");
+      }
+
+      storyCard.style.width = appConfig.cardWidth;
+      storyCard.style.height = appConfig.cardHeight;
+      storyCard.style.borderRadius = appConfig.cardBorderRadius;
+
+      // State variables
+      let currentStoryIndex = 0;
+      let isMuted = true;
+      let autoAdvanceTimer = null;
+      let animationFrame = null;
+      let analyticsAlreadySent = false;
+      let viewedStories = new Set();
+      let buttonClicked = false;
+
+      // Disable zooming
+      document.addEventListener(
+        "touchmove",
+        function (e) {
+          if (e.scale !== 1) e.preventDefault();
+        },
+        { passive: false }
+      );
+
+      // Create story indicators
+      stories.forEach(() => {
+        const indicator = document.createElement("div");
+        indicator.className = "story-indicator";
+
+        const progress = document.createElement("div");
+        progress.className = "story-indicator-progress";
+
+        indicator.appendChild(progress);
+        storyIndicators.appendChild(indicator);
+      });
+
+      // Create story elements
+      stories.forEach((story, index) => {
+        const storyItem = document.createElement("div");
+        storyItem.className = `story-item ${index === 0 ? "active" : ""}`;
+
+        if (story.type === "video") {
+          const video = document.createElement("video");
+          video.src = story.src;
+          video.loop = true;
+          video.muted = true;
+          video.playsInline = true;
+          video.preload = "auto";
+          storyItem.appendChild(video);
+        } else {
+          const img = document.createElement("img");
+          img.src = story.src;
+          img.alt = story.caption || `Story ${index + 1}`;
+          storyItem.appendChild(img);
+        }
+
+        storyContainer.appendChild(storyItem);
+      });
+
+      // Send analytics to CleverTap
+      function sendToCleverTap(eventName, props) {
+        try {
+          if (window.CleverTap) {
+            // Android interface
+            CleverTap.pushEvent(eventName, JSON.stringify(props));
+          } else if (
+            window.webkit &&
+            window.webkit.messageHandlers &&
+            window.webkit.messageHandlers.clevertap
+          ) {
+            // iOS interface
+            window.webkit.messageHandlers.clevertap.postMessage({
+              action: "recordEventWithProps",
+              event: eventName,
+              properties: props,
+            });
+          } else if (typeof clevertap !== "undefined") {
+            // Web interface
+            clevertap.event.push(eventName, props);
+          } else {
+            console.log("CleverTap event:", eventName, props);
+          }
+        } catch (e) {
+          console.log("Error sending to CleverTap:", e);
+        }
+      }
+
+      // Send carousel completed event (with stats)
+      function sendCarouselCompletionEvent() {
+        if (analyticsAlreadySent) return;
+
+        const props = {
+          totalStories: stories.length,
+          viewedCount: viewedStories.size,
+          buttonClicked: buttonClicked,
+        };
+
+        sendToCleverTap("StoryView", props);
+        analyticsAlreadySent = true;
+      }
+
+      // Send CTA clicked event
+      function sendCTAClickedEvent(link) {
+        sendToCleverTap("StoryCTA", {
+          storyIndex: currentStoryIndex + 1,
+          destination: link,
+        });
+      }
+
+      // Animate progress bar
+      function animateProgress(progressElement, duration) {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+        }
+
+        const startTime = Date.now();
+
+        function step() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          progressElement.style.width = `${progress * 100}%`;
+
+          if (progress < 1) {
+            animationFrame = requestAnimationFrame(step);
+          }
+        }
+
+        animationFrame = requestAnimationFrame(step);
+      }
+
+      // Update the display for the current story
+      function updateStoryView() {
+        // Track story view
+        viewedStories.add(currentStoryIndex);
+
+        // if (viewedStories.size === 1) {
+        // sendCarouselOpenedEvent();
+        // }
+
+        // Clear timers
+        if (autoAdvanceTimer) {
+          clearTimeout(autoAdvanceTimer);
+        }
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+        }
+
+        const allStories = storyContainer.querySelectorAll(".story-item");
+        const allIndicators =
+          storyIndicators.querySelectorAll(".story-indicator");
+        const currentStory = stories[currentStoryIndex];
+
+        // Update indicators
+        allIndicators.forEach((indicator, idx) => {
+          const progress = indicator.querySelector(".story-indicator-progress");
+          if (idx < currentStoryIndex) {
+            indicator.classList.add("complete");
+            progress.style.width = "100%";
+          } else if (idx > currentStoryIndex) {
+            indicator.classList.remove("complete");
+            progress.style.width = "0%";
+          } else {
+            indicator.classList.remove("complete");
+            progress.style.width = "0%";
+
+            let duration = appConfig.imageViewDuration;
+
+            if (currentStory.type === "video") {
+              const videoElement =
+                allStories[currentStoryIndex].querySelector("video");
+              if (videoElement && videoElement.duration) {
+                duration = videoElement.duration * 1000 + appConfig.videoBuffer;
+              }
+            }
+
+            if (appConfig.autoAdvance) {
+              animateProgress(progress, duration);
+            }
+          }
+        });
+
+        // Update story visibility
+        allStories.forEach((item, index) => {
+          item.classList.toggle("active", index === currentStoryIndex);
+        });
+
+        // Stop all videos
+        const allVideos = storyContainer.querySelectorAll("video");
+        allVideos.forEach((video) => video.pause());
+
+        // Handle current media
+        if (currentStory.type === "video") {
+          const currentVideo =
+            allStories[currentStoryIndex].querySelector("video");
+          if (currentVideo) {
+            currentVideo.muted = isMuted;
+            currentVideo.currentTime = 0;
+            currentVideo.play();
+            muteBtn.style.display = "flex";
+          }
+        } else {
+          muteBtn.style.display = "none";
+        }
+
+        // Update caption and action button
+        storyCaption.textContent = currentStory.caption || "";
+
+        if (currentStory.link) {
+          actionBtn.style.display = "inline-block";
+          actionBtn.href = currentStory.link;
+          // actionBtn.textContent = currentStory.buttonText || appConfig.defaultButtonText;
+        } else {
+          actionBtn.style.display = "none";
+        }
+
+        // Set auto advance
+        if (appConfig.autoAdvance) {
+          let duration = appConfig.imageViewDuration;
+
+          if (currentStory.type === "video") {
+            const videoElement =
+              allStories[currentStoryIndex].querySelector("video");
+            if (videoElement && videoElement.duration) {
+              duration = videoElement.duration * 1000 + appConfig.videoBuffer;
+            }
+          }
+
+          autoAdvanceTimer = setTimeout(goToNextStory, duration);
+        }
+      }
+
+      function goToNextStory() {
+        if (currentStoryIndex < stories.length - 1) {
+          currentStoryIndex++;
+          updateStoryView();
+        } else {
+          closeStories();
+        }
+      }
+
+      function goToPrevStory() {
+        if (currentStoryIndex > 0) {
+          currentStoryIndex--;
+          updateStoryView();
+        }
+      }
+
+      function closeStories() {
+        sendCarouselCompletionEvent();
+        if (window.CleverTap) {
+          CleverTap.dismissInAppNotification();
+        } else {
+          document.location.href = "wzrk://thisleadstonowhere";
+        }
+      }
+
+      function toggleMute() {
+        isMuted = !isMuted;
+
+        // Update mute icon
+        muteIcon.innerHTML = isMuted
+          ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
+          : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+
+        // Update current video
+        if (stories[currentStoryIndex].type === "video") {
+          const currentVideo = storyContainer.querySelector(
+            ".story-item.active video"
+          );
+          if (currentVideo) currentVideo.muted = isMuted;
+        }
+
+        // Restart auto-advance timer and animation to prevent pause
+        // This ensures the story continues to progress after mute toggle
+        if (appConfig.autoAdvance) {
+          // Clear existing timers first
+          if (autoAdvanceTimer) {
+            clearTimeout(autoAdvanceTimer);
+          }
+          if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+          }
+
+          // Calculate remaining duration based on current story type
+          let duration = appConfig.imageViewDuration;
+          if (stories[currentStoryIndex].type === "video") {
+            const videoElement = storyContainer.querySelector(
+              ".story-item.active video"
+            );
+            if (videoElement && videoElement.duration) {
+              const elapsed = videoElement.currentTime * 1000;
+              duration =
+                videoElement.duration * 1000 + appConfig.videoBuffer - elapsed;
+            }
+          }
+
+          // Restart progress animation
+          const progressElement = storyIndicators
+            .querySelectorAll(".story-indicator")
+            [currentStoryIndex].querySelector(".story-indicator-progress");
+
+          // Get current width percentage to continue from where it left off
+          const currentWidth = parseFloat(progressElement.style.width || "0");
+          const remainingDuration = duration * (1 - currentWidth / 100);
+
+          animateProgress(progressElement, remainingDuration);
+
+          // Restart auto advance timer
+          autoAdvanceTimer = setTimeout(goToNextStory, remainingDuration);
+        }
+      }
+
+      // Event listeners
+      actionBtn.addEventListener("click", () => {
+        buttonClicked = true;
+        sendCTAClickedEvent(actionBtn.href);
+        sendCarouselCompletionEvent();
+      });
+
+      navPrev.addEventListener("click", (e) => {
+        e.preventDefault();
+        goToPrevStory();
+      });
+
+      navNext.addEventListener("click", (e) => {
+        e.preventDefault();
+        goToNextStory();
+      });
+
+      muteBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleMute();
+      });
+
+      closeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeStories();
+      });
+
+      // Disable context menu
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      // Handle touch events
+      let touchStartX = 0;
+
+      storyCard.addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+
+          // Pause auto advance while touching
+          if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+          if (animationFrame) cancelAnimationFrame(animationFrame);
+        },
+        { passive: true }
+      );
+
+      storyCard.addEventListener(
+        "touchend",
+        (e) => {
+          const touchEndX = e.changedTouches[0].screenX;
+          const swipeThreshold = 50;
+
+          if (touchEndX < touchStartX - swipeThreshold) {
+            goToNextStory();
+          } else if (touchEndX > touchStartX + swipeThreshold) {
+            goToPrevStory();
+          }
+        },
+        { passive: true }
+      );
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          // User has switched away - pause videos and timers
+          const currentVideo = storyContainer.querySelector(
+            ".story-item.active video"
+          );
+          if (currentVideo) currentVideo.pause();
+
+          if (autoAdvanceTimer) {
+            clearTimeout(autoAdvanceTimer);
+          }
+          if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+          }
+
+          // Don't send completion event here, as it could just be notification panel
+        } else {
+          // User has returned - resume current story
+          updateStoryView();
+        }
+      });
+
+      // Initialize
+      updateStoryView();
+    </script>
+  </body>
+</html>
