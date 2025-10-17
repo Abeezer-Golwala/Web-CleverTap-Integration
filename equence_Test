@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleverTap Web SDK Integration</title>
+    <style>
+        /* Basic styles for layout */
+        body {
+            font-family: Arial, sans-serif;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f3f3f3;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        label,
+        input,
+        select {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        button {
+            margin-top: 12px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .bell-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .key-value-pair {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .key-value-pair input,
+        .key-value-pair select {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <link rel="manifest" href="/manifest.json" />
+    <h1>CleverTap Web SDK Integration</h1>
+    <div class="bell-icon" id= "btnInbox" >🔔</div>
+    <div class="container">
+        <div class="carousel">
+            <div class="slides">
+                <div class="slide"><img src="https://picsum.photos/id/230/600/200.jpg" alt="Image 1"></div>
+                <div class="slide"><img src="https://picsum.photos/id/231/600/200.jpg" alt="Image 2"></div>
+                <div class="slide"><img src="https://picsum.photos/id/232/600/200.jpg" alt="Image 3"></div>
+                <div class="slide"><img src="https://picsum.photos/id/233/600/200.jpg" alt="Image 4"></div>
+            </div>
+        </div>
+        <!-- Section to initialize user profile -->
+        <div>
+            <h2>Initialize User Profile</h2>
+            <label for="profileId">Profile ID:</label>
+            <input type="text" id="profileId" placeholder="Enter Profile ID" />
+
+            <button onclick="addUserProperty()">Add User Property</button>
+            <div id="userPropertiesContainer"></div>
+            <button onclick="uploadProfile()">Upload Profile</button>
+        </div>
+
+        <!-- Section to upload events -->
+        <div style="margin-top: 20px;">
+            <h2>Upload Event</h2>
+            <label for="eventName">Event Name:</label>
+            <input type="text" id="eventName" placeholder="Enter Event Name" />
+
+            <button onclick="addEventProperty()">Add Event Property</button>
+            <div id="eventPropertiesContainer"></div>
+            <button onclick="uploadEvent()">Upload Event</button>
+        </div>
+    </div>
+    <button onclick="getDataFromAndroid()">CTA for PE1</button>
+
+    <script>
+        // Initialize CleverTap SDK
+        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] , token: 'TEST-ab0-b64' };
+        // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
+        clevertap.account.push({ "id": "ZW6-K55-457Z"  },"in1");
+        clevertap.enablePersonalization = true;
+      
+
+
+        clevertap.privacy.push({ optOut: false }); //set the flag to true, if the user of the device opts out of sharing their data
+        clevertap.privacy.push({ useIP: true }); //set the flag to true, if the user agrees to share their IP data
+        (function () {
+            var wzrk = document.createElement('script');
+            wzrk.type = 'text/javascript';
+            wzrk.async = true;
+            wzrk.src = 'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js'; 
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wzrk, s);
+        })();
+        
+        // Request push permission on page load
+        window.onload = function () {
+            
+            clevertap.notifications.push({
+                "titleText": 'Would you like to receive Push Notifications?',
+                "bodyText": 'We promise to only send you relevant content and give you updates on your transactions',
+                "okButtonText": 'Sign me up!',
+                "rejectButtonText": 'No thanks',
+                "okButtonColor": '#778046',
+                "serviceWorkerPath": "./clevertap_sw.js"
+
+            });
+            clevertap.enableLocalStorageEncryption(true)
+            clevertap.addVariablesChangedCallback(() => {  
+                console.log("CleverTap addVariablesChangedCallback");
+            });
+            
+            clevertap.addOneTimeVariablesChangedCallback(() => {  
+                 console.log("CleverTap addOneTimeVariablesChangedCallback");
+            });
+        };
+
+        let currentIndex = 0;
+        const slides = document.querySelector(".slides");
+        const totalSlides = document.querySelectorAll(".slide").length;
+
+        function showSlide(index) {
+            slides.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            showSlide(currentIndex);
+        }
+        
+
+        setInterval(nextSlide, 3000); // Change image every 3 seconds
+
+        function getDataFromAndroid() {
+        // Call the Android method
+            const data = SDKBridge.callSDKMethod();
+            console.log("CleverTap Received from Android:" + data);
+        }
+        // Add additional profile and event property functions, omitted for brevity
+
+        // ... Add the rest of your event property and profile initialization code here
+
+
+        // Function to add user property with type selection
+        function addUserProperty() {
+            const container = document.getElementById("userPropertiesContainer");
+            const div = document.createElement("div");
+            div.className = "key-value-pair";
+            div.innerHTML = `
+        <input type="text" placeholder="Property Key" class="user-key" />
+        <select class="user-type" onchange="handleTypeChange(this)">
+          <option value="string">String</option>
+          <option value="integer">Integer</option>
+          <option value="boolean">Boolean</option>
+          <option value="date">Date</option>
+        </select>
+        <input type="text" placeholder="Property Value" class="user-value" />
+      `;
+            container.appendChild(div);
+        }
+
+        // Function to add event property with type selection
+        function addEventProperty() {
+            const container = document.getElementById("eventPropertiesContainer");
+            const div = document.createElement("div");
+            div.className = "key-value-pair";
+            div.innerHTML = `
+        <input type="text" placeholder="Event Property Key" class="event-key" />
+        <select class="event-type" onchange="handleTypeChange(this)">
+          <option value="string">String</option>
+          <option value="integer">Integer</option>
+          <option value="boolean">Boolean</option>
+          <option value="date">Date</option>
+        </select>
+        <input type="text" placeholder="Event Property Value" class="event-value" />
+      `;
+            container.appendChild(div);
+        }
+
+        // Handler to adjust input type based on selection
+        function handleTypeChange(selectElement) {
+            const input = selectElement.nextElementSibling;
+            switch (selectElement.value) {
+                case "integer":
+                    input.type = "number";
+                    input.placeholder = "Enter Integer Value";
+                    input.className = input.className.replace("checkbox", "");
+                    break;
+                case "boolean":
+                    input.type = "checkbox";
+                    input.className = "checkbox";
+                    input.placeholder = "";
+                    break;
+                case "date":
+                    input.type = "date";
+                    input.placeholder = "Select Date";
+                    input.className = input.className.replace("checkbox", "");
+                    break;
+                default:
+                    input.type = "text";
+                    input.placeholder = "Enter String Value";
+                    input.className = input.className.replace("checkbox", "");
+            }
+        }
+
+        // Function to upload user profile
+        function uploadProfile() {
+            const profileId = document.getElementById("profileId").value;
+            const userKeys = document.querySelectorAll(".user-key");
+            const userValues = document.querySelectorAll(".user-value");
+            const userTypes = document.querySelectorAll(".user-type");
+
+            const profileData = { "Identity": profileId };
+
+            userKeys.forEach((key, index) => {
+                const valueElement = userValues[index];
+                const type = userTypes[index].value;
+
+                if (key.value) {
+                    profileData[key.value] = parseValue(valueElement, type);
+                }
+            });
+
+            clevertap.onUserLogin.push({ "Site": profileData });
+            alert("User profile uploaded!");
+        }
+
+        // Function to upload event with key-value pairs
+        function uploadEvent() {
+            const eventName = document.getElementById("eventName").value;
+            const eventKeys = document.querySelectorAll(".event-key");
+            const eventValues = document.querySelectorAll(".event-value");
+            const eventTypes = document.querySelectorAll(".event-type");
+
+            const eventData = {};
+
+            eventKeys.forEach((key, index) => {
+                const valueElement = eventValues[index];
+                const type = eventTypes[index].value;
+
+                if (key.value) {
+                    eventData[key.value] = parseValue(valueElement, type);
+                }
+            });
+
+            clevertap.event.push(eventName, eventData);
+            alert("Event uploaded!");
+        }
+
+        // Helper function to parse value based on selected type
+        function parseValue(valueElement, type) {
+            switch (type) {
+                case "integer":
+                    return parseInt(valueElement.value, 10);
+                case "boolean":
+                    return valueElement.checked;
+                case "date":
+                    return new Date(valueElement.value); // Return as Date object
+                default:
+                    return valueElement.value; // Treat as string by default
+            }
+        }
+    </script>
+</body>
+
+</html>
