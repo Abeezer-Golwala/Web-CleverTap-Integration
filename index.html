@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+    <script>
+const url = "https://api.example.com/data";
+
+fetch("https://corsproxy.io/?" + encodeURIComponent(url))
+  .then(res => res.json())
+  .then(data => console.log(data));
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CleverTap Web SDK Integration</title>
@@ -122,6 +129,7 @@
     <button onclick="getDataFromAndroid()">CTA for PE1</button>
 
     <script>
+        
         // Initialize CleverTap SDK
         var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
         // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
