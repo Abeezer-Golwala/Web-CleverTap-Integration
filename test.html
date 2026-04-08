@@ -1,27 +1,338 @@
 <!DOCTYPE html>
-<html>
-   <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <style>
-         .container {
-         height: 102%;
-         }
-         .responsive-iframe {
-         top: 0;
-         left: 0;
-         bottom: 0;
-         right: 0;
-         display:block; 
-         style="text-align:center" 
-         overflow:hidden; 
-         height: 100%;
-         width: 100%
-         }
-      </style>
-   </head>
-   <body>
-      <div class="container"> 
-         <iframe class="responsive-iframe" src="https://www.youtube.com/embed/gje0VvMm3eo?autoplay=1&mute=0&rel=0&controls=0&modestbranding=1&playsinline=1"></iframe>
-      </div>
-   </body>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Webinar</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Satoshi:wght@400;500;700&display=swap');
+
+:root {
+--primary: #00c6ff;
+--primary-dark: #0072ff;
+--accent: #ff6b6b;
+--bg: #f5f7fa;
+--text: #1a1a1a;
+--text-light: #666666;
+--border-color: rgba(0, 0, 0, 0.1);
+--shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+--card-bg: #ffffff;
+--card-text: #666666;
+--card-icon-bg: #f0f0f0;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+-webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+}
+
+html, body {
+width: 100%;
+height: 100%;
+overflow-x: hidden;
+}
+
+body {
+font-family: 'Satoshi', sans-serif;
+background-color: var(--bg);
+color: var(--text);
+display: flex;
+flex-direction: column;
+align-items: center;
+min-height: 100vh;
+padding: 20px 16px;
+}
+
+.content-wrapper {
+width: 100%;
+max-width: 480px;
+display: flex;
+flex-direction: column;
+align-items: center;
+margin: auto;
+padding: 10px 0;
+}
+
+.live-tag {
+display: flex;
+justify-content: flex-start;
+width: 100%;
+margin-bottom: 12px;
+}
+
+.live {
+background: linear-gradient(135deg, #ff4d4d, #e60000);
+color: white;
+padding: 6px 14px;
+border-radius: 20px;
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 0.5px;
+animation: pulse 2s infinite;
+text-transform: uppercase;
+}
+
+@keyframes pulse {
+0%, 100% {
+opacity: 1;
+box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+}
+50% {
+opacity: 0.8;
+box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5);
+}
+}
+
+.video-container {
+position: relative;
+width: 100%;
+aspect-ratio: 16 / 9;
+overflow: hidden;
+border-radius: 12px;
+margin-bottom: 16px;
+box-shadow: var(--shadow);
+}
+
+iframe#player {
+width: 100%;
+height: 100%;
+display: block;
+border: none;
+border-radius: 12px;
+}
+
+.info-section {
+width: 100%;
+margin-bottom: 16px;
+}
+
+.heading-container {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+margin-bottom: 16px;
+}
+
+h1 {
+font-size: 20px;
+font-weight: 700;
+line-height: 1.3;
+margin: 0;
+}
+
+.about-card {
+width: 100%;
+background: var(--card-bg);
+box-shadow: var(--shadow);
+padding: 16px;
+border-radius: 8px;
+margin-bottom: 16px;
+transition: transform 0.3s ease;
+}
+
+.about-card:hover {
+transform: translateY(-4px);
+}
+
+.about-card-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 12px;
+}
+
+.about-card-icon {
+width: 40px;
+height: 40px;
+background: var(--card-icon-bg);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+}
+
+.about-card-icon svg {
+width: 20px;
+height: 20px;
+color: var(--primary);
+}
+
+.about-card-title {
+font-size: 16px;
+font-weight: 700;
+color: var(--primary);
+margin: 0;
+}
+
+.about-card p {
+font-size: 14px;
+line-height: 1.5;
+color: var(--card-text);
+margin: 0;
+}
+
+.close-text {
+width: 100%;
+text-align: center;
+font-size: 14px;
+font-weight: 500;
+color: var(--primary);
+cursor: pointer;
+transition: all 0.2s ease;
+text-decoration: underline;
+margin-top: 8px;
+}
+
+.close-text:hover {
+opacity: 0.8;
+}
+
+.speaker {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 24px;
+}
+
+.avatar {
+width: 48px;
+height: 48px;
+border-radius: 12px;
+overflow: hidden;
+flex-shrink: 0;
+position: relative;
+border: 2px solid var(--primary);
+}
+
+.avatar::before {
+content: '';
+position: absolute;
+top: -6px;
+left: -6px;
+right: -6px;
+bottom: -6px;
+border-radius: 18px;
+background: linear-gradient(45deg, var(--primary), var(--primary-dark), var(--primary), var(--primary-dark));
+background-size: 400% 400%;
+animation: ripple 3s ease-in-out infinite;
+z-index: -1;
+opacity: 0.6;
+}
+
+@keyframes ripple {
+0%, 100% { background-position: 0% 50%; }
+50% { background-position: 100% 50%; }
+}
+
+.avatar img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+position: relative;
+z-index: 1;
+}
+
+.details {
+font-size: 14px;
+}
+
+.details .name {
+font-weight: 700;
+margin-bottom: 2px;
+}
+
+.details .title {
+color: var(--text-light);
+font-weight: 500;
+}
+</style>
+</head>
+<body>
+<div class="content-wrapper">
+<div class="live-tag">
+<div class="live">LIVE NOW</div>
+</div>
+
+<div class="video-container">
+<iframe id="player" src="https://www.youtube.com/embed/iDxjM7ouyO8?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1&fs=1" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" playsinline></iframe>
+</div>
+
+<div class="info-section">
+<div class="heading-container">
+<h1>F&O ka Dose, 11 Baje Roz.</h1>
+</div>
+<div class="speaker">
+<div class="avatar">
+<img src="https://d3eqyohhnb5anr.cloudfront.net/1670582272/assets/0a6bccfaae644f87b88f581376b6f1f7.jpeg" alt="Speaker">
+</div>
+<div class="details">
+<div class="name">Yogesh Nanda</div>
+<div class="title">CA & Options Trader</div>
+</div>
+</div>
+</div>
+
+<article class="about-card">
+<div class="about-card-header">
+<div class="about-card-icon">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 1C10.9391 1 9.92172 1.42143 9.17157 2.17157C8.42143 2.92172 8 3.93913 8 5V12C8 13.0609 8.42143 14.0783 9.17157 14.8284C9.92172 15.5786 10.9391 16 12 16C13.0609 16 14.0783 15.5786 14.8284 14.8284C15.5786 14.0783 16 13.0609 16 12V5C16 3.93913 15.5786 2.92172 14.8284 2.17157C14.0783 1.42143 13.0609 1 12 1Z" 
+stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M4 9V12C4 14.0822 4.84285 16.1005 6.34315 17.6008C7.84344 19.1011 9.85782 19.944 12 19.944C14.1422 19.944 16.1566 19.1011 17.6569 17.6008C19.1571 16.1005 20 14.0822 20 12V9" 
+stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10 23H14" 
+stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<h3 class="about-card-title">About this Webinar</h3>
+</div>
+<p>
+Join seasoned trader Yogesh Nanda daily for a crisp, comprehensive live market analysis, covering essential Indian and global news, decode market sentiments and key levels, and dive deep into FII/DII activity, options data, and volume trends. <br><br>Please note: This webinar is for educational purposes only and not financial advice. Consult your financial advisor before making investment decisions.
+</p>
+</article>
+
+<div class="close-text" id="closeButton">Close Webinar</div>
+</div>
+
+<script>
+let sessionStartTime = new Date();
+const closeButton = document.getElementById('closeButton');
+function sendToCleverTap(eventName, eventData) {
+eventData.duration_seconds = Math.round((new Date() - sessionStartTime) / 1000);
+if (window.CleverTap) {
+CleverTap.pushEvent(eventName, JSON.stringify(eventData));
+} else if (window.webkit?.messageHandlers?.clevertap) {
+window.webkit.messageHandlers.clevertap.postMessage({
+action: "recordEventWithProps",
+event: eventName,
+properties: eventData
+});
+} else if (window.clevertap) {
+window.clevertap.event.push(eventName, eventData);
+} else {
+console.warn('No CleverTap SDK detected');
+}
+}
+
+closeButton.addEventListener('click', () => {
+const eventData = {
+action: "webinar_closed",
+video_muted: true,
+campaign_id: "{{ Campaign.campaignId | default: "0_0" }}",
+Timestamp: new Date().toISOString()
+};
+sendToCleverTap("Promotional_InApp", eventData);
+try {
+window.location.replace("wzrk://thisisadummylink");
+} catch (error) {
+document.body.style.display = 'none';
+}
+});
+</script>
+</body>
 </html>
