@@ -133,7 +133,7 @@ text-decoration: underline;
 <body>
 <div class="content-wrapper">
 
-<div class="live">LIVE NOW</div>
+<div class="live">LIVE NOW {{ Profile.name | default: "NA" }}</div>
 
 <div class="video-container">
 <div id="clickOverlay"></div>
