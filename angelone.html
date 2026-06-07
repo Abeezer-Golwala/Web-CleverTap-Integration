@@ -81,6 +81,18 @@
         .key-value-pair select {
             flex: 1;
         }
+
+        .time-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .time-input-wrapper input {
+            flex: 1;
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -241,26 +253,72 @@
         // Handler to adjust input type based on selection
         function handleTypeChange(selectElement) {
             const input = selectElement.nextElementSibling;
+            const parentDiv = selectElement.parentElement;
+            
             switch (selectElement.value) {
                 case "integer":
                     input.type = "number";
                     input.placeholder = "Enter Integer Value";
                     input.className = input.className.replace("checkbox", "");
+                    // Remove time input if it exists
+                    removeTimeInputIfExists(parentDiv);
                     break;
                 case "boolean":
                     input.type = "checkbox";
                     input.className = "checkbox";
                     input.placeholder = "";
+                    // Remove time input if it exists
+                    removeTimeInputIfExists(parentDiv);
                     break;
                 case "date":
                     input.type = "date";
                     input.placeholder = "Select Date";
                     input.className = input.className.replace("checkbox", "");
+                    // Add time input for date selection
+                    addTimeInput(parentDiv, input);
                     break;
                 default:
                     input.type = "text";
                     input.placeholder = "Enter String Value";
                     input.className = input.className.replace("checkbox", "");
+                    // Remove time input if it exists
+                    removeTimeInputIfExists(parentDiv);
+            }
+        }
+
+        // Function to add time input when date is selected
+        function addTimeInput(parentDiv, dateInput) {
+            // Check if time input already exists
+            if (parentDiv.querySelector('.time-input')) {
+                return;
+            }
+
+            // Create time input wrapper
+            const timeWrapper = document.createElement("div");
+            timeWrapper.className = "time-input-wrapper";
+            
+            const timeLabel = document.createElement("label");
+            timeLabel.textContent = "Time:";
+            timeLabel.style.margin = "0";
+            timeLabel.style.width = "auto";
+            
+            const timeInput = document.createElement("input");
+            timeInput.type = "time";
+            timeInput.className = "time-input";
+            timeInput.placeholder = "Select Time";
+            
+            timeWrapper.appendChild(timeLabel);
+            timeWrapper.appendChild(timeInput);
+            
+            // Insert time input after the date input
+            dateInput.parentNode.insertBefore(timeWrapper, dateInput.nextSibling);
+        }
+
+        // Function to remove time input if it exists
+        function removeTimeInputIfExists(parentDiv) {
+            const timeWrapper = parentDiv.querySelector(".time-input-wrapper");
+            if (timeWrapper) {
+                timeWrapper.remove();
             }
         }
 
@@ -278,7 +336,7 @@
                 const type = userTypes[index].value;
 
                 if (key.value) {
-                    profileData[key.value] = parseValue(valueElement, type);
+                    profileData[key.value] = parseValue(valueElement, type, valueElement.parentElement);
                 }
             });
 
@@ -300,7 +358,7 @@
                 const type = eventTypes[index].value;
 
                 if (key.value) {
-                    eventData[key.value] = parseValue(valueElement, type);
+                    eventData[key.value] = parseValue(valueElement, type, valueElement.parentElement);
                 }
             });
 
@@ -309,14 +367,24 @@
         }
 
         // Helper function to parse value based on selected type
-        function parseValue(valueElement, type) {
+        function parseValue(valueElement, type, parentDiv) {
             switch (type) {
                 case "integer":
                     return parseInt(valueElement.value, 10);
                 case "boolean":
                     return valueElement.checked;
                 case "date":
-                    return new Date(valueElement.value); // Return as Date object
+                    // Combine date and time if time input exists
+                    const dateValue = valueElement.value;
+                    const timeInput = parentDiv ? parentDiv.querySelector(".time-input") : null;
+                    const timeValue = timeInput ? timeInput.value : "00:00";
+                    
+                    if (dateValue && timeValue) {
+                        return new Date(`${dateValue}T${timeValue}:00`);
+                    } else if (dateValue) {
+                        return new Date(dateValue);
+                    }
+                    return null;
                 default:
                     return valueElement.value; // Treat as string by default
             }
