@@ -81,6 +81,34 @@
         .key-value-pair select {
             flex: 1;
         }
+
+        .trading-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .trading-buttons button {
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .trading-buttons .buy-btn {
+            background-color: #4CAF50;
+        }
+
+        .trading-buttons .buy-btn:hover {
+            background-color: #45a049;
+        }
+
+        .trading-buttons .sell-btn {
+            background-color: #f44336;
+        }
+
+        .trading-buttons .sell-btn:hover {
+            background-color: #da190b;
+        }
     </style>
 </head>
 
@@ -119,6 +147,12 @@
         </div>
     </div>
     <button onclick="getDataFromAndroid()">CTA for PE1</button>
+
+    <!-- Trading Buttons Section -->
+    <div class="trading-buttons">
+        <button class="buy-btn" onclick="handleBuy()">Buy</button>
+        <button class="sell-btn" onclick="handleSell()">Sell</button>
+    </div>
 
     <script>
         
@@ -197,6 +231,18 @@
             const data = SDKBridge.callSDKMethod();
             console.log("CleverTap Received from Android:" + data);
         }
+
+        // Trading button handlers
+        function handleBuy() {
+            alert("Buy action triggered!");
+            console.log("Buy button clicked");
+        }
+
+        function handleSell() {
+            alert("Sell action triggered!");
+            console.log("Sell button clicked");
+        }
+
         // Add additional profile and event property functions, omitted for brevity
 
         // ... Add the rest of your event property and profile initialization code here
