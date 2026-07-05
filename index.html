@@ -208,6 +208,9 @@
             clevertap.addOneTimeVariablesChangedCallback(() => {  
                  console.log("CleverTap addOneTimeVariablesChangedCallback");
             });
+
+            // Track Page Browsed event on page load
+            trackPageBrowsed();
         };
 
         let currentIndex = 0;
@@ -225,6 +228,27 @@
         
 
         setInterval(nextSlide, 3000); // Change image every 3 seconds
+
+        // Function to track Page Browsed event with dynamic properties
+        function trackPageBrowsed() {
+            // Get dynamic values from the website
+            const pageTitle = document.title || "NA";
+            const pageUrl = window.location.href || "NA";
+            const pageName = document.location.pathname || "NA";
+
+            // Create event properties object
+            const eventProperties = {
+                "Page": pageName !== "" ? pageName : "NA",
+                "Title": pageTitle !== "" ? pageTitle : "NA",
+                "URL": pageUrl !== "" ? pageUrl : "NA"
+            };
+
+            // Push the Page Browsed event to CleverTap
+            clevertap.event.push("Page Browsed", eventProperties);
+
+            // Log the event for debugging
+            console.log("Page Browsed event tracked with properties:", eventProperties);
+        }
 
         function getDataFromAndroid() {
         // Call the Android method
