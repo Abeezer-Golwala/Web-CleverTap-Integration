@@ -2,8 +2,6 @@
 <html lang="en">
 
 <head>
-        <script src="https://web-native-display-campaign.clevertap.com/production/lib-overlay/overlay.js"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CleverTap Web SDK Integration</title>
@@ -83,11 +81,38 @@
         .key-value-pair select {
             flex: 1;
         }
+
+        .trading-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .trading-buttons button {
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .trading-buttons .buy-btn {
+            background-color: #4CAF50;
+        }
+
+        .trading-buttons .buy-btn:hover {
+            background-color: #45a049;
+        }
+
+        .trading-buttons .sell-btn {
+            background-color: #f44336;
+        }
+
+        .trading-buttons .sell-btn:hover {
+            background-color: #da190b;
+        }
     </style>
 </head>
 
 <body>
-    <link rel="manifest" href="/manifest.json" />
     <h1>CleverTap Web SDK Integration</h1>
     <div class="bell-icon" id= "btnInbox" >🔔</div>
     <div class="container">
@@ -123,11 +148,18 @@
     </div>
     <button onclick="getDataFromAndroid()">CTA for PE1</button>
 
+    <!-- Trading Buttons Section -->
+    <div class="trading-buttons">
+        <button class="buy-btn" onclick="handleBuy()">Buy</button>
+        <button class="sell-btn" onclick="handleSell()">Sell</button>
+    </div>
+
     <script>
+        
         // Initialize CleverTap SDK
-        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] , token: 'TEST-ab0-b64' };
+        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
         // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
-        clevertap.account.push({ "id": "ZWW-WWW-WW4Z"  },"in1");
+        clevertap.account.push({ "id": "TEST-468-W87-546Z" });
         clevertap.enablePersonalization = true;
       
 
@@ -138,7 +170,7 @@
             var wzrk = document.createElement('script');
             wzrk.type = 'text/javascript';
             wzrk.async = true;
-            wzrk.src = 'https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js'; 
+            wzrk.src = 'https://static.clevertap.com/js/clevertap.min.js'; 
             var s = document.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(wzrk, s);
         })();
@@ -155,7 +187,20 @@
                 "serviceWorkerPath": "./clevertap_sw.js"
 
             });
-            clevertap.enableLocalStorageEncryption(true)
+            clevertap.enableLocalStorageEncryption(true);
+                
+                clevertap.setLogLevel(4);
+                var jsontestweb =
+                {
+                    "key1": { "key1": "value1" },
+                    "key2": "value2",
+                    "key3": "value3"
+                };
+
+                const var2 = clevertap.defineVariable("testkeyweb", JSON.stringify(jsontestweb));
+                clevertap.syncVariables();
+
+            
             clevertap.addVariablesChangedCallback(() => {  
                 console.log("CleverTap addVariablesChangedCallback");
             });
@@ -163,6 +208,9 @@
             clevertap.addOneTimeVariablesChangedCallback(() => {  
                  console.log("CleverTap addOneTimeVariablesChangedCallback");
             });
+
+            // Track Page Browsed event on page load
+            trackPageBrowsed();
         };
 
         let currentIndex = 0;
@@ -181,11 +229,44 @@
 
         setInterval(nextSlide, 3000); // Change image every 3 seconds
 
+        // Function to track Page Browsed event with dynamic properties
+        function trackPageBrowsed() {
+            // Get dynamic values from the website
+            const pageTitle = document.title || "NA";
+            const pageUrl = window.location.href || "NA";
+            const pageName = document.location.pathname || "NA";
+
+            // Create event properties object
+            const eventProperties = {
+                "Page": pageName !== "" ? pageName : "NA",
+                "Title": pageTitle !== "" ? pageTitle : "NA",
+                "URL": pageUrl !== "" ? pageUrl : "NA"
+            };
+
+            // Push the Page Browsed event to CleverTap
+            clevertap.event.push("Page Browsed", eventProperties);
+
+            // Log the event for debugging
+            console.log("Page Browsed event tracked with properties:", eventProperties);
+        }
+
         function getDataFromAndroid() {
         // Call the Android method
             const data = SDKBridge.callSDKMethod();
             console.log("CleverTap Received from Android:" + data);
         }
+
+        // Trading button handlers
+        function handleBuy() {
+            alert("Buy action triggered!");
+            console.log("Buy button clicked");
+        }
+
+        function handleSell() {
+            alert("Sell action triggered!");
+            console.log("Sell button clicked");
+        }
+
         // Add additional profile and event property functions, omitted for brevity
 
         // ... Add the rest of your event property and profile initialization code here
