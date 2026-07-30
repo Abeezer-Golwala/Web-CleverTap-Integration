@@ -72,79 +72,53 @@ function pushprofilefunc() {
 }
 
 function chargedEvent() {
-	var chargeDetails = {
-    "portfolioOptimiser": {
-        "action": "post_event",
-        "data": {
-            "eventName": "Screen_Open",
-            "props": [
-                {
-                    "Screen_Name": "Portfolio_Optimizer_Dashboard"
-                },
-                {
-                    "Initiation_Screen": "Dashboard"
-                },
-                {
-                    "Tab_Name": "EQ"
-                },
-                {
-                    "EQ_Count": 4
-                },
-                {
-                    "MF_Count": 2
-                },
-                {
-                    "PO_Top5_Sell_all_Stocks": [
-                        "LAURUS LABS LIMITED",
-                        "APOLLO TYRES LTD",
-                        "AMBER ENTERPRISES INDIA LTD",
-                        "SBI CARDS AND PAYMENT SERVICES LTD",
-                        "CIPLA LTD"
-                    ]
-                },
-                {
-                    "PO_Top5_Buy_all_Stocks": [
-                        "Reliance Industries Ltd.",
-                        "Lodha Developers Ltd.",
-                        "REC Ltd",
-                        "Kirloskar Pneumatic Company Ltd.",
-                        "General Insurance Corporation of India"
-                    ]
-                },
-                {
-                    "PO_Marketcap_Largecap": {
-                        "Total_Allocation": 6215008.51,
-                        "Stock_Count": 35,
-                        "Top_5_Stock_Name": [
-                            "LTM LIMITED",
-                            "MAX HEALTHCARE INSTITUTE LIMITED",
-                            "TATA CONSULTANCY SERVICES LIMITED",
-                            "KOTAK MAHINDRA BANK LTD",
-                            "ADANI ENERGY SOLUTIONS LIMITED"
-                        ]
-                    }
-                },
-                {
-                    "PO_Marketcap_Midcap": {
-                        "Total_Allocation": 11959780.200000001,
-                        "Stock_Count": 16,
-                        "Top_5_Stock_Name": [
-                            "INDIAN RAILWAY CATERING & TOURISM CO LTD",
-                            "LAURUS LABS LIMITED",
-                            "ONE 97 COMMUNICATION LTD",
-                            "ABBOTT INDIA",
-                            "INFO EDGE INDIA LIMITED"
-                        ]
-                    }
-                }
-            ]
-        }
+	var props ={
+    "Screen_Name": "Portfolio_Optimizer_Dashboard",
+    "Initiation_Screen": "Dashboard",
+    "Tab_Name": "EQ",
+    "EQ_Count": 4,
+    "MF_Count": 2,
+    "PO_Top5_Sell_all_Stocks": [
+        "LAURUS LABS LIMITED",
+        "APOLLO TYRES LTD",
+        "AMBER ENTERPRISES INDIA LTD",
+        "SBI CARDS AND PAYMENT SERVICES LTD",
+        "CIPLA LTD"
+    ],
+    "PO_Top5_Buy_all_Stocks": [
+        "Reliance Industries Ltd.",
+        "Lodha Developers Ltd.",
+        "REC Ltd",
+        "Kirloskar Pneumatic Company Ltd.",
+        "General Insurance Corporation of India"
+    ],
+    "PO_Marketcap_Largecap": {
+        "Total_Allocation": 6215008.51,
+        "Stock_Count": 35,
+        "Top_5_Stock_Name": [
+            "LTM LIMITED",
+            "MAX HEALTHCARE INSTITUTE LIMITED",
+            "TATA CONSULTANCY SERVICES LIMITED",
+            "KOTAK MAHINDRA BANK LTD",
+            "ADANI ENERGY SOLUTIONS LIMITED"
+        ]
+    },
+    "PO_Marketcap_Midcap": {
+        "Total_Allocation": 11959780.200000001,
+        "Stock_Count": 16,
+        "Top_5_Stock_Name": [
+            "INDIAN RAILWAY CATERING & TOURISM CO LTD",
+            "LAURUS LABS LIMITED",
+            "ONE 97 COMMUNICATION LTD",
+            "ABBOTT INDIA",
+            "INFO EDGE INDIA LIMITED"
+        ]
     }
 }
 
 	if (window.CleverTap) {
 		// Call Android interface             
-		CleverTap.pushEvent("Product Viewed", JSON.stringify(props));
+		CleverTap.pushEvent("Screen_Open", JSON.stringify(props));
 	// 	CleverTap.pushChargedEvent(JSON.stringify(chargeDetails), JSON.stringify(items))
 
 	}
