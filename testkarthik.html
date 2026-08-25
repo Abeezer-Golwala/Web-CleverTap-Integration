@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+<title>STARZPLAY · Maroc Telecom DCB · Serie A free trial</title>
+<link rel="preconnect" href="https://sp.starzplay.com" />
+<link rel="preconnect" href="https://mena-cdn-lb.aws.playco.com" />
+<style>
+/* ==========================================================================
+STARZPLAY — MAROC TELECOM DCB · SERIE A FREE TRIAL
+CleverTap Custom HTML In-App · INTERSTITIAL · ANDROID
+
+VARIANT B — free trial + "then 17.5 MAD/week".
+The A file is byte-identical except CONFIG.variant = 'A'.
+
+Palette + component treatment lifted from serie-a-team-picker.html
+(STARZPLAY Colour Guidance book).
+
+Copy follows the live Maroc Telecom DCB page in EN and AR — same offer
+wording, same benefit trio, same eligibility and renewal lines, and
+"Maroc Telecom" left in Latin inside Arabic exactly as the page does.
+
+The "switch to mobile data" notice has been REMOVED. The DCB page
+authenticates with MSISDN + OTP, not network header enrichment, so
+connection type does not affect signup. See README.
+
+NO CLOSE BUTTON: CleverTap renders its own. The top bar keeps 52px clear
+on BOTH sides so the native close cannot collide in LTR or RTL.
+========================================================================== */
+:root {
+--sp-accent: #7AFFFB; /* Accent · Pantone 318 C */
+--sp-focus: #FFFFFF; /* Focus · primary buttons */
+--sp-slate: #424242; /* Slate · secondary / disabled */
+--sp-body: #000000; /* Body · mobile background */
+--sp-pop: #1A1A1A; /* Pop · pop-ups / drawers */
+--sp-light: #FFFFFF;
+--sp-fade: #D4D1D1;
+--sp-w06: rgba(255,255,255,0.06);
+--sp-w12: rgba(255,255,255,0.12);
+--sp-grad: linear-gradient(120deg, var(--sp-light) 0%, var(--sp-accent) 100%);
+
+/* Averta has no Arabic coverage, so RTL uses the platform Arabic face —
+no network cost and better shaping than any Latin fallback. */
+--sp-font: 'Averta', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+--sp-font-ar: 'SF Arabic', 'Geeza Pro', 'Noto Sans Arabic', 'Noto Naskh Arabic',
+'Tajawal', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+
+--sp-pad-x: 16px;
+--sp-safe-top: max(env(safe-area-inset-top, 0px), 8px);
+--sp-safe-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+--sp-safe-left: env(safe-area-inset-left, 0px);
+--sp-safe-right: env(safe-area-inset-right, 0px);
+
+--sp-tile-w: clamp(148px, 44vw, 192px); /* row A · landscape 1400x600 */
+--sp-tile-w-b: clamp(72px, 22vw, 96px); /* row B · portrait 475x675 */
+
+/* Gap between the rounded panel and the physical screen edge. Safe-area
+insets are applied HERE, once, on .sp-root — so nothing inside needs to
+know about the notch. */
+--sp-inset: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+/* Transparent, NOT black. A rounded panel only reads as rounded if the page
+behind it lets CleverTap's overlay show through the corners. Requires the
+campaign's overlay style to be Transparent — see README setup step 4. */
+html, body {
+margin: 0; padding: 0; height: 100%;
+background: transparent;
+overflow: hidden; overscroll-behavior: none;
+}
+body {
+font-family: var(--sp-font);
+color: var(--sp-light);
+-webkit-tap-highlight-color: transparent;
+}
+html[dir="rtl"] body { font-family: var(--sp-font-ar); }
+
+.sp-root {
+position: fixed;
+top: calc(var(--sp-safe-top) + var(--sp-inset));
+bottom: calc(var(--sp-safe-bottom) + var(--sp-inset));
+left: calc(var(--sp-safe-left) + var(--sp-inset));
+right: calc(var(--sp-safe-right) + var(--sp-inset));
+display: flex; flex-direction: column;
+background: var(--sp-body);
+border: 1px solid var(--sp-w12);
+border-radius: 26px;
+/* Clips the hero backdrop and both full-bleed reels to the rounded corners. */
+overflow: hidden;
+/* FAILSAFE VISIBILITY.
+The panel fades in when boot() adds .is-ready. But if ANY JS throws before
+that line, a root stuck at opacity:0 means a fully invisible in-app that
+still overlays the app and swallows taps — and with a transparent body
+there is not even a black box to hint it is there.
+So the reveal also happens from CSS after 1.2s, regardless of JS. CSS
+cannot fail the way script can, so the user always sees something. */
+opacity: 0; transition: opacity .22s ease;
+animation: spReveal .01s linear 1.2s forwards;
+}
+.sp-root.is-ready { opacity: 1; animation: none; }
+@keyframes spReveal { to { opacity: 1; } }
+
+/* Hero backdrop. Paints only once decoded, so a slow or failed load degrades
+to plain black rather than a half-painted photo. */
+.sp-hero {
+position: absolute; inset: 0; z-index: 0;
+background-position: top center; background-repeat: no-repeat;
+background-size: cover;
+opacity: 0; transition: opacity .45s ease;
+pointer-events: none;
+}
+.sp-hero.is-on { opacity: 1; }
+.sp-hero::after {
+content: ''; position: absolute; inset: 0;
+background: linear-gradient(to bottom,
+rgba(0,0,0,0.18) 0%,
+rgba(0,0,0,0.50) 14%,
+rgba(0,0,0,0.86) 28%,
+#000 42%);
+}
+.sp-head, .sp-stage, .sp-foot { position: relative; z-index: 1; }
+
+/* ---------- Header ---------- */
+.sp-head {
+flex: 0 0 auto; text-align: center;
+padding: 12px var(--sp-pad-x) 2px;
+}
+/* 52px clear on both sides: CleverTap's own close button lives up here. */
+.sp-bar {
+display: flex; align-items: center; justify-content: center;
+min-height: 38px; padding-inline: 52px;
+}
+/* The switcher keeps LTR order (AR · FR · EN) in every language, so the pill
+you just tapped does not jump across the screen when the layout mirrors. */
+.sp-lang {
+display: flex; direction: ltr;
+background: var(--sp-w06);
+border: 1px solid var(--sp-w12); border-radius: 999px; padding: 2px;
+}
+.sp-lang-btn {
+min-width: 44px; min-height: 32px; padding: 0 12px;
+display: flex; align-items: center; justify-content: center;
+background: transparent; border: 0; border-radius: 999px;
+color: var(--sp-fade); font-family: var(--sp-font);
+font-size: .75rem; font-weight: 700; cursor: pointer;
+}
+.sp-lang-btn[lang="ar"] { font-family: var(--sp-font-ar); font-size: .8125rem; }
+.sp-lang-btn[aria-pressed="true"] { background: var(--sp-light); color: #000; }
+.sp-lang-btn:focus-visible { outline: 3px solid var(--sp-accent); outline-offset: 2px; }
+
+.sp-complogo { height: 40px; width: auto; display: block; margin: 8px auto 0; }
+
+/* ---------- Stage ---------- */
+.sp-stage {
+flex: 1 1 auto; min-height: 0;
+display: flex; flex-direction: column;
+/* NOT justify-content:center. Centring a scrollable flex container clips the
+overflow at the TOP and makes it unreachable — on a 320x568 screen that
+silently ate the first reel row. Auto margins on the end children absorb
+only POSITIVE free space, so the block centres when there is room and
+collapses to flush-top when there is not. */
+justify-content: flex-start;
+/* Safety valve for short viewports. Scrollbar hidden because a visible
+track on a full-bleed black interstitial reads as a rendering fault. */
+overflow-y: auto;
+scrollbar-width: none;
+padding: 4px 0 8px 0;
+text-align: center;
+}
+.sp-stage::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.sp-stage > :first-child { margin-top: auto; }
+.sp-stage > :last-child { margin-bottom: auto; }
+.sp-card {
+width: 100%; max-width: 460px; margin: 0 auto; min-width: 0;
+padding-left: var(--sp-pad-x); padding-right: var(--sp-pad-x);
+}
+
+.sp-title {
+margin: 4px auto 0; max-width: 20ch;
+font-size: clamp(1.75rem, 8.6vw, 2.375rem);
+font-weight: 900; line-height: 1.08; letter-spacing: -.015em;
+background: var(--sp-grad);
+-webkit-background-clip: text; background-clip: text;
+-webkit-text-fill-color: transparent; color: var(--sp-light);
+}
+html[dir="rtl"] .sp-title { letter-spacing: normal; line-height: 1.26; }
+
+/* Price pill — variant B only. Accent-ruled so the number is impossible to
+miss; the brief is explicit that the price must not be buried. Wording is
+taken verbatim from the DCB page. */
+.sp-price {
+display: none;
+margin: 10px auto 0; padding: 6px 15px;
+border: 1px solid rgba(122,255,251,0.45); border-radius: 999px;
+background: rgba(122,255,251,0.10);
+color: var(--sp-accent);
+font-size: clamp(.875rem, 4vw, 1rem); font-weight: 700; line-height: 1.3;
+}
+.sp-root.is-priced .sp-price { display: inline-block; }
+
+.sp-body {
+margin: 10px auto 0; max-width: 34ch;
+font-size: clamp(.8125rem, 3.6vw, .9375rem); line-height: 1.45; color: var(--sp-fade);
+}
+
+/* ---------- Key-art reel ----------
+Continuous CSS marquee, no JS timers. The tile list is rendered TWICE and
+the track shifts by exactly one repeat unit, so the loop has no snap.
+
+Sources are the 1400x600 key-art set — every one of them is exactly 2.33,
+so a landscape strip crops nothing. Tiles are sized from a single width
+variable rather than aspect-ratio: no dependency on newer CSS, no risk of
+the row collapsing to zero height in an older webview.
+
+The 44s duration is deliberate. The loop covers ~10 tile widths, which works
+out around 40px/s — slow enough to read a title as it passes. */
+.sp-reel {
+position: relative; margin-top: 14px;
+overflow: hidden;
+/* min-width:0 is load-bearing. As a flex item the default min-width:auto is
+the track's content size (~1120px), which drags the whole layout wider
+than the viewport and scrolls the body sideways. overflow:hidden does not
+prevent that — only this does. */
+width: 100%; min-width: 0;
+/* LTR on the CONTAINER, not just the track. An overflowing child is
+right-aligned in RTL, so the track would start at (reel - track) = -553px
+and the animation would translate a further -560 on top of that, sliding
+the strip almost entirely off-screen. Anchoring the container LTR keeps
+the track's static offset at 0 in both directions. The posters carry no
+reading order, so an LTR strip is not an RTL defect — travel direction is
+still mirrored, below. */
+direction: ltr;
+/* Fade both edges so posters dissolve instead of hard-cutting at the bezel.
+Logical inset would be pointless here — the strip is symmetric. */
+-webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+}
+.sp-reel.is-empty { display: none; }
+/* NO `gap` here on purpose. With gap, 10 tiles measure 10w + 9g, and half of
+that is 4px short of the true repeat unit 5(w+g) — so a -50% loop stutters
+every cycle. Spacing lives on the tile's margin-right instead, making the
+track exactly 10(w+g) and -50% exactly one repeat. */
+.sp-reel-track {
+display: flex; width: max-content;
+direction: ltr; /* transform maths stays LTR in both dirs */
+animation: spReel 44s linear infinite;
+}
+/* In RTL the reel travels the other way, matching the reading direction. */
+html[dir="rtl"] .sp-reel-track { animation-direction: reverse; }
+/* Row B counter-scrolls at a different speed, so the two rows drift apart
+instead of marching in lockstep. Direction is inverted relative to row A in
+BOTH text directions. */
+.sp-reel-b { margin-top: 8px; }
+.sp-reel-b .sp-reel-track {
+animation-direction: reverse;
+animation-duration: 53s;
+/* Negative delay starts row B mid-cycle. Together with the reversed list,
+the opposite travel direction and the coprime-ish duration, this stops the
+two rows from showing the same title abreast for more than a moment. */
+animation-delay: -19s;
+}
+html[dir="rtl"] .sp-reel-b .sp-reel-track { animation-direction: normal; }
+/* End value is an EXACT five-tile shift, not -50%. A percentage is relative to
+the track's own width, so it silently changes meaning if the number of
+copies changes; this is pinned to one repeat unit and stays seamless whether
+the track holds two copies or three. */
+/* One keyframe, two rows. Each row declares its own --sp-shift = one repeat
+unit (tile count x tile pitch), which the track inherits. A shared -50%
+could not work here: the rows hold different tile counts AND different
+widths, so their repeat units differ. */
+@keyframes spReel {
+from { transform: translateX(0); }
+to { transform: translateX(calc(var(--sp-shift) * -1)); }
+}
+.sp-reel { --sp-shift: calc((var(--sp-tile-w) + 8px) * 10); }
+.sp-reel-b { --sp-shift: calc((var(--sp-tile-w-b) + 8px) * 5); }
+
+.sp-tile {
+flex: 0 0 auto;
+width: var(--sp-tile-w);
+height: calc(var(--sp-tile-w) * 600 / 1400); /* 2.33 key art */
+margin-right: 8px; /* see the note on .sp-reel-track */
+border-radius: 10px; overflow: hidden;
+background: var(--sp-w06);
+border: 1px solid var(--sp-w06);
+}
+/* Row B is the portrait poster set — a different ratio as well as different
+titles, so the two strips never look like the same content twice. */
+.sp-reel-b .sp-tile {
+width: var(--sp-tile-w-b);
+height: calc(var(--sp-tile-w-b) * 675 / 475); /* 0.70 posters */
+}
+.sp-tile.is-dead { display: none; }
+.sp-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---------- Benefit trio (wording from the DCB page) ---------- */
+.sp-bens {
+display: flex; align-items: flex-start; justify-content: center;
+gap: 6px; margin: 14px auto 0; max-width: 400px;
+}
+.sp-ben {
+flex: 1 1 0; min-width: 0;
+display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.sp-ben svg { display: block; color: var(--sp-accent); flex: 0 0 auto; }
+.sp-ben span {
+font-size: clamp(.625rem, 2.8vw, .75rem); line-height: 1.25; color: var(--sp-fade);
+overflow-wrap: break-word;
+}
+
+/* ---------- Footer ---------- */
+.sp-foot {
+flex: 0 0 auto;
+padding: 10px var(--sp-pad-x) 12px;
+border-top: 1px solid var(--sp-w06);
+}
+.sp-cta {
+display: flex; align-items: center; justify-content: center; gap: 8px;
+width: 100%; max-width: 460px; margin: 0 auto; min-height: 54px;
+padding: 8px 16px;
+background: var(--sp-focus); color: #000;
+border: 0; border-radius: 10px;
+font: inherit; font-size: clamp(.9375rem, 4vw, 1.0625rem); font-weight: 700;
+text-align: center; text-decoration: none; cursor: pointer;
+transition: transform .12s ease;
+}
+.sp-cta:active { transform: scale(.98); }
+.sp-cta:focus-visible { outline: 3px solid var(--sp-accent); outline-offset: 2px; }
+
+/* "Not now" is a real button: full width, 46px tall, visible border, same type
+size as the fine print rather than a grey whisper. Not a dark pattern. */
+/* Deliberately smaller than the CTA, but still a 44px target with a visible
+border and full-size label — secondary, not hidden. */
+.sp-dismiss {
+display: block; width: 100%; max-width: 240px; margin: 8px auto 0;
+min-height: 44px; padding: 6px 16px;
+background: transparent; color: var(--sp-fade);
+border: 1px solid var(--sp-w12); border-radius: 10px;
+font: inherit; font-size: .875rem; font-weight: 700; cursor: pointer;
+}
+.sp-dismiss:active { background: var(--sp-w06); }
+.sp-dismiss:focus-visible { outline: 3px solid var(--sp-accent); outline-offset: 2px; }
+
+/* The constructive exit for an ineligible user. Accent-coloured like the
+"Click here" link on the DCB page. */
+.sp-alt {
+display: block; margin: 10px auto 0; padding: 6px 4px;
+font-size: .8125rem; line-height: 1.35; text-align: center;
+color: var(--sp-fade); text-decoration: none; cursor: pointer;
+}
+.sp-alt b { color: var(--sp-accent); font-weight: 700; text-decoration: underline; }
+.sp-alt:focus-visible { outline: 3px solid var(--sp-accent); outline-offset: 2px; }
+
+.sp-fine {
+display: flex; align-items: center; justify-content: center;
+gap: 7px; flex-wrap: wrap;
+margin: 8px auto 0; max-width: 460px;
+font-size: .6875rem; line-height: 1.35;
+color: #8C8C8C; /* Slate (#424242) on black is under 3:1; lifted to stay legible. */
+}
+.sp-oplogo { height: 20px; width: auto; display: block; border-radius: 2px; }
+.sp-optext { display: none; font-weight: 700; color: #8C8C8C; }
+.sp-fine.is-noimg .sp-oplogo { display: none; }
+.sp-fine.is-noimg .sp-optext { display: inline; }
+
+/* Short viewports (iPhone SE class): trade reel height and logo size for
+keeping the CTA above the fold. */
+@media (max-height: 640px) {
+:root { --sp-tile-w: clamp(130px, 38vw, 160px); --sp-inset: 6px; }
+.sp-reel-b { display: none; } /* one row only — protect the CTA */
+.sp-root { border-radius: 20px; }
+.sp-complogo { height: 30px; margin-top: 4px; }
+.sp-head { padding-top: 8px; }
+.sp-price { margin-top: 8px; }
+.sp-body { margin-top: 8px; }
+.sp-alt { margin-top: 6px; }
+.sp-fine { margin-top: 6px; }
+.sp-foot { padding-top: 8px; padding-bottom: 8px; }
+.sp-complogo { height: 32px; }
+.sp-title { font-size: clamp(1.5rem, 7.4vw, 1.875rem); }
+.sp-reel { margin-top: 10px; }
+.sp-bens { margin-top: 10px; }
+}
+
+.sp-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sp-debug {
+position: fixed; inset-inline: 0; bottom: 0; z-index: 99; background: #000; color: #0f0;
+font: 10px/1.35 ui-monospace, Menlo, monospace; padding: 4px 6px;
+max-height: 34vh; overflow: auto; white-space: pre-wrap; display: none;
+direction: ltr; text-align: left;
+}
+.sp-debug.is-on { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+.sp-root, .sp-hero, .sp-cta { transition: none !important; }
+.sp-cta:active { transform: none; }
+.sp-reel-track { animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="sp-root" id="spRoot" role="dialog" aria-modal="true" aria-labelledby="spTitle">
+
+<div class="sp-hero" id="spHero" aria-hidden="true"></div>
+
+<header class="sp-head">
+<div class="sp-bar">
+<div class="sp-lang" role="group" id="spLangGroup" aria-label="Language">
+<button type="button" class="sp-lang-btn" id="spLangAr" aria-pressed="true" lang="ar">ع</button>
+<button type="button" class="sp-lang-btn" id="spLangFr" aria-pressed="false" lang="fr">FR</button>
+<button type="button" class="sp-lang-btn" id="spLangEn" aria-pressed="false" lang="en">EN</button>
+</div>
+</div>
+<img class="sp-complogo" id="spCompLogo" alt="" />
+</header>
+
+<main class="sp-stage">
+<!-- Row A sits above the offer, row B below it, so the headline is framed
+by key art rather than floating in dead space. Both are full-bleed and
+clipped by the panel's rounded corners. -->
+<div class="sp-reel" id="spReelA" aria-hidden="true">
+<div class="sp-reel-track" id="spReelTrackA"></div>
+</div>
+
+<div class="sp-card">
+<h1 class="sp-title" id="spTitle"></h1>
+<div class="sp-price" id="spPrice"></div>
+<p class="sp-body" id="spBody"></p>
+</div>
+
+<!-- Row B travels the opposite way at a different speed, and is offset by
+half the list so the two rows never show the same title abreast.
+Hidden on short viewports — see the max-height media query. -->
+<div class="sp-reel sp-reel-b" id="spReelB" aria-hidden="true">
+<div class="sp-reel-track" id="spReelTrackB"></div>
+</div>
+
+<div class="sp-card">
+<div class="sp-bens">
+<div class="sp-ben">
+<!-- devices -->
+<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+<rect x="2" y="4" width="14" height="10" rx="1.5"/>
+<path d="M6 18h6"/>
+<rect x="17" y="9" width="5" height="11" rx="1.5"/>
+</svg>
+<span id="spBen1"></span>
+</div>
+<div class="sp-ben">
+<!-- cancel any time -->
+<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+<circle cx="12" cy="12" r="9"/>
+<path d="M5.6 18.4 18.4 5.6"/>
+</svg>
+<span id="spBen2"></span>
+</div>
+<div class="sp-ben">
+<!-- download / offline -->
+<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+<path d="M12 3v11"/>
+<path d="M7.5 10 12 14.5 16.5 10"/>
+<path d="M4 19h16"/>
+</svg>
+<span id="spBen3"></span>
+</div>
+</div>
+</div>
+</main>
+
+<footer class="sp-foot">
+<!-- Anchor, not a button. If the JS bridge is missing entirely, this is
+still a real navigable link rather than a dead control. -->
+<a class="sp-cta" id="spCta" href="#" role="button"><span id="spCtaLabel"></span></a>
+<button type="button" class="sp-dismiss" id="spDismiss"></button>
+<a class="sp-alt" id="spAlt" href="#"></a>
+<p class="sp-fine" id="spFine">
+<img class="sp-oplogo" id="spOpLogo" alt="" />
+<span class="sp-optext" id="spOpText">Maroc Telecom</span>
+<span id="spFineText"></span>
+</p>
+</footer>
+
+</div>
+<div class="sp-debug" id="spDebug"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ==========================================================================
+CONFIG
+========================================================================== */
+var CONFIG = {
+/* ---- A/B ---------------------------------------------------------------
+THE ONLY LINE THAT DIFFERS BETWEEN THE TWO VARIANT FILES.
+'A' = free trial only, no price. 'B' = free trial + weekly price.
+---------------------------------------------------------------------- */
+variant: 'B',
+
+lang: 'ar', /* Arabic is the default on load */
+
+/* ---- Event + property schema (see README for the conflicts flagged) ---- */
+eventName: 'web_exitpop_clm', /* existing event, reused as instructed */
+campaignName: 'seriea_dcb_2627', /* existing property name is campaign_name */
+triggerSource: 'maroc_telecom_dcb',
+placement: 'inapp_interstitial',
+channel: 'in_app',
+country: 'MA',
+carrierTarget: 'maroc_telecom',
+
+/* ---- Destinations ------------------------------------------------------ */
+destUrl: 'https://starzplay.com/en/partners/maroc-telecom',
+utmCampaign: 'seriea_dcb_2627',
+
+/* Localised DCB paths. OFF because the brief names the /en/ URL explicitly
+and the screenshots only evidence EN and AR. Flip to true once infra
+confirms the localised routes — see README open question 2. */
+localiseDestPath: false,
+destPathByLang: {
+ar: 'https://starzplay.com/ar/partners/maroc-telecom',
+fr: 'https://starzplay.com/fr/partners/maroc-telecom',
+en: 'https://starzplay.com/en/partners/maroc-telecom'
+},
+
+/* Where a NON Maroc Telecom user goes. AR and EN were supplied; FR falls
+back to EN because /fr/landing is unverified (403 behind the WAF, so I
+could not confirm it either way). README open question 2. */
+landingByLang: {
+ar: 'https://starzplay.com/ar/landing',
+fr: 'https://starzplay.com/en/landing',
+en: 'https://starzplay.com/en/landing'
+},
+
+/* ---- CleverTap Liquid injection ----------------------------------------
+Rendered SERVER-SIDE by CleverTap before the HTML reaches the webview.
+Verified syntax: {{Campaign.campaignId | default:"0_0"}}.
+If CleverTap does NOT render it (dashboard preview, HTML sanitisation, or
+a non-personalised send) the raw "{{...}}" text survives into the string.
+liquid() below detects that and drops the value rather than shipping
+literal braces in the querystring.
+DO NOT put Identity, email or phone here — click_id is the join key, so
+no personal data needs to travel in the URL at all. */
+ctCampaignIdRaw: '{{Campaign.campaignId | default:"0_0"}}',
+
+/* ---- Images: all verified live (26/26 loaded, dimensions checked) ------ */
+
+/* Serie A crowd backdrop, 1000x879, already fades to black.
+Alternatives, all live: .../png/design1.jpg (floodlit stadium), or any of
+the 1400x600 modularLanding banners. '' disables the backdrop. */
+heroUrl: 'https://sp.starzplay.com/starzon/serie-a/team-logos/new/png/design2.jpg',
+
+/* Reel tiles — all 1400x600 (2.33), so nothing is cropped.
+
+ORDER MATTERS: sport and entertainment strictly alternate, so whatever
+moment a user looks at the strip, both are on screen. Sport leads, because
+this audience is here for Serie A. 3carousel-1 is the Serie A Season
+2026/27 key art, which is the closest possible message-match.
+
+Every URL below was loaded and its dimensions checked. Also live and
+unused, if you want to swap something in:
+sport .../3carousel-{1,2,3,4,6}.webp
+entertainment .../1carousel-{1,2,3,5,6,7,8}.webp
+.../4carousel-{2,4,6}.webp
+.../5basic-lg.png (1400x464 — 3.02, would crop)
+The 475x675 portrait posters are NOT mixed into this strip — they are a
+different ratio, and they run in row B instead (see reelUrlsB).
+
+To change the tile count, update BOTH this list and the -10 multiplier in
+the spReel keyframe — that number is the repeat unit. */
+reelUrls: [
+/* sport — Serie A 2026/27 */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/3carousel-1.webp',
+/* entertainment */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/1carousel-1.webp',
+/* sport — UFC 321 */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/3carousel-2.webp',
+/* entertainment */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/4carousel-2.webp',
+/* sport — semi finals */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/3carousel-6.webp',
+/* entertainment — Arabic original */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/1carousel-7.webp',
+/* sport — UFC Fight Night */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/3carousel-3.webp',
+/* entertainment */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/4carousel-6.webp',
+/* sport — Noche UFC */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/3carousel-4.webp',
+/* entertainment — Arabic drama */
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/modularLanding/landing/1carousel-8.webp'
+],
+
+/* Row B — the portrait poster set, 475x675 (0.70). Deliberately a DIFFERENT
+set of titles from reelUrls above, so the two strips never show the same
+content. Five uniques; update the * 5 in --sp-shift if you change that. */
+reelUrlsB: [
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/landing/genres/exclusive/0.jpg',
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/landing/genres/exclusive/1.jpg',
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/landing/genres/exclusive/2.jpg',
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/landing/genres/exclusive/3.jpg',
+'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/landing/genres/exclusive/5.jpg'
+],
+
+/* Maroc Telecom mark, 99x80 SVG, as used on the STARZPLAY payment page. */
+opLogoUrl: 'https://mena-cdn-lb.aws.playco.com/prd-peg-data/default/web3/resources/images/signup/payment/maroc_ma.svg',
+
+/* Serie A lockups. AR has its own; FR reuses EN (no FR lockup exists).
+SerieA-Logo-Clean.png is the mark with no season text if wanted. */
+compLogoBase: 'https://sp.starzplay.com/starzon/serie-a/team-logos/new/png/',
+compLogoAr: 'SerieA-Logo-Arabic',
+compLogoEn: 'SerieA-Logo-English',
+compLogoExt: '.png',
+
+bridgeSettleMs: 400, /* CleverTap documents no flush guarantee before
+dismiss; they suggest 100-200ms. 400 here because
+we are also handing off to an external browser. */
+debug: false
+};
+
+/* ==========================================================================
+COPY — all three languages ship in the file. No network, no reload.
+
+EN and AR follow the live DCB page: the offer lines, the benefit trio, the
+eligibility line, the renewal line and the "Not a Maroc Telecom customer?"
+link are the page's own wording, so the in-app and the landing page say the
+same thing. Two deliberate adjustments, both noted in the README:
+- benefit labels are shortened ("Cancel any time" not "No commitments,
+cancel any time") because a 3-up row at 320px cannot hold the full
+sentence
+- the renewal line is plan-neutral ("renews automatically after your
+trial") rather than the page's "every week", because plan choice
+happens on the DCB page and weekly is only one of the two options
+
+"Maroc Telecom" stays in LATIN inside Arabic, exactly as the page does.
+
+Numerals: Western digits (3, 17.5) in all three languages, and "د.م" for
+MAD in Arabic — both taken from the live Arabic page. Note the team-picker
+in-app uses Eastern digits ("٢٦/٢٧"), which is a Gulf convention and wrong
+for Morocco.
+
+Limits from the brief: headline < 45 chars, body < 140 chars. Longest
+strings are FR. Set CONFIG.debug = true to print live char counts.
+========================================================================== */
+var COPY = {
+ar: {
+dir: 'rtl', htmlLang: 'ar',
+title: '3 أيام تجربة مجانية',
+price: 'ثم 17.5 د.م كل أسبوع',
+body: 'شاهد الدوري الإيطالي مباشرة، مع مسلسلات حصرية وأحدث الأفلام والمزيد.',
+ben1: 'أجهزة متعددة',
+ben2: 'إلغاء في أي وقت',
+ben3: 'مشاهدة بدون إنترنت',
+cta: 'ابدأ تجربتك المجانية',
+dismiss: 'ليس الآن',
+altPre: 'لست من عملاء Maroc Telecom ؟ ',
+altLink: 'اضغط هنا',
+fine: 'هذه الخدمة فقط لعملاء Maroc Telecom · تتجدد تلقائيًا بعد التجربة · يمكنك الإلغاء في أي وقت',
+logoAlt: 'الدوري الإيطالي',
+opAlt: 'Maroc Telecom'
+},
+fr: {
+dir: 'ltr', htmlLang: 'fr',
+title: '3 jours d’essai gratuit',
+price: 'Puis 17,5 MAD par semaine',
+body: 'Regardez la Serie A en direct, avec des séries exclusives, les derniers films et plus encore.',
+ben1: 'Tous vos écrans',
+ben2: 'Annulable à tout moment',
+ben3: 'Hors ligne',
+cta: 'Démarrer mon essai gratuit',
+dismiss: 'Plus tard',
+altPre: 'Vous n’êtes pas client Maroc Telecom ? ',
+altLink: 'Cliquez ici',
+fine: 'Réservé aux clients Maroc Telecom · Renouvellement automatique après l’essai · Annulable à tout moment',
+logoAlt: 'Serie A',
+opAlt: 'Maroc Telecom'
+},
+en: {
+dir: 'ltr', htmlLang: 'en',
+title: '3 days free trial',
+price: 'Then 17.5 MAD per week',
+body: 'Watch Serie A live, plus exclusive series, the latest movies and more.',
+ben1: 'All your devices',
+ben2: 'Cancel any time',
+ben3: 'Watch offline',
+cta: 'Start my free trial',
+dismiss: 'Not now',
+altPre: 'Not a Maroc Telecom customer? ',
+altLink: 'Click here',
+fine: 'Only for Maroc Telecom customers · Renews automatically after your trial · Cancel any time',
+logoAlt: 'Serie A',
+opAlt: 'Maroc Telecom'
+}
+};
+var T = COPY[CONFIG.lang] || COPY.ar;
+
+/* ==========================================================================
+CLEVERTAP BRIDGE
+
+Verified against CleverTap's current docs (see README "Docs used").
+Targeting is Android-only for this flight, but the iOS path is kept: it is
+~15 lines, it is verified correct, and stripping it would only have to be
+rewritten if iOS is ever enabled.
+
+Android : global object `window.CleverTap`
+pushEvent(name, JSON_STRING)
+triggerInAppAction(JSON_STRING, callToAction, buttonId)
+dismissInAppNotification()
+
+iOS : window.webkit.messageHandlers.clevertap.postMessage({...})
+{action:'recordEventWithProps', event, properties} <- JS OBJECT
+{action:'triggerInAppAction', actionJson, callToAction, buttonId}
+{action:'dismissInAppNotification'}
+
+Android takes JSON STRINGS because an @JavascriptInterface method cannot
+receive a JS object at all. iOS takes real objects. Sending the wrong one
+silently drops every property, so the paths are kept separate.
+========================================================================== */
+var Bridge = (function () {
+var log = [], cached, cachedDone = false;
+
+function note(m) {
+log.push(m);
+if (CONFIG.debug) {
+var el = document.getElementById('spDebug');
+if (el) { el.classList.add('is-on'); el.textContent = log.join('\n'); }
+}
+try { console.log('[CT] ' + m); } catch (e) {}
+}
+
+function resolve() {
+if (cachedDone) return cached;
+cachedDone = true; cached = null;
+var names = ['clevertap', 'CleverTap'], i;
+
+/* Android first: a real object exposing pushEvent. */
+for (i = 0; i < names.length; i++) {
+try {
+var o = window[names[i]];
+if (o && typeof o.pushEvent === 'function') {
+cached = { kind: 'android', obj: o, name: 'window.' + names[i] };
+note('bridge = ANDROID via ' + cached.name); return cached;
+}
+} catch (e) {}
+}
+/* iOS: WKScriptMessageHandler. Docs use lowercase `clevertap`. */
+try {
+var mh = window.webkit && window.webkit.messageHandlers;
+if (mh) {
+for (i = 0; i < names.length; i++) {
+if (mh[names[i]] && typeof mh[names[i]].postMessage === 'function') {
+cached = { kind: 'ios', handler: mh[names[i]],
+name: 'webkit.messageHandlers.' + names[i] };
+note('bridge = IOS via ' + cached.name); return cached;
+}
+}
+note('webkit.messageHandlers present but no clevertap key. keys=' +
+Object.keys(mh).join(','));
+}
+} catch (e) { note('iOS probe threw: ' + e); }
+
+note('NO BRIDGE FOUND (running outside the app?)');
+return cached;
+}
+
+function post(msg, label) {
+var b = resolve();
+if (!b || b.kind !== 'ios') return false;
+try { b.handler.postMessage(msg); note('iOS ' + label + ' OK'); return true; }
+catch (e) { note('iOS ' + label + ' threw: ' + e); return false; }
+}
+
+function pushEvent(name, props) {
+var b = resolve();
+if (!b) { note('WOULD FIRE ' + name + ' ' + JSON.stringify(props)); return false; }
+if (b.kind === 'android') {
+try { b.obj.pushEvent(name, JSON.stringify(props)); note('AND pushEvent OK ' + name); return true; }
+catch (e) { note('AND pushEvent threw: ' + e); return false; }
+}
+return post({ action: 'recordEventWithProps', event: name, properties: props }, 'pushEvent ' + name);
+}
+
+/* Opens the URL OUTSIDE the webview. Android resolves open-url through
+Intent.ACTION_VIEW; iOS through the system opener.
+
+`type` is "open-url" and the URL is repeated under android / ios / url.
+The Android SDK doc shows the "android" key; the iOS doc page shows an
+"ios" key. Extra keys are ignored by both parsers, so sending all three
+removes the guess. Returns true only if a bridge actually accepted it. */
+function openUrl(url, cta, buttonId) {
+var b = resolve();
+var actionJson = { type: 'open-url', android: url, ios: url, url: url };
+
+if (!b) { note('WOULD OPEN ' + url); return false; }
+
+if (b.kind === 'android') {
+if (typeof b.obj.triggerInAppAction !== 'function') {
+note('AND triggerInAppAction MISSING — SDK too old (needs 7.x+)');
+return false;
+}
+try {
+b.obj.triggerInAppAction(JSON.stringify(actionJson), cta, buttonId);
+note('AND triggerInAppAction OK -> ' + url); return true;
+} catch (e) { note('AND triggerInAppAction threw: ' + e); return false; }
+}
+return post({ action: 'triggerInAppAction', actionJson: actionJson,
+callToAction: cta, buttonId: buttonId }, 'openUrl');
+}
+
+function dismiss() {
+var b = resolve();
+if (!b) {
+note('no bridge — DOM hide only');
+var r = document.getElementById('spRoot'); if (r) r.style.display = 'none';
+return;
+}
+if (b.kind === 'android') {
+try { b.obj.dismissInAppNotification(); note('AND dismiss OK'); }
+catch (e) { note('AND dismiss threw: ' + e); }
+return;
+}
+post({ action: 'dismissInAppNotification' }, 'dismiss');
+}
+
+return { pushEvent: pushEvent, openUrl: openUrl, dismiss: dismiss, note: note };
+})();
+
+/* ==========================================================================
+LIQUID + URL
+
+liquid() is the "no undefined in the querystring" guard. It rejects:
+- unrendered Liquid (still contains braces)
+- empty / whitespace-only
+- the literal strings "undefined" / "null"
+========================================================================== */
+function liquid(raw) {
+if (typeof raw !== 'string') return '';
+var v = raw.trim();
+if (!v) return '';
+if (v.indexOf('{{') !== -1 || v.indexOf('}}') !== -1) return '';
+if (v === 'undefined' || v === 'null') return '';
+return v;
+}
+/* "0_0" is CleverTap's documented fallback and means "rendered, but no
+campaign". Kept in the EVENT payload, because a stream of campaign_id="0_0"
+is how you spot a misconfigured send. Stripped from the URL, because a fake
+ID in a querystring is worse than an absent one. */
+function ctCampaignIdForEvent() { return liquid(CONFIG.ctCampaignIdRaw) || 'unset'; }
+function ctCampaignIdForUrl() {
+var v = liquid(CONFIG.ctCampaignIdRaw);
+return (v === '0_0') ? '' : v;
+}
+
+function makeClickId() {
+var rnd = '', i;
+try {
+var a = new Uint8Array(8);
+(window.crypto || window.msCrypto).getRandomValues(a);
+for (i = 0; i < a.length; i++) rnd += ('0' + a[i].toString(16)).slice(-2);
+} catch (e) {
+rnd = Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10);
+}
+return 'ct' + Date.now().toString(36) + rnd;
+}
+
+/* Shared by the DCB CTA and the "not a Maroc Telecom customer" link, so both
+destinations are attributed the same way. */
+function buildUrl(base, clickId, extraPairs) {
+var pairs = [
+['utm_source', 'clevertap'],
+['utm_medium', 'inapp'],
+['utm_campaign', CONFIG.utmCampaign],
+['utm_content', CONFIG.variant + '_' + CONFIG.lang],
+['click_id', clickId],
+['ct_campaign_id', ctCampaignIdForUrl()],
+/* Explicit copies of variant and language. utm_content already encodes
+both, but string-splitting a utm field in the warehouse is brittle and
+these two drive the whole A/B read. Drop them if you would rather not
+carry the redundancy. */
+['sp_variant', CONFIG.variant],
+['sp_lang', CONFIG.lang]
+];
+if (extraPairs) pairs = pairs.concat(extraPairs);
+
+var q = [], i, k, v;
+for (i = 0; i < pairs.length; i++) {
+k = pairs[i][0]; v = pairs[i][1];
+if (v === null || v === undefined) continue;
+v = String(v).trim();
+if (!v || v === 'undefined' || v === 'null') continue;
+q.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+}
+return base + (base.indexOf('?') === -1 ? '?' : '&') + q.join('&');
+}
+
+function dcbUrl(clickId) {
+var base = CONFIG.destUrl;
+if (CONFIG.localiseDestPath && CONFIG.destPathByLang[CONFIG.lang]) {
+base = CONFIG.destPathByLang[CONFIG.lang];
+}
+return buildUrl(base, clickId);
+}
+function altUrl(clickId) {
+var base = CONFIG.landingByLang[CONFIG.lang] || CONFIG.landingByLang.en;
+return buildUrl(base, clickId, [['sp_route', 'non_carrier']]);
+}
+
+/* ==========================================================================
+STATE + EVENTS
+========================================================================== */
+var state = { shownAt: Date.now(), langSwitches: 0, clickId: null, done: false };
+
+function deviceType() { return window.innerWidth >= 600 ? 'tablet' : 'mobile'; }
+function osGuess() {
+var u = navigator.userAgent || '';
+if (/iPhone|iPad|iPod/i.test(u)) return 'ios';
+if (/Android/i.test(u)) return 'android';
+return 'unknown';
+}
+function secsSince(t) { return t ? Math.round((Date.now() - t) / 1000) : null; }
+
+/* `language` is the language ACTIVE AT THE TIME OF THE ACTION, per the brief.
+For language_switched that means the language being left, with
+language_from / language_to carrying the transition. The team-picker in-app
+sets `language` to the DESTINATION language on that action, which
+double-counts with language_to and loses the origin. Deliberate deviation. */
+function fireEvent(action, extra) {
+var p = {
+action: action,
+/* --- shape inherited from serie-a-team-picker.html --- */
+trigger_source: CONFIG.triggerSource,
+campaign_name: CONFIG.campaignName,
+placement: CONFIG.placement,
+channel: CONFIG.channel,
+language: CONFIG.lang,
+language_switches: state.langSwitches,
+device_type: deviceType(),
+os: osGuess(),
+timestamp: new Date().toISOString(),
+dwell_time_sec: secsSince(state.shownAt),
+/* --- new for this campaign --- */
+variant: CONFIG.variant,
+campaign_id: ctCampaignIdForEvent(),
+country: CONFIG.country,
+carrier_target: CONFIG.carrierTarget,
+price_shown: CONFIG.variant === 'B',
+offer: 'free_trial_3d'
+};
+if (state.clickId) p.click_id = state.clickId;
+if (extra) for (var k in extra) if (extra.hasOwnProperty(k)) p[k] = extra[k];
+Bridge.pushEvent(CONFIG.eventName, p);
+}
+
+/* ==========================================================================
+RENDER
+========================================================================== */
+var els = {
+root: document.getElementById('spRoot'),
+hero: document.getElementById('spHero'),
+compLogo: document.getElementById('spCompLogo'),
+title: document.getElementById('spTitle'),
+price: document.getElementById('spPrice'),
+body: document.getElementById('spBody'),
+reelA: document.getElementById('spReelA'),
+reelTrackA: document.getElementById('spReelTrackA'),
+reelB: document.getElementById('spReelB'),
+reelTrackB: document.getElementById('spReelTrackB'),
+ben1: document.getElementById('spBen1'),
+ben2: document.getElementById('spBen2'),
+ben3: document.getElementById('spBen3'),
+cta: document.getElementById('spCta'),
+ctaLabel: document.getElementById('spCtaLabel'),
+dismiss: document.getElementById('spDismiss'),
+alt: document.getElementById('spAlt'),
+fine: document.getElementById('spFine'),
+fineText: document.getElementById('spFineText'),
+opLogo: document.getElementById('spOpLogo'),
+opText: document.getElementById('spOpText'),
+langAr: document.getElementById('spLangAr'),
+langFr: document.getElementById('spLangFr'),
+langEn: document.getElementById('spLangEn')
+};
+
+/* Tiles are rendered TWICE so the marquee loops seamlessly.
+
+Image failure is handled per URL, not per tile: if a source 404s, BOTH of
+its copies are hidden together. Hiding only one would make the two halves of
+the track different widths, so the fixed keyframe shift would no longer land
+on a whole repeat and the loop would visibly jump. If every source fails the
+strip is removed entirely rather than leaving a band of empty boxes. */
+function buildReel(reelEl, trackEl, urls) {
+urls = urls || [];
+if (!urls.length) { reelEl.classList.add('is-empty'); return; }
+
+var aliveUrls = urls.length;
+var frag = document.createDocumentFragment();
+var pass, i;
+
+function killUrl(idx) {
+var dead = trackEl.querySelectorAll('[data-idx="' + idx + '"]');
+if (!dead.length || dead[0].classList.contains('is-dead')) return;
+for (var d = 0; d < dead.length; d++) dead[d].classList.add('is-dead');
+if (--aliveUrls <= 0) reelEl.classList.add('is-empty');
+}
+
+for (pass = 0; pass < 2; pass++) {
+for (i = 0; i < urls.length; i++) {
+var tile = document.createElement('div');
+tile.className = 'sp-tile';
+tile.setAttribute('data-idx', String(i));
+var img = document.createElement('img');
+img.alt = ''; img.decoding = 'async';
+img.setAttribute('data-idx', String(i));
+img.addEventListener('error', function () {
+killUrl(this.getAttribute('data-idx'));
+});
+img.src = urls[i];
+tile.appendChild(img);
+frag.appendChild(tile);
+}
+}
+trackEl.appendChild(frag);
+}
+
+function applyLocale() {
+T = COPY[CONFIG.lang] || COPY.ar;
+var h = document.documentElement;
+h.setAttribute('dir', T.dir); /* full layout mirror, not just text-align */
+h.setAttribute('lang', T.htmlLang);
+
+els.title.textContent = T.title;
+els.price.textContent = T.price;
+els.body.textContent = T.body;
+els.ben1.textContent = T.ben1;
+els.ben2.textContent = T.ben2;
+els.ben3.textContent = T.ben3;
+els.ctaLabel.textContent = T.cta;
+els.dismiss.textContent = T.dismiss;
+els.fineText.textContent = T.fine;
+els.opText.textContent = T.opAlt;
+els.opLogo.alt = T.opAlt;
+
+/* textContent for the prose, a real <b> for the link phrase — matches the
+DCB page, where only "Click here" is accented. */
+els.alt.textContent = T.altPre;
+var b = document.createElement('b');
+b.textContent = T.altLink;
+els.alt.appendChild(b);
+
+els.langAr.setAttribute('aria-pressed', CONFIG.lang === 'ar' ? 'true' : 'false');
+els.langFr.setAttribute('aria-pressed', CONFIG.lang === 'fr' ? 'true' : 'false');
+els.langEn.setAttribute('aria-pressed', CONFIG.lang === 'en' ? 'true' : 'false');
+
+/* FR falls back to the EN lockup — Serie A supplied EN and AR only. */
+els.compLogo.src = CONFIG.compLogoBase +
+(CONFIG.lang === 'ar' ? CONFIG.compLogoAr : CONFIG.compLogoEn) + CONFIG.compLogoExt;
+els.compLogo.alt = T.logoAlt;
+
+/* hrefs are rebuilt on every locale change so utm_content is never stale,
+even if the user switches language and taps immediately. Before the tap
+there is no click_id yet and buildUrl simply omits it — a placeholder
+would be worse than absent if the link were ever copied. */
+els.cta.setAttribute('href', dcbUrl(state.clickId));
+els.alt.setAttribute('href', altUrl(state.clickId));
+
+if (CONFIG.debug) auditLengths();
+}
+
+function auditLengths() {
+var lim = { title: 45, body: 140 }, k, l;
+for (l in COPY) if (COPY.hasOwnProperty(l)) {
+for (k in lim) if (lim.hasOwnProperty(k)) {
+var n = COPY[l][k].length;
+Bridge.note((n > lim[k] ? 'OVERFLOW ' : 'ok ') + l + '.' + k +
+' = ' + n + '/' + lim[k]);
+}
+}
+}
+
+/* ==========================================================================
+ACTIONS
+========================================================================== */
+/* Both outbound taps share this. `which` distinguishes the DCB trial route
+from the non-carrier landing route; they are separate action values so the
+click-to-trial denominator stays clean. */
+function onOutbound(e, which) {
+if (state.done) { if (e) e.preventDefault(); return; }
+state.done = true;
+state.clickId = makeClickId();
+
+var isDcb = which === 'dcb';
+var url = isDcb ? dcbUrl(state.clickId) : altUrl(state.clickId);
+var el = isDcb ? els.cta : els.alt;
+var btnId = isDcb ? ('cta_dcb_' + CONFIG.variant) : ('cta_landing_' + CONFIG.variant);
+var label = isDcb ? T.cta : T.altLink;
+
+el.setAttribute('href', url);
+
+/* Fire BEFORE handing off — once the external browser takes focus the
+webview may be torn down mid-flush. */
+fireEvent(isDcb ? 'cta_clicked' : 'secondary_cta_clicked', {
+destination_url: url,
+click_id: state.clickId,
+link_target: isDcb ? 'maroc_telecom_dcb' : 'non_carrier_landing'
+});
+
+var opened = Bridge.openUrl(url, label, btnId);
+
+if (opened) {
+/* Bridge accepted it. Suppress the anchor so the URL does not ALSO load
+inside the webview, then dismiss once events have had time to flush. */
+if (e) e.preventDefault();
+window.setTimeout(function () {
+fireEvent('dismissed', { dismiss_method: isDcb ? 'cta_handoff' : 'secondary_cta_handoff' });
+window.setTimeout(Bridge.dismiss, CONFIG.bridgeSettleMs);
+}, CONFIG.bridgeSettleMs);
+} else {
+/* triggerInAppAction unavailable (old SDK) or no bridge. Let the anchor
+navigate — the webview's own URL handler is the last chance at an
+external launch. Do NOT dismiss: killing the in-app here would cancel
+the navigation and strand the user on nothing. */
+Bridge.note('openUrl failed — falling through to anchor navigation');
+state.done = false;
+}
+}
+
+function onDismiss() {
+if (state.done) return;
+state.done = true;
+fireEvent('dismissed', { dismiss_method: 'not_now_button' });
+window.setTimeout(Bridge.dismiss, CONFIG.bridgeSettleMs);
+}
+
+function setLang(lang) {
+if (lang === CONFIG.lang || !COPY[lang]) return;
+var from = CONFIG.lang;
+state.langSwitches++;
+/* Fire while `language` still reads as the language being LEFT. */
+fireEvent('language_switched', { language_from: from, language_to: lang });
+CONFIG.lang = lang;
+applyLocale();
+}
+
+/* ==========================================================================
+BOOT
+========================================================================== */
+function loadHero() {
+if (!CONFIG.heroUrl) return;
+var pre = new Image();
+pre.onload = function () {
+els.hero.style.backgroundImage = 'url("' + CONFIG.heroUrl + '")';
+els.hero.classList.add('is-on');
+};
+pre.onerror = function () { Bridge.note('hero failed: ' + CONFIG.heroUrl); };
+pre.src = CONFIG.heroUrl;
+}
+
+function boot() {
+if (CONFIG.debug) document.getElementById('spDebug').classList.add('is-on');
+if (CONFIG.variant === 'B') els.root.classList.add('is-priced');
+
+loadHero();
+var reel = CONFIG.reelUrls || [];
+buildReel(els.reelA, els.reelTrackA, reel);
+buildReel(els.reelB, els.reelTrackB, CONFIG.reelUrlsB || []);
+
+/* Image failure must never cost readability or the CTA. Comp logo hides
+itself; the operator mark swaps to a text wordmark so the Maroc Telecom
+requirement is still stated. */
+els.compLogo.addEventListener('error', function () { els.compLogo.style.display = 'none'; });
+els.opLogo.addEventListener('error', function () { els.fine.classList.add('is-noimg'); });
+if (!CONFIG.opLogoUrl) els.fine.classList.add('is-noimg');
+else els.opLogo.src = CONFIG.opLogoUrl;
+
+applyLocale();
+
+els.langAr.addEventListener('click', function () { setLang('ar'); });
+els.langFr.addEventListener('click', function () { setLang('fr'); });
+els.langEn.addEventListener('click', function () { setLang('en'); });
+els.cta.addEventListener('click', function (e) { onOutbound(e, 'dcb'); });
+els.alt.addEventListener('click', function (e) { onOutbound(e, 'landing'); });
+els.dismiss.addEventListener('click', onDismiss);
+
+els.root.classList.add('is-ready');
+
+/* 'shown', not 'viewed' — matches the 10,348 existing web_exitpop_clm rows.
+See README property-conflict table. */
+fireEvent('shown');
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+})();
+</script>
+</body>
+</html>
