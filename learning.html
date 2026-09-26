@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Academy | CleverTap Web SDK Integration</title>
+    <style>
+        :root {
+            /* Same fintech palette as index.html, for a consistent site theme. */
+            --fin-navy: #0B1F3A;
+            --fin-navy-light: #16324F;
+            --fin-teal: #0F9D8E;
+            --fin-teal-dark: #0B7A6E;
+            --fin-buy: #16A34A;
+            --fin-sell: #DC2626;
+            --fin-gold: #C9A227;
+            --fin-gold-dark: #9C7E1D;
+            --fin-bg: #F3F5F8;
+            --fin-card: #FFFFFF;
+            --fin-border: #E2E6EC;
+            --fin-text: #10192B;
+            --fin-muted: #5B6472;
+            --fin-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background-color: var(--fin-bg);
+            color: var(--fin-text);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background-color: var(--fin-navy);
+            color: #fff;
+            border-bottom: 3px solid var(--fin-gold);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .topbar-badge {
+            padding: 3px 9px;
+            border-radius: 999px;
+            background-color: rgba(201, 162, 39, 0.18);
+            border: 1px solid var(--fin-gold);
+            color: var(--fin-gold);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .topbar-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        .topbar-nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .page {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 24px 16px 56px;
+            display: grid;
+            gap: 22px;
+        }
+
+        .card {
+            background-color: var(--fin-card);
+            border: 1px solid var(--fin-border);
+            border-radius: var(--fin-radius);
+            padding: 22px 24px;
+            box-shadow: 0 1px 3px rgba(11, 31, 58, 0.08);
+        }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            text-align: center;
+            padding: 34px 24px;
+            border-left: 4px solid var(--fin-gold);
+        }
+
+        .hero h2 {
+            margin: 0 0 8px;
+            font-size: 1.7rem;
+            color: var(--fin-navy);
+        }
+
+        .hero p {
+            margin: 0 0 22px;
+            color: var(--fin-muted);
+            max-width: 520px;
+            margin-inline: auto;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-size: 1.4rem;
+            color: var(--fin-teal);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hero-stat span {
+            font-size: 0.72rem;
+            color: var(--fin-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ---------- Filters ---------- */
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--fin-border);
+            background: #fff;
+            color: var(--fin-navy);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            background: var(--fin-navy);
+            color: #fff;
+            border-color: var(--fin-navy);
+        }
+
+        /* ---------- Catalog ---------- */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .course-card {
+            background: #fff;
+            border: 1px solid var(--fin-border);
+            border-radius: var(--fin-radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(11, 31, 58, 0.08);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(11, 31, 58, 0.14);
+        }
+
+        .course-thumb {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .lvl-beginner {
+            background-color: var(--fin-teal);
+        }
+
+        .lvl-intermediate {
+            background-color: var(--fin-gold);
+            color: var(--fin-navy);
+        }
+
+        .lvl-advanced {
+            background-color: var(--fin-navy);
+        }
+
+        .course-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .course-provider {
+            font-size: 0.72rem;
+            color: var(--fin-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .course-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--fin-text);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .course-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--fin-muted);
+            flex-wrap: wrap;
+        }
+
+        .rating {
+            color: var(--fin-gold-dark);
+            font-weight: 700;
+        }
+
+        .duration-badge {
+            border: 1px solid var(--fin-border);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 0.72rem;
+        }
+
+        .tag-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tag-chip {
+            background: #EEF2F1;
+            color: var(--fin-navy);
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .course-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .course-actions button {
+            flex: 1;
+            margin-top: 0;
+            font-size: 0.85rem;
+            padding: 9px 10px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            background-color: var(--fin-teal);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 10px 16px;
+            transition: background-color 0.15s ease;
+        }
+
+        button:hover {
+            background-color: var(--fin-teal-dark);
+        }
+
+        button.secondary {
+            background-color: var(--fin-navy);
+        }
+
+        button.secondary:hover {
+            background-color: var(--fin-navy-light);
+        }
+
+        /* ---------- Curriculum / modules ---------- */
+        #curriculumSection.card {
+            border-left: 4px solid var(--fin-teal);
+        }
+
+        .curriculum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .curriculum-header h2 {
+            margin: 0 0 4px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--fin-navy);
+        }
+
+        #curriculumTitle {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--fin-text);
+            display: block;
+            margin: 2px 0 4px;
+        }
+
+        #curriculumProvider {
+            font-size: 0.85rem;
+            color: var(--fin-muted);
+        }
+
+        .progress-wrap {
+            min-width: 180px;
+        }
+
+        .progress-track {
+            background: var(--fin-border);
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: var(--fin-teal);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #progressLabel {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: var(--fin-muted);
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .module {
+            border: 1px solid var(--fin-border);
+            border-radius: 8px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            cursor: pointer;
+            background: #F8F9FB;
+            font-weight: 700;
+            color: var(--fin-navy);
+            font-size: 0.9rem;
+        }
+
+        .module-header .module-meta {
+            font-size: 0.72rem;
+            color: var(--fin-muted);
+            font-weight: 600;
+        }
+
+        .module-lessons {
+            display: none;
+            padding: 4px 14px 12px;
+        }
+
+        .module.is-open .module-lessons {
+            display: block;
+        }
+
+        .module.is-open .module-caret {
+            transform: rotate(90deg);
+        }
+
+        .module-caret {
+            display: inline-block;
+            transition: transform 0.15s ease;
+            margin-right: 8px;
+        }
+
+        .lesson-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-top: 1px solid var(--fin-border);
+        }
+
+        .lesson-row:first-child {
+            border-top: none;
+        }
+
+        .lesson-row input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .lesson-title {
+            flex: 1;
+            font-size: 0.88rem;
+        }
+
+        .lesson-time {
+            font-size: 0.75rem;
+            color: var(--fin-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .curriculum-empty {
+            color: var(--fin-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-brand">
+            <h1>Learning Academy</h1>
+            <span class="topbar-badge">Fintech Demo</span>
+        </div>
+        <nav class="topbar-nav">
+            <a href="index.html">&larr; Back to SDK Demo</a>
+        </nav>
+    </div>
+
+    <div class="page">
+        <section class="card hero">
+            <h2>Learn to trade and invest with confidence</h2>
+            <p>Structured courses on markets, trading and personal finance — built from short video
+                lessons and quizzes, organized into modules you can track as you go.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><strong id="statCourses">0</strong><span>Courses</span></div>
+                <div class="hero-stat"><strong>96K+</strong><span>Learners</span></div>
+                <div class="hero-stat"><strong>4.8</strong><span>Avg. Rating</span></div>
+            </div>
+        </section>
+
+        <section class="filters" id="filterRow"></section>
+
+        <section class="catalog-grid" id="catalogGrid"></section>
+
+        <section class="card" id="curriculumSection">
+            <div class="curriculum-header">
+                <div>
+                    <h2>Course Curriculum</h2>
+                    <span id="curriculumTitle">Select a course to view its modules</span>
+                    <span id="curriculumProvider"></span>
+                </div>
+                <div class="progress-wrap" id="progressWrap" style="display:none;">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressLabel">0% complete</span>
+                </div>
+            </div>
+            <div id="moduleList">
+                <p class="curriculum-empty">Click "View Curriculum" on any course above to see its modules and
+                    lessons here.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Initialize CleverTap SDK (same account/setup as index.html, for a consistent demo site).
+        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
+        clevertap.account.push({ "id": "TEST-468-W87-546Z" });
+        clevertap.privacy.push({ optOut: false });
+        clevertap.privacy.push({ useIP: true });
+        (function () {
+            var wzrk = document.createElement('script');
+            wzrk.type = 'text/javascript';
+            wzrk.async = true;
+            wzrk.src = 'https://static.clevertap.com/js/clevertap.min.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wzrk, s);
+        })();
+
+        // ---------------------------------------------------------------
+        // Course catalog data. Each course carries its own module/lesson
+        // breakdown so "View Curriculum" can render a real syllabus.
+        // ---------------------------------------------------------------
+        const COURSES = [
+            {
+                id: "stock-fundamentals",
+                title: "Stock Market Fundamentals",
+                provider: "Fintech Academy",
+                level: "beginner",
+                rating: 4.8,
+                reviews: 12340,
+                duration: "6h",
+                tags: ["Trading", "Stocks"],
+                modules: [
+                    {
+                        title: "Module 1 · How Markets Work", lessons: [
+                            { title: "What is a stock exchange?", minutes: 8 },
+                            { title: "Order types explained", minutes: 12 },
+                            { title: "Quiz: Market basics", minutes: 5 }
+                        ]
+                    },
+                    {
+                        title: "Module 2 · Reading a Stock", lessons: [
+                            { title: "Price, volume & market cap", minutes: 10 },
+                            { title: "Understanding candlestick charts", minutes: 14 }
+                        ]
+                    },
+                    {
+                        title: "Module 3 · Your First Portfolio", lessons: [
+                            { title: "Diversification basics", minutes: 9 },
+                            { title: "Case study: a starter portfolio", minutes: 16 },
+                            { title: "Quiz: Portfolio basics", minutes: 5 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "technical-analysis",
+                title: "Technical Analysis Masterclass",
+                provider: "Fintech Academy",
+                level: "intermediate",
+                rating: 4.7,
+                reviews: 8210,
+                duration: "8h",
+                tags: ["Trading", "Charts"],
+                modules: [
+                    {
+                        title: "Module 1 · Chart Patterns", lessons: [
+                            { title: "Support & resistance", minutes: 11 },
+                            { title: "Trend lines & channels", minutes: 13 }
+                        ]
+                    },
+                    {
+                        title: "Module 2 · Indicators", lessons: [
+                            { title: "Moving averages", minutes: 12 },
+                            { title: "RSI & MACD", minutes: 15 },
+                            { title: "Quiz: Reading indicators", minutes: 5 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "options-101",
+                title: "Options Trading 101",
+                provider: "Fintech Academy",
+                level: "intermediate",
+                rating: 4.6,
+                reviews: 5430,
+                duration: "5h",
+                tags: ["Options", "Trading"],
+                modules: [
+                    {
+                        title: "Module 1 · Options Basics", lessons: [
+                            { title: "Calls vs. puts", minutes: 9 },
+                            { title: "Premium, strike & expiry", minutes: 10 }
+                        ]
+                    },
+                    {
+                        title: "Module 2 · Simple Strategies", lessons: [
+                            { title: "Covered calls", minutes: 12 },
+                            { title: "Protective puts", minutes: 12 },
+                            { title: "Quiz: Strategy basics", minutes: 5 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "personal-finance",
+                title: "Personal Finance & Budgeting",
+                provider: "Fintech Academy",
+                level: "beginner",
+                rating: 4.9,
+                reviews: 20150,
+                duration: "4h",
+                tags: ["Personal Finance"],
+                modules: [
+                    {
+                        title: "Module 1 · Building a Budget", lessons: [
+                            { title: "The 50/30/20 rule", minutes: 8 },
+                            { title: "Tracking your expenses", minutes: 9 }
+                        ]
+                    },
+                    {
+                        title: "Module 2 · Saving & Emergency Funds", lessons: [
+                            { title: "How much to save", minutes: 7 },
+                            { title: "Where to keep your emergency fund", minutes: 8 },
+                            { title: "Quiz: Savings habits", minutes: 5 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "risk-management",
+                title: "Risk Management for Traders",
+                provider: "Fintech Academy",
+                level: "advanced",
+                rating: 4.7,
+                reviews: 3120,
+                duration: "6h",
+                tags: ["Risk Management", "Trading"],
+                modules: [
+                    {
+                        title: "Module 1 · Position Sizing", lessons: [
+                            { title: "Risk per trade", minutes: 11 },
+                            { title: "Stop-loss placement", minutes: 13 }
+                        ]
+                    },
+                    {
+                        title: "Module 2 · Portfolio-Level Risk", lessons: [
+                            { title: "Correlation & concentration", minutes: 14 },
+                            { title: "Drawdown limits", minutes: 12 },
+                            { title: "Quiz: Risk controls", minutes: 5 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "mutual-funds",
+                title: "Mutual Funds & SIP Investing",
+                provider: "Fintech Academy",
+                level: "beginner",
+                rating: 4.8,
+                reviews: 9870,
+                duration: "3h",
+                tags: ["Investing", "Mutual Funds"],
+                modules: [
+                    {
+                        title: "Module 1 · Fund Basics", lessons: [
+                            { title: "Active vs. index funds", minutes: 9 },
+                            { title: "Understanding expense ratios", minutes: 8 }
+                        ]
+                    },
+                    {
+                        title: "Module 2 · Systematic Investing", lessons: [
+                            { title: "How a SIP works", minutes: 10 },
+                            { title: "Quiz: SIP fundamentals", minutes: 5 }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const CATEGORIES = ["All", "Trading", "Investing", "Options", "Personal Finance", "Risk Management"];
+        let activeFilter = "All";
+        let activeCourseId = null;
+
+        function starString(rating) {
+            const full = Math.round(rating);
+            return "★".repeat(full) + "☆".repeat(5 - full);
+        }
+
+        function totalLessons(course) {
+            return course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+        }
+
+        function renderFilters() {
+            const row = document.getElementById("filterRow");
+            row.innerHTML = "";
+            CATEGORIES.forEach((cat) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "filter-chip" + (cat === activeFilter ? " active" : "");
+                chip.textContent = cat;
+                chip.onclick = () => {
+                    activeFilter = cat;
+                    renderFilters();
+                    renderCatalog();
+                };
+                row.appendChild(chip);
+            });
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById("catalogGrid");
+            grid.innerHTML = "";
+            const visible = COURSES.filter((c) => activeFilter === "All" || c.tags.includes(activeFilter));
+
+            visible.forEach((course) => {
+                const card = document.createElement("div");
+                card.className = "course-card";
+                card.innerHTML = `
+          <div class="course-thumb lvl-${course.level}">
+            <span>${course.level}</span>
+            <span>${course.duration}</span>
+          </div>
+          <div class="course-body">
+            <div class="course-provider">${course.provider}</div>
+            <h3 class="course-title">${course.title}</h3>
+            <div class="course-meta">
+              <span class="rating">${starString(course.rating)} ${course.rating}</span>
+              <span>(${course.reviews.toLocaleString()})</span>
+              <span class="duration-badge">${totalLessons(course)} lessons</span>
+            </div>
+            <div class="tag-row">
+              ${course.tags.map((t) => `<span class="tag-chip">${t}</span>`).join("")}
+            </div>
+            <div class="course-actions">
+              <button type="button" class="secondary" data-action="curriculum">View Curriculum</button>
+              <button type="button" data-action="enroll">Enroll</button>
+            </div>
+          </div>
+        `;
+                card.querySelector('[data-action="curriculum"]').addEventListener("click", () => showCurriculum(course.id));
+                card.querySelector('[data-action="enroll"]').addEventListener("click", () => enrollInCourse(course));
+                grid.appendChild(card);
+            });
+
+            document.getElementById("statCourses").textContent = COURSES.length;
+        }
+
+        function enrollInCourse(course) {
+            clevertap.event.push("Course Enrolled", {
+                "Course Id": course.id,
+                "Course Title": course.title,
+                "Level": course.level
+            });
+            alert('Enrolled in "' + course.title + '"! Opening the curriculum...');
+            showCurriculum(course.id);
+        }
+
+        function showCurriculum(courseId) {
+            const course = COURSES.find((c) => c.id === courseId);
+            if (!course) return;
+            activeCourseId = courseId;
+
+            clevertap.event.push("Course Curriculum Viewed", {
+                "Course Id": course.id,
+                "Course Title": course.title
+            });
+
+            document.getElementById("curriculumTitle").textContent = course.title;
+            document.getElementById("curriculumProvider").textContent =
+                course.provider + " · " + course.level.charAt(0).toUpperCase() + course.level.slice(1) + " · " + course.duration;
+            document.getElementById("progressWrap").style.display = "block";
+
+            const list = document.getElementById("moduleList");
+            list.innerHTML = "";
+            course.modules.forEach((mod, mIdx) => {
+                const modEl = document.createElement("div");
+                modEl.className = "module";
+                modEl.innerHTML = `
+          <div class="module-header" data-module-toggle>
+            <span><span class="module-caret">&#9656;</span>${mod.title}</span>
+            <span class="module-meta">${mod.lessons.length} lessons</span>
+          </div>
+          <div class="module-lessons">
+            ${mod.lessons.map((lesson, lIdx) => `
+              <label class="lesson-row">
+                <input type="checkbox" data-module="${mIdx}" data-lesson="${lIdx}" />
+                <span class="lesson-title">${lesson.title}</span>
+                <span class="lesson-time">${lesson.minutes} min</span>
+              </label>
+            `).join("")}
+          </div>
+        `;
+                modEl.querySelector("[data-module-toggle]").addEventListener("click", () => {
+                    modEl.classList.toggle("is-open");
+                });
+                list.appendChild(modEl);
+            });
+            // First module open by default so the syllabus doesn't look empty.
+            const firstModule = list.querySelector(".module");
+            if (firstModule) firstModule.classList.add("is-open");
+
+            list.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+                box.addEventListener("change", () => onLessonToggle(course, box));
+            });
+
+            updateProgress(course);
+            document.getElementById("curriculumSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function onLessonToggle(course, checkbox) {
+            const modIdx = Number(checkbox.getAttribute("data-module"));
+            const lesIdx = Number(checkbox.getAttribute("data-lesson"));
+            const lesson = course.modules[modIdx].lessons[lesIdx];
+
+            if (checkbox.checked) {
+                clevertap.event.push("Lesson Completed", {
+                    "Course Id": course.id,
+                    "Course Title": course.title,
+                    "Module": course.modules[modIdx].title,
+                    "Lesson": lesson.title
+                });
+            }
+            updateProgress(course);
+        }
+
+        function updateProgress(course) {
+            const list = document.getElementById("moduleList");
+            const boxes = list.querySelectorAll('input[type="checkbox"]');
+            const total = boxes.length;
+            const done = list.querySelectorAll('input[type="checkbox"]:checked').length;
+            const pct = total ? Math.round((done / total) * 100) : 0;
+
+            document.getElementById("progressFill").style.width = pct + "%";
+            document.getElementById("progressLabel").textContent = pct + "% complete (" + done + "/" + total + " lessons)";
+
+            if (pct === 100 && total > 0) {
+                clevertap.event.push("Course Completed", {
+                    "Course Id": course.id,
+                    "Course Title": course.title
+                });
+            }
+        }
+
+        // Track Page Browsed, matching the pattern used on the other demo pages.
+        function trackPageBrowsed() {
+            clevertap.event.push("Page Browsed", {
+                "Page": document.location.pathname || "NA",
+                "Title": document.title || "NA",
+                "URL": window.location.href || "NA"
+            });
+        }
+
+        renderFilters();
+        renderCatalog();
+        window.onload = trackPageBrowsed;
+    </script>
+</body>
+
+</html>
