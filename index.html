@@ -172,6 +172,21 @@
             margin-top: 0;
         }
 
+        .remove-btn {
+            flex: 0 0 auto;
+            margin-top: 0;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            line-height: 1;
+            font-size: 1.1rem;
+            background-color: var(--ct-danger);
+        }
+
+        .remove-btn:hover {
+            background-color: var(--ct-danger-dark);
+        }
+
         .trading-buttons {
             display: flex;
             gap: 15px;
@@ -470,6 +485,7 @@
           <option value="date">Date</option>
         </select>
         <input type="text" placeholder="Property Value" class="user-value" />
+        <button type="button" class="remove-btn" onclick="removeProperty(this)" aria-label="Remove property">&times;</button>
       `;
             container.appendChild(div);
         }
@@ -488,8 +504,14 @@
           <option value="date">Date</option>
         </select>
         <input type="text" placeholder="Event Property Value" class="event-value" />
+        <button type="button" class="remove-btn" onclick="removeProperty(this)" aria-label="Remove property">&times;</button>
       `;
             container.appendChild(div);
+        }
+
+        // Removes the property row (key/type/value/remove-button group) containing the clicked remove button
+        function removeProperty(button) {
+            button.closest(".key-value-pair").remove();
         }
 
         // Handler to adjust input type based on selection
