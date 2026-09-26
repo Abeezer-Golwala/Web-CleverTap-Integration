@@ -6,55 +6,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CleverTap Web SDK Integration</title>
     <style>
-        /* Basic styles for layout */
+        :root {
+            --ct-primary: #2E7D32;
+            --ct-primary-dark: #1B5E20;
+            --ct-accent: #778046;
+            --ct-danger: #D32F2F;
+            --ct-danger-dark: #B71C1C;
+            --ct-bg: #F4F6F5;
+            --ct-card: #FFFFFF;
+            --ct-border: #E1E4E2;
+            --ct-text: #1F2723;
+            --ct-muted: #667066;
+            --ct-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             margin: 0;
-            background-color: #f3f3f3;
+            min-height: 100vh;
+            background-color: var(--ct-bg);
+            color: var(--ct-text);
         }
 
-        h1 {
-            color: #333;
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background-color: var(--ct-primary-dark);
+            color: #fff;
         }
 
-        .container {
-            max-width: 600px;
+        .topbar h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .bell-icon {
+            font-size: 22px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            max-width: 960px;
             margin: 0 auto;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+            padding: 24px 16px 48px;
+            display: grid;
+            gap: 20px;
         }
 
-        label,
+        .card {
+            background-color: var(--ct-card);
+            border: 1px solid var(--ct-border);
+            border-radius: var(--ct-radius);
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.05rem;
+            color: var(--ct-primary-dark);
+        }
+
+        .card-subtext {
+            margin-top: -8px;
+            color: var(--ct-muted);
+            font-size: 0.85rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 720px) {
+            .two-col {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ct-muted);
+        }
+
         input,
         select {
             display: block;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 6px;
+            padding: 8px 10px;
+            border: 1px solid var(--ct-border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #fff;
         }
 
         button {
-            margin-top: 12px;
-            padding: 10px 15px;
+            margin-top: 14px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
+            border-radius: 8px;
+            background-color: var(--ct-primary);
             color: #fff;
+            font-weight: 600;
             cursor: pointer;
+            transition: background-color 0.15s ease;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: var(--ct-primary-dark);
+        }
+
+        button.secondary {
+            background-color: var(--ct-accent);
+        }
+
+        button.secondary:hover {
+            background-color: #5f6538;
         }
 
         .carousel {
             position: relative;
             overflow: hidden;
-            border-radius: 10px;
+            border-radius: var(--ct-radius);
         }
 
         .slides {
@@ -62,12 +154,9 @@
             transition: transform 0.5s ease;
         }
 
-        .bell-icon {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
+        .slide img {
+            display: block;
+            width: 100%;
         }
 
         .key-value-pair {
@@ -80,12 +169,12 @@
         .key-value-pair input,
         .key-value-pair select {
             flex: 1;
+            margin-top: 0;
         }
 
         .trading-buttons {
             display: flex;
             gap: 15px;
-            margin-top: 30px;
             justify-content: center;
         }
 
@@ -95,28 +184,65 @@
         }
 
         .trading-buttons .buy-btn {
-            background-color: #4CAF50;
+            background-color: var(--ct-primary);
         }
 
         .trading-buttons .buy-btn:hover {
-            background-color: #45a049;
+            background-color: var(--ct-primary-dark);
         }
 
         .trading-buttons .sell-btn {
-            background-color: #f44336;
+            background-color: var(--ct-danger);
         }
 
         .trading-buttons .sell-btn:hover {
-            background-color: #da190b;
+            background-color: var(--ct-danger-dark);
+        }
+
+        /* Product Experiences */
+        .pe-vars {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+            font-family: ui-monospace, Consolas, monospace;
+            font-size: 0.85rem;
+            background-color: #F0F3F0;
+            border: 1px solid var(--ct-border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .pe-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--ct-muted);
+        }
+
+        .pe-banner {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background-color: #E8F1E4;
+            border: 1px solid #C7DDBC;
+            color: var(--ct-primary-dark);
+            font-weight: 600;
+            display: none;
+        }
+
+        .pe-banner.is-visible {
+            display: block;
         }
     </style>
 </head>
 
 <body>
-    <h1>CleverTap Web SDK Integration</h1>
-    <div class="bell-icon" id= "btnInbox" >🔔</div>
-    <div class="container">
-        <div class="carousel">
+    <div class="topbar">
+        <h1>CleverTap Web SDK Integration</h1>
+        <div class="bell-icon" id="btnInbox" title="Inbox">🔔</div>
+    </div>
+
+    <div class="page">
+        <div class="card carousel">
             <div class="slides">
                 <div class="slide"><img src="https://picsum.photos/id/230/600/200.jpg" alt="Image 1"></div>
                 <div class="slide"><img src="https://picsum.photos/id/231/600/200.jpg" alt="Image 2"></div>
@@ -124,34 +250,54 @@
                 <div class="slide"><img src="https://picsum.photos/id/233/600/200.jpg" alt="Image 4"></div>
             </div>
         </div>
-        <!-- Section to initialize user profile -->
-        <div>
-            <h2>Initialize User Profile</h2>
-            <label for="profileId">Profile ID:</label>
-            <input type="text" id="profileId" placeholder="Enter Profile ID" />
 
-            <button onclick="addUserProperty()">Add User Property</button>
-            <div id="userPropertiesContainer"></div>
-            <button onclick="uploadProfile()">Upload Profile</button>
+        <!-- Section: CleverTap Product Experiences (Web Remote Config) -->
+        <div class="card" id="productExperienceCard">
+            <h2>Product Experiences</h2>
+            <p class="card-subtext">Remote-config variables defined and synced via the Web SDK
+                (<code>defineVariable</code> / <code>syncVariables</code>), used here to drive UI without a redeploy.</p>
+
+            <div class="pe-banner" id="peBanner"></div>
+
+            <div class="pe-vars" id="peVarsDisplay">Loading variables…</div>
+
+            <button onclick="syncProductExperience()">Sync Product Experience</button>
+            <span class="pe-status" id="peStatus"></span>
         </div>
 
-        <!-- Section to upload events -->
-        <div style="margin-top: 20px;">
-            <h2>Upload Event</h2>
-            <label for="eventName">Event Name:</label>
-            <input type="text" id="eventName" placeholder="Enter Event Name" />
+        <div class="two-col">
+            <!-- Section to initialize user profile -->
+            <div class="card">
+                <h2>Initialize User Profile</h2>
+                <label for="profileId">Profile ID:</label>
+                <input type="text" id="profileId" placeholder="Enter Profile ID" />
 
-            <button onclick="addEventProperty()">Add Event Property</button>
-            <div id="eventPropertiesContainer"></div>
-            <button onclick="uploadEvent()">Upload Event</button>
+                <button onclick="addUserProperty()">Add User Property</button>
+                <div id="userPropertiesContainer"></div>
+                <button onclick="uploadProfile()">Upload Profile</button>
+            </div>
+
+            <!-- Section to upload events -->
+            <div class="card">
+                <h2>Upload Event</h2>
+                <label for="eventName">Event Name:</label>
+                <input type="text" id="eventName" placeholder="Enter Event Name" />
+
+                <button onclick="addEventProperty()">Add Event Property</button>
+                <div id="eventPropertiesContainer"></div>
+                <button onclick="uploadEvent()">Upload Event</button>
+            </div>
         </div>
-    </div>
-    <button onclick="getDataFromAndroid()">CTA for PE1</button>
 
-    <!-- Trading Buttons Section -->
-    <div class="trading-buttons">
-        <button class="buy-btn" onclick="handleBuy()">Buy</button>
-        <button class="sell-btn" onclick="handleSell()">Sell</button>
+        <div class="card">
+            <h2>Native Bridge</h2>
+            <button class="secondary" onclick="getDataFromAndroid()">CTA for PE1</button>
+
+            <div class="trading-buttons" style="margin-top: 20px;">
+                <button class="buy-btn" onclick="handleBuy()">Buy</button>
+                <button class="sell-btn" onclick="handleSell()">Sell</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -188,30 +334,68 @@
 
             });
             clevertap.enableLocalStorageEncryption(true);
-                
-                clevertap.setLogLevel(4);
-                var jsontestweb =
-                {
-                    "key1": { "key1": "value1" },
-                    "key2": "value2",
-                    "key3": "value3"
-                };
+            clevertap.setLogLevel(4);
 
-                const var2 = clevertap.defineVariable("testkeyweb", JSON.stringify(jsontestweb));
-                clevertap.syncVariables();
+            // Product Experience (Web Remote Config) variables.
+            // Values are set on the CleverTap dashboard; these are the defaults
+            // used until a synced value arrives.
+            peVars.showPromoBanner = clevertap.defineVariable("show_promo_banner", false);
+            peVars.promoMessage = clevertap.defineVariable("promo_message", "Welcome!");
+            peVars.promoDiscount = clevertap.defineVariable("promo_discount_pct", 0);
 
-            
-            clevertap.addVariablesChangedCallback(() => {  
+            clevertap.syncVariables();
+
+            clevertap.addVariablesChangedCallback(() => {
                 console.log("CleverTap addVariablesChangedCallback");
+                renderProductExperience();
             });
-            
-            clevertap.addOneTimeVariablesChangedCallback(() => {  
-                 console.log("CleverTap addOneTimeVariablesChangedCallback");
+
+            clevertap.addOneTimeVariablesChangedCallback(() => {
+                console.log("CleverTap addOneTimeVariablesChangedCallback");
+                renderProductExperience();
             });
 
             // Track Page Browsed event on page load
             trackPageBrowsed();
         };
+
+        // Holds the CleverTap remote-config variable handles once defined.
+        const peVars = {};
+
+        // Renders the current Product Experience variable values into the UI
+        // and toggles the promo banner based on the boolean flag.
+        function renderProductExperience() {
+            const display = document.getElementById("peVarsDisplay");
+            const banner = document.getElementById("peBanner");
+            if (!display || !peVars.showPromoBanner) return;
+
+            const showBanner = peVars.showPromoBanner.getValue();
+            const message = peVars.promoMessage.getValue();
+            const discount = peVars.promoDiscount.getValue();
+
+            display.textContent =
+                "show_promo_banner: " + showBanner + "\n" +
+                "promo_message: " + message + "\n" +
+                "promo_discount_pct: " + discount;
+
+            banner.textContent = message + (discount ? " (" + discount + "% off)" : "");
+            banner.classList.toggle("is-visible", !!showBanner);
+        }
+
+        // Re-syncs Product Experience variables against the dashboard on demand.
+        function syncProductExperience() {
+            const status = document.getElementById("peStatus");
+            if (status) status.textContent = "Syncing…";
+            clevertap.syncVariables(
+                () => {
+                    if (status) status.textContent = "Synced";
+                    renderProductExperience();
+                },
+                () => {
+                    if (status) status.textContent = "Sync failed";
+                }
+            );
+        }
 
         let currentIndex = 0;
         const slides = document.querySelector(".slides");
