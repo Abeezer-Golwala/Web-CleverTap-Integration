@@ -7,17 +7,23 @@
     <title>CleverTap Web SDK Integration</title>
     <style>
         :root {
-            --ct-primary: #2E7D32;
-            --ct-primary-dark: #1B5E20;
-            --ct-accent: #778046;
-            --ct-danger: #D32F2F;
-            --ct-danger-dark: #B71C1C;
-            --ct-bg: #F4F6F5;
-            --ct-card: #FFFFFF;
-            --ct-border: #E1E4E2;
-            --ct-text: #1F2723;
-            --ct-muted: #667066;
-            --ct-radius: 12px;
+            /* Fintech palette: deep navy chrome, a single teal action color,
+               and buy/sell reserved exclusively for trading semantics. */
+            --fin-navy: #0B1F3A;
+            --fin-navy-light: #16324F;
+            --fin-teal: #0F9D8E;
+            --fin-teal-dark: #0B7A6E;
+            --fin-buy: #16A34A;
+            --fin-buy-dark: #15803D;
+            --fin-sell: #DC2626;
+            --fin-sell-dark: #B91C1C;
+            --fin-gold: #C9A227;
+            --fin-bg: #F3F5F8;
+            --fin-card: #FFFFFF;
+            --fin-border: #E2E6EC;
+            --fin-text: #10192B;
+            --fin-muted: #5B6472;
+            --fin-radius: 12px;
         }
 
         * {
@@ -28,8 +34,8 @@
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             margin: 0;
             min-height: 100vh;
-            background-color: var(--ct-bg);
-            color: var(--ct-text);
+            background-color: var(--fin-bg);
+            color: var(--fin-text);
         }
 
         .topbar {
@@ -37,14 +43,34 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 24px;
-            background-color: var(--ct-primary-dark);
+            background-color: var(--fin-navy);
             color: #fff;
+            border-bottom: 3px solid var(--fin-gold);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
         }
 
         .topbar h1 {
             margin: 0;
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .topbar-badge {
+            padding: 3px 9px;
+            border-radius: 999px;
+            background-color: rgba(201, 162, 39, 0.18);
+            border: 1px solid var(--fin-gold);
+            color: var(--fin-gold);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .bell-icon {
@@ -68,22 +94,30 @@
         }
 
         .card {
-            background-color: var(--ct-card);
-            border: 1px solid var(--ct-border);
-            border-radius: var(--ct-radius);
+            background-color: var(--fin-card);
+            border: 1px solid var(--fin-border);
+            border-left: 4px solid var(--fin-navy);
+            border-radius: var(--fin-radius);
             padding: 20px 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 3px rgba(11, 31, 58, 0.08);
+        }
+
+        .card.accent-teal {
+            border-left-color: var(--fin-teal);
         }
 
         .card h2 {
             margin-top: 0;
-            font-size: 1.05rem;
-            color: var(--ct-primary-dark);
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--fin-navy);
         }
 
         .card-subtext {
             margin-top: -8px;
-            color: var(--ct-muted);
+            color: var(--fin-muted);
             font-size: 0.85rem;
         }
 
@@ -104,7 +138,7 @@
             margin-top: 12px;
             font-size: 0.85rem;
             font-weight: 600;
-            color: var(--ct-muted);
+            color: var(--fin-muted);
         }
 
         input,
@@ -113,10 +147,18 @@
             width: 100%;
             margin-top: 6px;
             padding: 8px 10px;
-            border: 1px solid var(--ct-border);
+            border: 1px solid var(--fin-border);
             border-radius: 8px;
             font-size: 0.95rem;
             background-color: #fff;
+            color: var(--fin-text);
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--fin-teal);
+            box-shadow: 0 0 0 3px rgba(15, 157, 142, 0.15);
         }
 
         button {
@@ -124,7 +166,7 @@
             padding: 10px 16px;
             border: none;
             border-radius: 8px;
-            background-color: var(--ct-primary);
+            background-color: var(--fin-teal);
             color: #fff;
             font-weight: 600;
             cursor: pointer;
@@ -132,21 +174,21 @@
         }
 
         button:hover {
-            background-color: var(--ct-primary-dark);
+            background-color: var(--fin-teal-dark);
         }
 
         button.secondary {
-            background-color: var(--ct-accent);
+            background-color: var(--fin-navy);
         }
 
         button.secondary:hover {
-            background-color: #5f6538;
+            background-color: var(--fin-navy-light);
         }
 
         .carousel {
             position: relative;
             overflow: hidden;
-            border-radius: var(--ct-radius);
+            border-radius: var(--fin-radius);
         }
 
         .slides {
@@ -172,6 +214,21 @@
             margin-top: 0;
         }
 
+        .remove-btn {
+            flex: 0 0 auto;
+            margin-top: 0;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            line-height: 1;
+            font-size: 1.1rem;
+            background-color: var(--fin-sell);
+        }
+
+        .remove-btn:hover {
+            background-color: var(--fin-sell-dark);
+        }
+
         .trading-buttons {
             display: flex;
             gap: 15px;
@@ -181,50 +238,55 @@
         .trading-buttons button {
             flex: 1;
             max-width: 150px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 0.9rem;
         }
 
         .trading-buttons .buy-btn {
-            background-color: var(--ct-primary);
+            background-color: var(--fin-buy);
         }
 
         .trading-buttons .buy-btn:hover {
-            background-color: var(--ct-primary-dark);
+            background-color: var(--fin-buy-dark);
         }
 
         .trading-buttons .sell-btn {
-            background-color: var(--ct-danger);
+            background-color: var(--fin-sell);
         }
 
         .trading-buttons .sell-btn:hover {
-            background-color: var(--ct-danger-dark);
+            background-color: var(--fin-sell-dark);
         }
 
-        /* Product Experiences */
+        /* Product Experiences — styled like a ticker/quote readout */
         .pe-vars {
             display: grid;
-            gap: 8px;
+            gap: 6px;
             margin-top: 12px;
             font-family: ui-monospace, Consolas, monospace;
             font-size: 0.85rem;
-            background-color: #F0F3F0;
-            border: 1px solid var(--ct-border);
+            font-variant-numeric: tabular-nums;
+            background-color: var(--fin-navy);
+            border: 1px solid var(--fin-navy-light);
             border-radius: 8px;
             padding: 12px;
+            color: #7FE8D4;
         }
 
         .pe-status {
             margin-top: 10px;
             font-size: 0.85rem;
-            color: var(--ct-muted);
+            color: var(--fin-muted);
         }
 
         .pe-banner {
             margin-top: 14px;
             padding: 12px 16px;
             border-radius: 8px;
-            background-color: #E8F1E4;
-            border: 1px solid #C7DDBC;
-            color: var(--ct-primary-dark);
+            background-color: #FBF3DC;
+            border: 1px solid var(--fin-gold);
+            color: var(--fin-navy);
             font-weight: 600;
             display: none;
         }
@@ -237,7 +299,10 @@
 
 <body>
     <div class="topbar">
-        <h1>CleverTap Web SDK Integration</h1>
+        <div class="topbar-brand">
+            <h1>CleverTap Web SDK Integration</h1>
+            <span class="topbar-badge">Fintech Demo</span>
+        </div>
         <div class="bell-icon" id="btnInbox" title="Inbox">🔔</div>
     </div>
 
@@ -252,7 +317,7 @@
         </div>
 
         <!-- Section: CleverTap Product Experiences (Web Remote Config) -->
-        <div class="card" id="productExperienceCard">
+        <div class="card accent-teal" id="productExperienceCard">
             <h2>Product Experiences</h2>
             <p class="card-subtext">Remote-config variables defined and synced via the Web SDK
                 (<code>defineVariable</code> / <code>syncVariables</code>), used here to drive UI without a redeploy.</p>
@@ -329,7 +394,7 @@
                 "bodyText": 'We promise to only send you relevant content and give you updates on your transactions',
                 "okButtonText": 'Sign me up!',
                 "rejectButtonText": 'No thanks',
-                "okButtonColor": '#778046',
+                "okButtonColor": '#0F9D8E',
                 "serviceWorkerPath": "./clevertap_sw.js"
 
             });
@@ -470,6 +535,7 @@
           <option value="date">Date</option>
         </select>
         <input type="text" placeholder="Property Value" class="user-value" />
+        <button type="button" class="remove-btn" onclick="removeProperty(this)" aria-label="Remove property">&times;</button>
       `;
             container.appendChild(div);
         }
@@ -488,8 +554,14 @@
           <option value="date">Date</option>
         </select>
         <input type="text" placeholder="Event Property Value" class="event-value" />
+        <button type="button" class="remove-btn" onclick="removeProperty(this)" aria-label="Remove property">&times;</button>
       `;
             container.appendChild(div);
+        }
+
+        // Removes the property row (key/type/value/remove-button group) containing the clicked remove button
+        function removeProperty(button) {
+            button.closest(".key-value-pair").remove();
         }
 
         // Handler to adjust input type based on selection
