@@ -327,6 +327,7 @@
             <div class="pe-vars" id="peVarsDisplay">Loading variables…</div>
 
             <button onclick="syncProductExperience()">Sync Product Experience</button>
+            <button class="secondary" onclick="fetchProductExperienceKeys()">Fetch PE Keys</button>
             <span class="pe-status" id="peStatus"></span>
         </div>
 
@@ -460,6 +461,18 @@
                     if (status) status.textContent = "Sync failed";
                 }
             );
+        }
+
+        // Fetches the latest Product Experience variable values from the
+        // server (as opposed to syncVariables, which pushes definitions to
+        // the dashboard) and loads the refreshed values into the UI.
+        function fetchProductExperienceKeys() {
+            const status = document.getElementById("peStatus");
+            if (status) status.textContent = "Fetching PE keys…";
+            clevertap.fetchVariables(() => {
+                if (status) status.textContent = "PE keys loaded";
+                renderProductExperience();
+            });
         }
 
         let currentIndex = 0;
