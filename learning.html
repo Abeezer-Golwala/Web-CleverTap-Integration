@@ -503,6 +503,7 @@
         // Initialize CleverTap SDK (same account/setup as index.html, for a consistent demo site).
         var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
         clevertap.account.push({ "id": "TEST-468-W87-546Z" });
+        clevertap.enablePersonalization = true;
         clevertap.privacy.push({ optOut: false });
         clevertap.privacy.push({ useIP: true });
         (function () {
@@ -852,7 +853,14 @@
 
         renderFilters();
         renderCatalog();
-        window.onload = trackPageBrowsed;
+
+        // Matches the SDK setup on index.html so both pages agree on how
+        // local-storage state for this shared account is read/written.
+        window.onload = function () {
+            clevertap.enableLocalStorageEncryption(true);
+            clevertap.setLogLevel(4);
+            trackPageBrowsed();
+        };
     </script>
 </body>
 
