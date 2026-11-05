@@ -407,7 +407,7 @@
 
         <section class="card" id="sequenceCard">
             <h2>Banner Order &amp; Visibility</h2>
-            <p class="card-subtext">Display order comes from one shared <code>bannersequence</code> variable —
+            <p class="card-subtext">Display order comes from one shared <code>bannerseq</code> variable —
                 a comma-separated list of banner numbers (e.g. <code>"3,1,5,2,4"</code>). Any banner left out
                 of the list is simply appended afterward in its natural slot order. Each banner's own
                 <code>enable</code> variable still decides whether it shows at all — disabled banners are
@@ -479,7 +479,7 @@
 
         // Gradient is chosen by the banner's CATEGORY VALUE, not its slot
         // number — so styling follows the content even if banners get
-        // reordered via bannersequence or a new category is typed in on the
+        // reordered via bannerseq or a new category is typed in on the
         // dashboard. Unrecognized category strings fall back to a neutral
         // gradient rather than breaking.
         const CATEGORY_STYLE = {
@@ -532,7 +532,7 @@
                     category: clevertap.defineVariable("Home Banner.banner" + slot + ".category", defaultCategoryForSlot(slot))
                 };
             }
-            bannerSeqVar = clevertap.defineVariable("Home Banner.bannersequence", DEFAULT_SEQUENCE);
+            bannerSeqVar = clevertap.defineVariable("Home Banner.bannerseq", DEFAULT_SEQUENCE);
         }
 
         function readBannerSlot(slot) {
@@ -658,7 +658,7 @@
             const enabledSlots = order.map((slot) => bySlot[slot]).filter((s) => s.enabled);
 
             document.getElementById("seqReadout").textContent =
-                "bannersequence: \"" + rawSeq + "\"\n" +
+                "bannerseq: \"" + rawSeq + "\"\n" +
                 enabledSlots.length + " of " + MAX_BANNERS + " slots enabled\n" +
                 "resolved order: " + enabledSlots.map((s) => "banner" + s.slot).join(" → ");
 
