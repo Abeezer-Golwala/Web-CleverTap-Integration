@@ -466,7 +466,7 @@
         // Default category text per slot — used ONLY as the defineVariable()
         // default, so it's what renders before any Product Experience value
         // has been received for that slot. Once the dashboard sets
-        // home_banner.banner<N>.category, getValue() returns that instead and
+        // Home Banner.banner<N>.category, getValue() returns that instead and
         // this default is never shown again for that slot.
         const DEFAULT_CATEGORY_BY_SLOT = {
             1: "MTF", 2: "Equity", 3: "MF", 4: "Commodities", 5: "Insurance"
@@ -503,10 +503,10 @@
                 // banners); the rest are extra capacity, off until configured.
                 const defaultEnabled = slot <= 5;
                 bannerVars[slot] = {
-                    enable: clevertap.defineVariable("home_banner.banner" + slot + ".enable", defaultEnabled),
-                    image_url: clevertap.defineVariable("home_banner.banner" + slot + ".image_url", ""),
-                    position: clevertap.defineVariable("home_banner.banner" + slot + ".position", slot),
-                    category: clevertap.defineVariable("home_banner.banner" + slot + ".category", defaultCategoryForSlot(slot))
+                    enable: clevertap.defineVariable("Home Banner.banner" + slot + ".enable", defaultEnabled),
+                    image_url: clevertap.defineVariable("Home Banner.banner" + slot + ".image_url", ""),
+                    position: clevertap.defineVariable("Home Banner.banner" + slot + ".position", slot),
+                    category: clevertap.defineVariable("Home Banner.banner" + slot + ".category", defaultCategoryForSlot(slot))
                 };
             }
         }
@@ -542,7 +542,7 @@
           <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
         </div>
         <div class="banner-bottom-row">
-          <span class="banner-key-hint">home_banner.banner${s.slot}.* via Product Experience</span>
+          <span class="banner-key-hint">Home Banner.banner${s.slot}.* via Product Experience</span>
         </div>
       `;
 
@@ -626,7 +626,7 @@
             if (!enabledSlots.length) {
                 const empty = document.createElement("div");
                 empty.className = "banner-slot is-disabled";
-                empty.textContent = "No banners enabled — toggle on a home_banner.banner<N>.enable key.";
+                empty.textContent = "No banners enabled — toggle on a Home Banner.banner<N>.enable key.";
                 track.appendChild(empty);
                 if (carouselTimer) clearInterval(carouselTimer);
                 carouselTimer = null;
