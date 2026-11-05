@@ -555,6 +555,35 @@
         let carouselTimer = null;
         const AUTO_ADVANCE_MS = 4000;
 
+        // Tracks which slots have already fired "Banner Viewed" for the
+        // current render — reset in renderBanners(). Without this, an
+        // auto-advancing carousel would push a fresh network event to
+        // CleverTap every 4s forever, even cycling back through banners
+        // that were already counted as viewed moments earlier.
+        let viewedSlotsThisRender = new Set();
+
+        // CleverTap logs (and strips) any empty-string event property —
+        // e.g. an unconfigured Image Url. Stripping it ourselves first
+        // keeps the console quiet and the event payload meaningful.
+        function cleanEventProps(props) {
+            const out = {};
+            Object.keys(props).forEach((k) => {
+                if (props[k] !== "" && props[k] !== null && props[k] !== undefined) out[k] = props[k];
+            });
+            return out;
+        }
+
+        function fireBannerViewed(s) {
+            if (viewedSlotsThisRender.has(s.slot)) return;
+            viewedSlotsThisRender.add(s.slot);
+            clevertap.event.push("Banner Viewed", cleanEventProps({
+                "Slot": s.slot,
+                "Category": s.category,
+                "Image Url": s.imageUrl,
+                "Banner Sequence": bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE
+            }));
+        }
+
         function buildSlideElement(s) {
             const el = document.createElement("div");
             el.setAttribute("data-slot", s.slot);
@@ -583,12 +612,12 @@
             }
 
             el.addEventListener("click", () => {
-                clevertap.event.push("Banner Clicked", {
+                clevertap.event.push("Banner Clicked", cleanEventProps({
                     "Slot": s.slot,
                     "Category": s.category,
                     "Image Url": s.imageUrl,
                     "Banner Sequence": bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE
-                });
+                }));
             });
 
             return el;
@@ -606,13 +635,7 @@
                 dot.classList.toggle("is-active", i === currentSlide);
             });
 
-            const s = carouselSlides[currentSlide];
-            clevertap.event.push("Banner Viewed", {
-                "Slot": s.slot,
-                "Category": s.category,
-                "Image Url": s.imageUrl,
-                "Banner Sequence": bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE
-            });
+            fireBannerViewed(carouselSlides[currentSlide]);
         }
 
         function nextSlide() { goToSlide(currentSlide + 1); }
@@ -641,6 +664,7 @@
 
             carouselSlides = enabledSlots;
             currentSlide = 0;
+            viewedSlotsThisRender = new Set();
 
             const track = document.getElementById("carouselTrack");
             track.innerHTML = "";
@@ -670,14 +694,7 @@
                 dots.appendChild(dot);
             });
 
-            // First slide's own "Banner Viewed" fire.
-            const first = carouselSlides[0];
-            clevertap.event.push("Banner Viewed", {
-                "Slot": first.slot,
-                "Category": first.category,
-                "Image Url": first.imageUrl,
-                "Banner Sequence": rawSeq
-            });
+            fireBannerViewed(carouselSlides[0]);
 
             restartAutoAdvance();
 
