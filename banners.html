@@ -400,17 +400,18 @@
             <h2>Home Promotions</h2>
             <p class="card-subtext">Up to <code id="maxBannersText">10</code> banner placements, each
                 independently controlled by its own <code>enable</code> / <code>image_url</code> /
-                <code>position</code> Product Experience variables — not a fixed count of 5. Add more by
+                <code>category</code> Product Experience variables — not a fixed count of 5. Add more by
                 configuring further slots on the dashboard, no redeploy needed (only raising the slot
                 ceiling itself requires a code change — see the comment in the script).</p>
         </section>
 
         <section class="card" id="sequenceCard">
             <h2>Banner Order &amp; Visibility</h2>
-            <p class="card-subtext">Each banner's own <code>position</code> variable decides where it lands
-                (lower shows first); its <code>enable</code> variable decides whether it shows at all. Change
-                either on the dashboard to reorder, add, or drop a banner — no single shared sequence
-                variable to hand-edit.</p>
+            <p class="card-subtext">Display order comes from one shared <code>bannersequence</code> variable —
+                a comma-separated list of banner numbers (e.g. <code>"3,1,5,2,4"</code>). Any banner left out
+                of the list is simply appended afterward in its natural slot order. Each banner's own
+                <code>enable</code> variable still decides whether it shows at all — disabled banners are
+                skipped wherever they fall in the sequence.</p>
             <div class="seq-readout" id="seqReadout">Loading banner slots…</div>
             <button type="button" onclick="refreshBanners()">Refresh Banners (fetchVariables)</button>
             <span class="seq-status" id="seqStatus"></span>
@@ -478,7 +479,7 @@
 
         // Gradient is chosen by the banner's CATEGORY VALUE, not its slot
         // number — so styling follows the content even if banners get
-        // reordered via `position` or a new category is typed in on the
+        // reordered via bannersequence or a new category is typed in on the
         // dashboard. Unrecognized category strings fall back to a neutral
         // gradient rather than breaking.
         const CATEGORY_STYLE = {
@@ -493,6 +494,29 @@
             return CATEGORY_STYLE[category] || "banner-cat-generic";
         }
 
+        // Display order comes from this ONE shared variable instead of a
+        // per-banner position — a comma-separated list of slot numbers,
+        // e.g. "3,1,5,2,4". Banners not mentioned are appended afterward in
+        // their natural slot order, so a partial list still works.
+        const DEFAULT_SEQUENCE = Array.from({ length: MAX_BANNERS }, (_, i) => i + 1).join(",");
+        let bannerSeqVar = null;
+
+        function parseSequence(raw) {
+            const seen = new Set();
+            const order = [];
+            String(raw || "").split(",").forEach((p) => {
+                const n = parseInt(p.trim(), 10);
+                if (Number.isInteger(n) && n >= 1 && n <= MAX_BANNERS && !seen.has(n)) {
+                    seen.add(n);
+                    order.push(n);
+                }
+            });
+            for (let slot = 1; slot <= MAX_BANNERS; slot++) {
+                if (!seen.has(slot)) order.push(slot);
+            }
+            return order;
+        }
+
         // Holds the defineVariable() handles for every banner, keyed by
         // slot number (1..MAX_BANNERS).
         const bannerVars = {};
@@ -505,10 +529,10 @@
                 bannerVars[slot] = {
                     enable: clevertap.defineVariable("Home Banner.banner" + slot + ".enable", defaultEnabled),
                     image_url: clevertap.defineVariable("Home Banner.banner" + slot + ".image_url", ""),
-                    position: clevertap.defineVariable("Home Banner.banner" + slot + ".position", slot),
                     category: clevertap.defineVariable("Home Banner.banner" + slot + ".category", defaultCategoryForSlot(slot))
                 };
             }
+            bannerSeqVar = clevertap.defineVariable("Home Banner.bannersequence", DEFAULT_SEQUENCE);
         }
 
         function readBannerSlot(slot) {
@@ -517,7 +541,6 @@
                 slot: slot,
                 enabled: vars ? vars.enable.getValue() : slot <= 5,
                 imageUrl: vars ? vars.image_url.getValue() : "",
-                position: vars ? vars.position.getValue() : slot,
                 category: vars ? vars.category.getValue() : defaultCategoryForSlot(slot)
             };
         }
@@ -539,7 +562,7 @@
             el.innerHTML = `
         <div class="banner-top-row">
           <span class="banner-pill">${s.category}</span>
-          <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
+          <span class="banner-slot-tag">banner${s.slot}</span>
         </div>
         <div class="banner-bottom-row">
           <span class="banner-key-hint">Home Banner.banner${s.slot}.* via Product Experience</span>
@@ -563,8 +586,8 @@
                 clevertap.event.push("Banner Clicked", {
                     "Slot": s.slot,
                     "Category": s.category,
-                    "Position": s.position,
-                    "Image Url": s.imageUrl
+                    "Image Url": s.imageUrl,
+                    "Banner Sequence": bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE
                 });
             });
 
@@ -587,8 +610,8 @@
             clevertap.event.push("Banner Viewed", {
                 "Slot": s.slot,
                 "Category": s.category,
-                "Position": s.position,
-                "Image Url": s.imageUrl
+                "Image Url": s.imageUrl,
+                "Banner Sequence": bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE
             });
         }
 
@@ -604,14 +627,17 @@
         }
 
         function renderBanners() {
-            const slots = [];
-            for (let slot = 1; slot <= MAX_BANNERS; slot++) slots.push(readBannerSlot(slot));
-            const enabledSlots = slots.filter((s) => s.enabled)
-                .sort((a, b) => (a.position - b.position) || (a.slot - b.slot));
+            const rawSeq = bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE;
+            const order = parseSequence(rawSeq);
+
+            const bySlot = {};
+            for (let slot = 1; slot <= MAX_BANNERS; slot++) bySlot[slot] = readBannerSlot(slot);
+            const enabledSlots = order.map((slot) => bySlot[slot]).filter((s) => s.enabled);
 
             document.getElementById("seqReadout").textContent =
+                "bannersequence: \"" + rawSeq + "\"\n" +
                 enabledSlots.length + " of " + MAX_BANNERS + " slots enabled\n" +
-                "order (by position): " + enabledSlots.map((s) => "banner" + s.slot + "(pos " + s.position + ")").join(" → ");
+                "resolved order: " + enabledSlots.map((s) => "banner" + s.slot).join(" → ");
 
             carouselSlides = enabledSlots;
             currentSlide = 0;
@@ -649,8 +675,8 @@
             clevertap.event.push("Banner Viewed", {
                 "Slot": first.slot,
                 "Category": first.category,
-                "Position": first.position,
-                "Image Url": first.imageUrl
+                "Image Url": first.imageUrl,
+                "Banner Sequence": rawSeq
             });
 
             restartAutoAdvance();
