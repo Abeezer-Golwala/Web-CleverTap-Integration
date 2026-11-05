@@ -306,6 +306,13 @@
             background: linear-gradient(135deg, var(--fin-buy) 0%, #0F6E31 100%);
         }
 
+        /* Fallback for any category string that doesn't match one of the
+           sample fintech categories above — e.g. a new category typed into
+           the dashboard that the page doesn't have a dedicated gradient for. */
+        .banner-cat-generic {
+            background: linear-gradient(135deg, var(--fin-muted) 0%, var(--fin-navy) 100%);
+        }
+
         .banner-top-row {
             display: flex;
             justify-content: space-between;
@@ -456,20 +463,34 @@
         // ---------------------------------------------------------------
         const MAX_BANNERS = 10;
 
-        // Placeholder-only content (category label + gradient) for the 5
-        // sample fintech banners, shown whenever a slot's image_url is
-        // empty or fails to load. This is purely a local fallback design —
-        // the actual dashboard-controlled fields are enable/image_url/position.
-        const PLACEHOLDER_BY_SLOT = {
-            1: { category: "MTF", catClass: "banner-cat-mtf" },
-            2: { category: "Equity", catClass: "banner-cat-equity" },
-            3: { category: "MF", catClass: "banner-cat-mf" },
-            4: { category: "Commodities", catClass: "banner-cat-commodities" },
-            5: { category: "Insurance", catClass: "banner-cat-insurance" }
+        // Default category text per slot — used ONLY as the defineVariable()
+        // default, so it's what renders before any Product Experience value
+        // has been received for that slot. Once the dashboard sets
+        // home_banner.banner<N>.category, getValue() returns that instead and
+        // this default is never shown again for that slot.
+        const DEFAULT_CATEGORY_BY_SLOT = {
+            1: "MTF", 2: "Equity", 3: "MF", 4: "Commodities", 5: "Insurance"
         };
 
-        function placeholderForSlot(slot) {
-            return PLACEHOLDER_BY_SLOT[slot] || { category: "Banner " + slot, catClass: "banner-cat-mtf" };
+        function defaultCategoryForSlot(slot) {
+            return DEFAULT_CATEGORY_BY_SLOT[slot] || ("Banner " + slot);
+        }
+
+        // Gradient is chosen by the banner's CATEGORY VALUE, not its slot
+        // number — so styling follows the content even if banners get
+        // reordered via `position` or a new category is typed in on the
+        // dashboard. Unrecognized category strings fall back to a neutral
+        // gradient rather than breaking.
+        const CATEGORY_STYLE = {
+            "MTF": "banner-cat-mtf",
+            "Equity": "banner-cat-equity",
+            "MF": "banner-cat-mf",
+            "Commodities": "banner-cat-commodities",
+            "Insurance": "banner-cat-insurance"
+        };
+
+        function catClassForCategory(category) {
+            return CATEGORY_STYLE[category] || "banner-cat-generic";
         }
 
         // Holds the defineVariable() handles for every banner, keyed by
@@ -484,7 +505,8 @@
                 bannerVars[slot] = {
                     enable: clevertap.defineVariable("home_banner.banner" + slot + ".enable", defaultEnabled),
                     image_url: clevertap.defineVariable("home_banner.banner" + slot + ".image_url", ""),
-                    position: clevertap.defineVariable("home_banner.banner" + slot + ".position", slot)
+                    position: clevertap.defineVariable("home_banner.banner" + slot + ".position", slot),
+                    category: clevertap.defineVariable("home_banner.banner" + slot + ".category", defaultCategoryForSlot(slot))
                 };
             }
         }
@@ -495,7 +517,8 @@
                 slot: slot,
                 enabled: vars ? vars.enable.getValue() : slot <= 5,
                 imageUrl: vars ? vars.image_url.getValue() : "",
-                position: vars ? vars.position.getValue() : slot
+                position: vars ? vars.position.getValue() : slot,
+                category: vars ? vars.category.getValue() : defaultCategoryForSlot(slot)
             };
         }
 
@@ -510,13 +533,12 @@
         const AUTO_ADVANCE_MS = 4000;
 
         function buildSlideElement(s) {
-            const placeholder = placeholderForSlot(s.slot);
             const el = document.createElement("div");
             el.setAttribute("data-slot", s.slot);
-            el.className = "banner-slot " + placeholder.catClass;
+            el.className = "banner-slot " + catClassForCategory(s.category);
             el.innerHTML = `
         <div class="banner-top-row">
-          <span class="banner-pill">${placeholder.category}</span>
+          <span class="banner-pill">${s.category}</span>
           <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
         </div>
         <div class="banner-bottom-row">
@@ -540,6 +562,7 @@
             el.addEventListener("click", () => {
                 clevertap.event.push("Banner Clicked", {
                     "Slot": s.slot,
+                    "Category": s.category,
                     "Position": s.position,
                     "Image Url": s.imageUrl
                 });
@@ -563,6 +586,7 @@
             const s = carouselSlides[currentSlide];
             clevertap.event.push("Banner Viewed", {
                 "Slot": s.slot,
+                "Category": s.category,
                 "Position": s.position,
                 "Image Url": s.imageUrl
             });
@@ -624,6 +648,7 @@
             const first = carouselSlides[0];
             clevertap.event.push("Banner Viewed", {
                 "Slot": first.slot,
+                "Category": first.category,
                 "Position": first.position,
                 "Image Url": first.imageUrl
             });
