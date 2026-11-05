@@ -723,25 +723,14 @@
 
         // Runs once the CleverTap script above has actually loaded (see
         // wzrk.onload). Registers the Product Experience variables, syncs
-        // their DEFINITIONS to the dashboard (syncVariables — this does NOT
-        // pull values down, it only makes the keys visible/configurable on
-        // the dashboard), then explicitly fetches the actual dashboard
-        // VALUES (fetchVariables) so banners reflect real Product Experience
-        // config on load instead of sitting on the local defaults until
-        // someone manually clicks "Refresh Banners".
+        // their definitions to the dashboard, and re-renders with the real
+        // (dashboard-backed) values in place of the hard-coded defaults.
         function initProductExperience() {
             defineBannerVariables();
             clevertap.syncVariables();
             clevertap.enableLocalStorageEncryption(true);
             clevertap.setLogLevel(4);
             renderBanners();
-
-            const status = document.getElementById("seqStatus");
-            if (status) status.textContent = "Fetching Product Experience banners…";
-            clevertap.fetchVariables(() => {
-                if (status) status.textContent = "Banners loaded from Product Experience";
-                renderBanners();
-            });
 
             clevertap.addVariablesChangedCallback(() => {
                 renderBanners();
