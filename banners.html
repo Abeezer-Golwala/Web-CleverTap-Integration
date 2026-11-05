@@ -163,26 +163,40 @@
             color: var(--fin-muted);
         }
 
-        /* ---------- Banner slots ---------- */
-        .banner-stack {
-            display: grid;
-            gap: 16px;
+        /* ---------- Banner carousel ---------- */
+        .carousel-card {
+            padding: 20px 20px 24px;
         }
 
-        /* Every rendered banner reserves this exact footprint — the "default
-           space" — whether it's showing a real image_url or the fallback
-           placeholder design. */
-        .banner-slot {
-            min-height: 150px;
+        /* This viewport is the fixed "default space" — it keeps the exact
+           same footprint whether 1 or 10 banners are enabled, or whether a
+           slide is showing a real image_url or the fallback placeholder. */
+        .carousel-viewport {
+            position: relative;
+            min-height: 200px;
             border-radius: var(--fin-radius);
-            border: 1px solid var(--fin-border);
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.45s ease;
+            height: 200px;
+        }
+
+        .banner-slot {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--fin-radius);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 18px 22px;
+            padding: 20px 26px;
             color: #fff;
             position: relative;
+            cursor: pointer;
         }
 
         .banner-slot.is-disabled {
@@ -191,7 +205,8 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            border-style: dashed;
+            border: 1px dashed var(--fin-border);
+            cursor: default;
         }
 
         /* Used when image_url is set and loads successfully: the image is
@@ -213,6 +228,61 @@
         .banner-slot.has-image>* {
             position: relative;
             z-index: 1;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(11, 31, 58, 0.45);
+            color: #fff;
+            font-size: 1.1rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-top: 0;
+            z-index: 2;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(11, 31, 58, 0.7);
+        }
+
+        .carousel-arrow-prev {
+            left: 12px;
+        }
+
+        .carousel-arrow-next {
+            right: 12px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: none;
+            padding: 0;
+            margin-top: 0;
+            background: var(--fin-border);
+            cursor: pointer;
+        }
+
+        .carousel-dot.is-active {
+            background: var(--fin-navy);
+            width: 20px;
+            border-radius: 999px;
         }
 
         .banner-cat-mtf {
@@ -339,7 +409,14 @@
             <span class="seq-status" id="seqStatus"></span>
         </section>
 
-        <section class="banner-stack" id="bannerStack"></section>
+        <section class="card carousel-card">
+            <div class="carousel-viewport" id="carouselViewport">
+                <div class="carousel-track" id="carouselTrack"></div>
+                <button type="button" class="carousel-arrow carousel-arrow-prev" id="carouselPrev" aria-label="Previous banner">&#8249;</button>
+                <button type="button" class="carousel-arrow carousel-arrow-next" id="carouselNext" aria-label="Next banner">&#8250;</button>
+            </div>
+            <div class="carousel-dots" id="carouselDots"></div>
+        </section>
     </div>
 
     <script>
@@ -422,6 +499,86 @@
             };
         }
 
+        // Carousel state. Re-created every renderBanners() call (e.g. a
+        // dashboard push via addVariablesChangedCallback, or a manual
+        // "Refresh Banners" click), so the old auto-advance timer must be
+        // cleared before a new one is started — otherwise every refresh
+        // would stack another interval on top of the last.
+        let carouselSlides = [];
+        let currentSlide = 0;
+        let carouselTimer = null;
+        const AUTO_ADVANCE_MS = 4000;
+
+        function buildSlideElement(s) {
+            const placeholder = placeholderForSlot(s.slot);
+            const el = document.createElement("div");
+            el.setAttribute("data-slot", s.slot);
+            el.className = "banner-slot " + placeholder.catClass;
+            el.innerHTML = `
+        <div class="banner-top-row">
+          <span class="banner-pill">${placeholder.category}</span>
+          <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
+        </div>
+        <div class="banner-bottom-row">
+          <span class="banner-key-hint">home_banner.banner${s.slot}.* via Product Experience</span>
+        </div>
+      `;
+
+            if (s.imageUrl) {
+                const probe = new Image();
+                probe.onload = () => {
+                    el.classList.add("has-image");
+                    el.style.backgroundImage = 'url("' + s.imageUrl + '")';
+                };
+                probe.onerror = () => {
+                    // image_url set but unreachable/broken — stay on the
+                    // placeholder design rather than showing a broken image.
+                };
+                probe.src = s.imageUrl;
+            }
+
+            el.addEventListener("click", () => {
+                clevertap.event.push("Banner Clicked", {
+                    "Slot": s.slot,
+                    "Position": s.position,
+                    "Image Url": s.imageUrl
+                });
+            });
+
+            return el;
+        }
+
+        function goToSlide(index) {
+            const total = carouselSlides.length;
+            if (!total) return;
+            currentSlide = ((index % total) + total) % total;
+
+            const track = document.getElementById("carouselTrack");
+            track.style.transform = "translateX(-" + (currentSlide * 100) + "%)";
+
+            document.querySelectorAll("#carouselDots .carousel-dot").forEach((dot, i) => {
+                dot.classList.toggle("is-active", i === currentSlide);
+            });
+
+            const s = carouselSlides[currentSlide];
+            clevertap.event.push("Banner Viewed", {
+                "Slot": s.slot,
+                "Position": s.position,
+                "Image Url": s.imageUrl
+            });
+        }
+
+        function nextSlide() { goToSlide(currentSlide + 1); }
+        function prevSlide() { goToSlide(currentSlide - 1); }
+
+        // Restarts the auto-advance timer, including after a manual
+        // next/prev/dot interaction so the carousel doesn't immediately
+        // jump again a moment later.
+        function restartAutoAdvance() {
+            if (carouselTimer) clearInterval(carouselTimer);
+            carouselTimer = carouselSlides.length > 1 ? setInterval(nextSlide, AUTO_ADVANCE_MS) : null;
+        }
+
         function renderBanners() {
             const slots = [];
             for (let slot = 1; slot <= MAX_BANNERS; slot++) slots.push(readBannerSlot(slot));
@@ -432,54 +589,46 @@
                 enabledSlots.length + " of " + MAX_BANNERS + " slots enabled\n" +
                 "order (by position): " + enabledSlots.map((s) => "banner" + s.slot + "(pos " + s.position + ")").join(" → ");
 
-            const stack = document.getElementById("bannerStack");
-            stack.innerHTML = "";
+            carouselSlides = enabledSlots;
+            currentSlide = 0;
 
-            enabledSlots.forEach((s) => {
-                const placeholder = placeholderForSlot(s.slot);
-                const el = document.createElement("div");
-                el.setAttribute("data-slot", s.slot);
-                el.className = "banner-slot " + placeholder.catClass;
-                el.innerHTML = `
-          <div class="banner-top-row">
-            <span class="banner-pill">${placeholder.category}</span>
-            <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
-          </div>
-          <div class="banner-bottom-row">
-            <span class="banner-key-hint">home_banner.banner${s.slot}.* via Product Experience</span>
-          </div>
-        `;
+            const track = document.getElementById("carouselTrack");
+            track.innerHTML = "";
+            track.style.transform = "translateX(0%)";
 
-                if (s.imageUrl) {
-                    const probe = new Image();
-                    probe.onload = () => {
-                        el.classList.add("has-image");
-                        el.style.backgroundImage = 'url("' + s.imageUrl + '")';
-                    };
-                    probe.onerror = () => {
-                        // image_url set but unreachable/broken — stay on the
-                        // placeholder design rather than showing a broken image.
-                    };
-                    probe.src = s.imageUrl;
-                }
+            const dots = document.getElementById("carouselDots");
+            dots.innerHTML = "";
 
-                el.addEventListener("click", () => {
-                    clevertap.event.push("Banner Clicked", {
-                        "Slot": s.slot,
-                        "Position": s.position,
-                        "Image Url": s.imageUrl
-                    });
-                });
-                el.style.cursor = "pointer";
+            if (!enabledSlots.length) {
+                const empty = document.createElement("div");
+                empty.className = "banner-slot is-disabled";
+                empty.textContent = "No banners enabled — toggle on a home_banner.banner<N>.enable key.";
+                track.appendChild(empty);
+                if (carouselTimer) clearInterval(carouselTimer);
+                carouselTimer = null;
+                return;
+            }
 
-                stack.appendChild(el);
+            enabledSlots.forEach((s, i) => {
+                track.appendChild(buildSlideElement(s));
 
-                clevertap.event.push("Banner Viewed", {
-                    "Slot": s.slot,
-                    "Position": s.position,
-                    "Image Url": s.imageUrl
-                });
+                const dot = document.createElement("button");
+                dot.type = "button";
+                dot.className = "carousel-dot" + (i === 0 ? " is-active" : "");
+                dot.setAttribute("aria-label", "Go to banner " + (i + 1));
+                dot.addEventListener("click", () => { goToSlide(i); restartAutoAdvance(); });
+                dots.appendChild(dot);
             });
+
+            // First slide's own "Banner Viewed" fire.
+            const first = carouselSlides[0];
+            clevertap.event.push("Banner Viewed", {
+                "Slot": first.slot,
+                "Position": first.position,
+                "Image Url": first.imageUrl
+            });
+
+            restartAutoAdvance();
 
             const maxText = document.getElementById("maxBannersText");
             if (maxText) maxText.textContent = MAX_BANNERS;
@@ -524,6 +673,9 @@
                 renderBanners();
             });
         }
+
+        document.getElementById("carouselPrev").addEventListener("click", () => { prevSlide(); restartAutoAdvance(); });
+        document.getElementById("carouselNext").addEventListener("click", () => { nextSlide(); restartAutoAdvance(); });
 
         // Render with the hard-coded defaults (first 5 slots enabled, rest
         // off) immediately — every rendered banner always has this default
