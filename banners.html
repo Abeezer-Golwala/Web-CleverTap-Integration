@@ -408,10 +408,10 @@
         <section class="card" id="sequenceCard">
             <h2>Banner Order &amp; Visibility</h2>
             <p class="card-subtext">Display order comes from one shared <code>bannerseq</code> variable —
-                a comma-separated list of banner numbers (e.g. <code>"3,1,5,2,4"</code>). Any banner left out
-                of the list is simply appended afterward in its natural slot order. Each banner's own
-                <code>enable</code> variable still decides whether it shows at all — disabled banners are
-                skipped wherever they fall in the sequence.</p>
+                a comma-separated list of banner numbers (e.g. <code>"3,1,5"</code>). ONLY the banners listed
+                are shown, in that exact order — anything left out does not display, even if its own
+                <code>enable</code> is true. <code>enable</code> is still checked for the banners that are
+                listed, so a listed-but-disabled banner is skipped too.</p>
             <div class="seq-readout" id="seqReadout">Loading banner slots…</div>
             <button type="button" onclick="refreshBanners()">Refresh Banners (fetchVariables)</button>
             <span class="seq-status" id="seqStatus"></span>
@@ -496,8 +496,9 @@
 
         // Display order comes from this ONE shared variable instead of a
         // per-banner position — a comma-separated list of slot numbers,
-        // e.g. "3,1,5,2,4". Banners not mentioned are appended afterward in
-        // their natural slot order, so a partial list still works.
+        // e.g. "3,1,5". ONLY the slots listed here are shown, in this exact
+        // order; anything left out is not displayed at all, even if its own
+        // enable variable is true.
         const DEFAULT_SEQUENCE = Array.from({ length: MAX_BANNERS }, (_, i) => i + 1).join(",");
         let bannerSeqVar = null;
 
@@ -511,9 +512,6 @@
                     order.push(n);
                 }
             });
-            for (let slot = 1; slot <= MAX_BANNERS; slot++) {
-                if (!seen.has(slot)) order.push(slot);
-            }
             return order;
         }
 
@@ -659,7 +657,7 @@
 
             document.getElementById("seqReadout").textContent =
                 "bannerseq: \"" + rawSeq + "\"\n" +
-                enabledSlots.length + " of " + MAX_BANNERS + " slots enabled\n" +
+                order.length + " listed, " + enabledSlots.length + " shown (enable=true)\n" +
                 "resolved order: " + enabledSlots.map((s) => "banner" + s.slot).join(" → ");
 
             carouselSlides = enabledSlots;
