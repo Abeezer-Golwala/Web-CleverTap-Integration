@@ -169,8 +169,9 @@
             gap: 16px;
         }
 
-        /* Every slot reserves this exact footprint — the "default space" —
-           whether or not Product Experience ever fills it. */
+        /* Every rendered banner reserves this exact footprint — the "default
+           space" — whether it's showing a real image_url or the fallback
+           placeholder design. */
         .banner-slot {
             min-height: 150px;
             border-radius: var(--fin-radius);
@@ -191,6 +192,27 @@
             justify-content: center;
             text-align: center;
             border-style: dashed;
+        }
+
+        /* Used when image_url is set and loads successfully: the image is
+           the whole banner, with a scrim at the bottom so the slot/position
+           tag stays legible over any artwork. */
+        .banner-slot.has-image {
+            background-size: cover;
+            background-position: center;
+            justify-content: flex-end;
+        }
+
+        .banner-slot.has-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(11, 31, 58, 0.75) 0%, rgba(11, 31, 58, 0) 55%);
+        }
+
+        .banner-slot.has-image>* {
+            position: relative;
+            z-index: 1;
         }
 
         .banner-cat-mtf {
@@ -299,17 +321,20 @@
     <div class="page">
         <section class="card">
             <h2>Home Promotions</h2>
-            <p class="card-subtext">5 fixed banner slots, each with hard-coded default copy that renders
-                immediately. CleverTap Product Experience (remote config) variables can override every
-                field and reorder the slots — without a redeploy.</p>
+            <p class="card-subtext">Up to <code id="maxBannersText">10</code> banner placements, each
+                independently controlled by its own <code>enable</code> / <code>image_url</code> /
+                <code>position</code> Product Experience variables — not a fixed count of 5. Add more by
+                configuring further slots on the dashboard, no redeploy needed (only raising the slot
+                ceiling itself requires a code change — see the comment in the script).</p>
         </section>
 
         <section class="card" id="sequenceCard">
-            <h2>Banner Sequence</h2>
-            <p class="card-subtext">Display order is driven entirely by the <code>banner_seq</code> remote
-                config variable — a comma-separated list of slot numbers (1-5). Change it on the dashboard
-                to promote, demote, or drop a banner.</p>
-            <div class="seq-readout" id="seqReadout">Loading banner_seq…</div>
+            <h2>Banner Order &amp; Visibility</h2>
+            <p class="card-subtext">Each banner's own <code>position</code> variable decides where it lands
+                (lower shows first); its <code>enable</code> variable decides whether it shows at all. Change
+                either on the dashboard to reorder, add, or drop a banner — no single shared sequence
+                variable to hand-edit.</p>
+            <div class="seq-readout" id="seqReadout">Loading banner slots…</div>
             <button type="button" onclick="refreshBanners()">Refresh Banners (fetchVariables)</button>
             <span class="seq-status" id="seqStatus"></span>
         </section>
@@ -345,144 +370,119 @@
         })();
 
         // ---------------------------------------------------------------
-        // Default content for each of the 5 fixed banner slots. These are
-        // the DEFAULT VALUES passed to defineVariable(), so they render
-        // immediately and remain the fallback if Product Experience never
-        // sets anything for that key.
+        // The Web SDK has no API to list "all defined variables" — every
+        // variable name it can ever read must be declared up front via
+        // defineVariable(). So "arbitrary number of banners" is really
+        // "however many slots we pre-declare, up to this ceiling". Raise
+        // MAX_BANNERS (and add the matching dashboard variables) any time
+        // you need more than this many banner placements.
         // ---------------------------------------------------------------
-        const BANNER_DEFAULTS = [
-            {
-                slot: 1, category: "MTF", catClass: "banner-cat-mtf",
-                title: "Trade more with Margin Trade Funding",
-                subtitle: "Get up to 4x buying power on select stocks.",
-                ctaText: "Activate MTF", ctaUrl: "/mtf"
-            },
-            {
-                slot: 2, category: "Equity", catClass: "banner-cat-equity",
-                title: "Start investing in Equity",
-                subtitle: "Zero brokerage on your first ₹10,000 trade.",
-                ctaText: "Explore Stocks", ctaUrl: "/equity"
-            },
-            {
-                slot: 3, category: "MF", catClass: "banner-cat-mf",
-                title: "Grow wealth with Mutual Funds",
-                subtitle: "Start a SIP from just ₹100 a month.",
-                ctaText: "Explore Funds", ctaUrl: "/mutual-funds"
-            },
-            {
-                slot: 4, category: "Commodities", catClass: "banner-cat-commodities",
-                title: "Trade Commodities, 24x5",
-                subtitle: "Gold, Silver & Crude Oil at your fingertips.",
-                ctaText: "Start Trading", ctaUrl: "/commodities"
-            },
-            {
-                slot: 5, category: "Insurance", catClass: "banner-cat-insurance",
-                title: "Protect what matters",
-                subtitle: "Term & health cover starting ₹20 a day.",
-                ctaText: "Get Covered", ctaUrl: "/insurance"
-            }
-        ];
+        const MAX_BANNERS = 10;
 
-        const DEFAULT_SEQUENCE = "1,2,3,4,5";
+        // Placeholder-only content (category label + gradient) for the 5
+        // sample fintech banners, shown whenever a slot's image_url is
+        // empty or fails to load. This is purely a local fallback design —
+        // the actual dashboard-controlled fields are enable/image_url/position.
+        const PLACEHOLDER_BY_SLOT = {
+            1: { category: "MTF", catClass: "banner-cat-mtf" },
+            2: { category: "Equity", catClass: "banner-cat-equity" },
+            3: { category: "MF", catClass: "banner-cat-mf" },
+            4: { category: "Commodities", catClass: "banner-cat-commodities" },
+            5: { category: "Insurance", catClass: "banner-cat-insurance" }
+        };
 
-        // Holds the defineVariable() handles for every banner field, keyed
-        // by slot number, plus the bannerSeqVar handle.
+        function placeholderForSlot(slot) {
+            return PLACEHOLDER_BY_SLOT[slot] || { category: "Banner " + slot, catClass: "banner-cat-mtf" };
+        }
+
+        // Holds the defineVariable() handles for every banner, keyed by
+        // slot number (1..MAX_BANNERS).
         const bannerVars = {};
-        let bannerSeqVar = null;
 
         function defineBannerVariables() {
-            BANNER_DEFAULTS.forEach((b) => {
-                bannerVars[b.slot] = {
-                    enabled: clevertap.defineVariable("banner." + b.slot + ".enabled", true),
-                    category: clevertap.defineVariable("banner." + b.slot + ".category", b.category),
-                    title: clevertap.defineVariable("banner." + b.slot + ".title", b.title),
-                    subtitle: clevertap.defineVariable("banner." + b.slot + ".subtitle", b.subtitle),
-                    cta_text: clevertap.defineVariable("banner." + b.slot + ".cta_text", b.ctaText),
-                    cta_url: clevertap.defineVariable("banner." + b.slot + ".cta_url", b.ctaUrl)
+            for (let slot = 1; slot <= MAX_BANNERS; slot++) {
+                // First 5 slots are enabled by default (the sample fintech
+                // banners); the rest are extra capacity, off until configured.
+                const defaultEnabled = slot <= 5;
+                bannerVars[slot] = {
+                    enable: clevertap.defineVariable("home_banner.banner" + slot + ".enable", defaultEnabled),
+                    image_url: clevertap.defineVariable("home_banner.banner" + slot + ".image_url", ""),
+                    position: clevertap.defineVariable("home_banner.banner" + slot + ".position", slot)
                 };
-            });
-            bannerSeqVar = clevertap.defineVariable("banner_seq", DEFAULT_SEQUENCE);
+            }
         }
 
-        // Parses "3,1,4,2,5" into [3,1,4,2,5], falling back to the default
-        // order if the value is missing or isn't a clean 1-5 permutation.
-        function parseSequence(raw) {
-            const parts = String(raw || "").split(",").map((p) => parseInt(p.trim(), 10));
-            const valid = parts.length === BANNER_DEFAULTS.length &&
-                parts.every((n) => Number.isInteger(n) && n >= 1 && n <= BANNER_DEFAULTS.length) &&
-                new Set(parts).size === parts.length;
-            return valid ? parts : DEFAULT_SEQUENCE.split(",").map(Number);
-        }
-
-        function defaultsForSlot(slot) {
-            return BANNER_DEFAULTS.find((b) => b.slot === slot);
+        function readBannerSlot(slot) {
+            const vars = bannerVars[slot];
+            return {
+                slot: slot,
+                enabled: vars ? vars.enable.getValue() : slot <= 5,
+                imageUrl: vars ? vars.image_url.getValue() : "",
+                position: vars ? vars.position.getValue() : slot
+            };
         }
 
         function renderBanners() {
-            const rawSeq = bannerSeqVar ? bannerSeqVar.getValue() : DEFAULT_SEQUENCE;
-            const order = parseSequence(rawSeq);
+            const slots = [];
+            for (let slot = 1; slot <= MAX_BANNERS; slot++) slots.push(readBannerSlot(slot));
+            const enabledSlots = slots.filter((s) => s.enabled)
+                .sort((a, b) => (a.position - b.position) || (a.slot - b.slot));
 
             document.getElementById("seqReadout").textContent =
-                "banner_seq: \"" + rawSeq + "\"\nresolved order: " + order.join(" → ");
+                enabledSlots.length + " of " + MAX_BANNERS + " slots enabled\n" +
+                "order (by position): " + enabledSlots.map((s) => "banner" + s.slot + "(pos " + s.position + ")").join(" → ");
 
             const stack = document.getElementById("bannerStack");
             stack.innerHTML = "";
 
-            order.forEach((slot) => {
-                const vars = bannerVars[slot];
-                const fallback = defaultsForSlot(slot);
-                const enabled = vars ? vars.enabled.getValue() : true;
+            enabledSlots.forEach((s) => {
+                const placeholder = placeholderForSlot(s.slot);
                 const el = document.createElement("div");
-                el.setAttribute("data-slot", slot);
-
-                if (!enabled) {
-                    el.className = "banner-slot is-disabled";
-                    el.innerHTML = `<span>Banner ${slot} is disabled via <code>banner.${slot}.enabled</code> — space reserved, nothing rendered.</span>`;
-                    stack.appendChild(el);
-                    return;
-                }
-
-                const category = vars ? vars.category.getValue() : fallback.category;
-                const title = vars ? vars.title.getValue() : fallback.title;
-                const subtitle = vars ? vars.subtitle.getValue() : fallback.subtitle;
-                const ctaText = vars ? vars.cta_text.getValue() : fallback.ctaText;
-                const ctaUrl = vars ? vars.cta_url.getValue() : fallback.ctaUrl;
-
-                el.className = "banner-slot " + fallback.catClass;
+                el.setAttribute("data-slot", s.slot);
+                el.className = "banner-slot " + placeholder.catClass;
                 el.innerHTML = `
           <div class="banner-top-row">
-            <span class="banner-pill">${category}</span>
-            <span class="banner-slot-tag">Slot ${slot}</span>
-          </div>
-          <div>
-            <h3 class="banner-title">${title}</h3>
-            <p class="banner-subtitle">${subtitle}</p>
+            <span class="banner-pill">${placeholder.category}</span>
+            <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
           </div>
           <div class="banner-bottom-row">
-            <span class="banner-key-hint">banner.${slot}.* via Product Experience</span>
-            <button type="button" class="banner-cta">${ctaText}</button>
+            <span class="banner-key-hint">home_banner.banner${s.slot}.* via Product Experience</span>
           </div>
         `;
-                el.querySelector(".banner-cta").addEventListener("click", () => {
+
+                if (s.imageUrl) {
+                    const probe = new Image();
+                    probe.onload = () => {
+                        el.classList.add("has-image");
+                        el.style.backgroundImage = 'url("' + s.imageUrl + '")';
+                    };
+                    probe.onerror = () => {
+                        // image_url set but unreachable/broken — stay on the
+                        // placeholder design rather than showing a broken image.
+                    };
+                    probe.src = s.imageUrl;
+                }
+
+                el.addEventListener("click", () => {
                     clevertap.event.push("Banner Clicked", {
-                        "Slot": slot,
-                        "Category": category,
-                        "Title": title,
-                        "CTA Url": ctaUrl,
-                        "Banner Seq": rawSeq
+                        "Slot": s.slot,
+                        "Position": s.position,
+                        "Image Url": s.imageUrl
                     });
-                    alert('CTA clicked: "' + ctaText + '" → ' + ctaUrl);
                 });
+                el.style.cursor = "pointer";
 
                 stack.appendChild(el);
 
                 clevertap.event.push("Banner Viewed", {
-                    "Slot": slot,
-                    "Category": category,
-                    "Title": title,
-                    "Banner Seq": rawSeq
+                    "Slot": s.slot,
+                    "Position": s.position,
+                    "Image Url": s.imageUrl
                 });
             });
+
+            const maxText = document.getElementById("maxBannersText");
+            if (maxText) maxText.textContent = MAX_BANNERS;
         }
 
         function refreshBanners() {
@@ -525,9 +525,9 @@
             });
         }
 
-        // Render the 5 slots with their hard-coded defaults immediately —
-        // this is the fixed "default space" every slot always has, with no
-        // dependency on the SDK having loaded yet.
+        // Render with the hard-coded defaults (first 5 slots enabled, rest
+        // off) immediately — every rendered banner always has this default
+        // placeholder design, with no dependency on the SDK having loaded yet.
         renderBanners();
         trackPageBrowsed();
     </script>
