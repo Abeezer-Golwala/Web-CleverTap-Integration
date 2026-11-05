@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner Placements | CleverTap Web SDK Integration</title>
+    <style>
+        :root {
+            /* Same fintech palette as index.html/learning.html, plus one
+               extra accent (copper) so each banner category reads distinctly. */
+            --fin-navy: #0B1F3A;
+            --fin-navy-light: #16324F;
+            --fin-teal: #0F9D8E;
+            --fin-teal-dark: #0B7A6E;
+            --fin-buy: #16A34A;
+            --fin-sell: #DC2626;
+            --fin-gold: #C9A227;
+            --fin-gold-dark: #9C7E1D;
+            --fin-copper: #B5651D;
+            --fin-bg: #F3F5F8;
+            --fin-card: #FFFFFF;
+            --fin-border: #E2E6EC;
+            --fin-text: #10192B;
+            --fin-muted: #5B6472;
+            --fin-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background-color: var(--fin-bg);
+            color: var(--fin-text);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background-color: var(--fin-navy);
+            color: #fff;
+            border-bottom: 3px solid var(--fin-gold);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .topbar-badge {
+            padding: 3px 9px;
+            border-radius: 999px;
+            background-color: rgba(201, 162, 39, 0.18);
+            border: 1px solid var(--fin-gold);
+            color: var(--fin-gold);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .topbar-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        .topbar-nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 24px 16px 56px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--fin-card);
+            border: 1px solid var(--fin-border);
+            border-radius: var(--fin-radius);
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(11, 31, 58, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--fin-navy);
+        }
+
+        .card-subtext {
+            margin-top: -8px;
+            color: var(--fin-muted);
+            font-size: 0.85rem;
+        }
+
+        button {
+            margin-top: 14px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--fin-teal);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        button:hover {
+            background-color: var(--fin-teal-dark);
+        }
+
+        /* ---------- Banner Sequence control card ---------- */
+        #sequenceCard {
+            border-left: 4px solid var(--fin-teal);
+        }
+
+        .seq-readout {
+            display: grid;
+            gap: 6px;
+            margin-top: 12px;
+            font-family: ui-monospace, Consolas, monospace;
+            font-size: 0.85rem;
+            background-color: var(--fin-navy);
+            border: 1px solid var(--fin-navy-light);
+            border-radius: 8px;
+            padding: 12px;
+            color: #7FE8D4;
+        }
+
+        .seq-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--fin-muted);
+        }
+
+        /* ---------- Banner carousel ---------- */
+        .carousel-card {
+            padding: 20px 20px 24px;
+        }
+
+        /* This viewport is the fixed "default space" — it keeps the exact
+           same footprint whether 1 or 10 banners are enabled, or whether a
+           slide is showing a real image_url or the fallback placeholder. */
+        .carousel-viewport {
+            position: relative;
+            min-height: 200px;
+            border-radius: var(--fin-radius);
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.45s ease;
+            height: 200px;
+        }
+
+        .banner-slot {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--fin-radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 26px;
+            color: #fff;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .banner-slot.is-disabled {
+            background: #fff;
+            color: var(--fin-muted);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px dashed var(--fin-border);
+            cursor: default;
+        }
+
+        /* Used when image_url is set and loads successfully: the image is
+           the whole banner, with a scrim at the bottom so the slot/position
+           tag stays legible over any artwork. */
+        .banner-slot.has-image {
+            background-size: cover;
+            background-position: center;
+            justify-content: flex-end;
+        }
+
+        .banner-slot.has-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(11, 31, 58, 0.75) 0%, rgba(11, 31, 58, 0) 55%);
+        }
+
+        .banner-slot.has-image>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(11, 31, 58, 0.45);
+            color: #fff;
+            font-size: 1.1rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-top: 0;
+            z-index: 2;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(11, 31, 58, 0.7);
+        }
+
+        .carousel-arrow-prev {
+            left: 12px;
+        }
+
+        .carousel-arrow-next {
+            right: 12px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: none;
+            padding: 0;
+            margin-top: 0;
+            background: var(--fin-border);
+            cursor: pointer;
+        }
+
+        .carousel-dot.is-active {
+            background: var(--fin-navy);
+            width: 20px;
+            border-radius: 999px;
+        }
+
+        .banner-cat-mtf {
+            background: linear-gradient(135deg, var(--fin-navy) 0%, var(--fin-navy-light) 100%);
+        }
+
+        .banner-cat-equity {
+            background: linear-gradient(135deg, var(--fin-teal) 0%, var(--fin-teal-dark) 100%);
+        }
+
+        .banner-cat-mf {
+            background: linear-gradient(135deg, var(--fin-gold) 0%, var(--fin-gold-dark) 100%);
+            color: var(--fin-navy);
+        }
+
+        .banner-cat-commodities {
+            background: linear-gradient(135deg, var(--fin-copper) 0%, #7A430F 100%);
+        }
+
+        .banner-cat-insurance {
+            background: linear-gradient(135deg, var(--fin-buy) 0%, #0F6E31 100%);
+        }
+
+        /* Fallback for any category string that doesn't match one of the
+           sample fintech categories above — e.g. a new category typed into
+           the dashboard that the page doesn't have a dedicated gradient for. */
+        .banner-cat-generic {
+            background: linear-gradient(135deg, var(--fin-muted) 0%, var(--fin-navy) 100%);
+        }
+
+        .banner-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .banner-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.22);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .banner-cat-mf .banner-pill {
+            background: rgba(11, 31, 58, 0.14);
+        }
+
+        .banner-slot-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            opacity: 0.75;
+            font-family: ui-monospace, Consolas, monospace;
+        }
+
+        .banner-title {
+            margin: 10px 0 4px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .banner-subtitle {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.92;
+            max-width: 70%;
+        }
+
+        .banner-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .banner-key-hint {
+            font-family: ui-monospace, Consolas, monospace;
+            font-size: 0.66rem;
+            opacity: 0.7;
+        }
+
+        .banner-cta {
+            margin-top: 0;
+            background: #fff;
+            color: var(--fin-navy);
+            white-space: nowrap;
+        }
+
+        .banner-cta:hover {
+            background: #EDEFF2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-brand">
+            <h1>Banner Placements</h1>
+            <span class="topbar-badge">Fintech Demo</span>
+        </div>
+        <nav class="topbar-nav">
+            <a href="learning.html">Learning Academy</a>
+            <a href="index.html">&larr; Back to SDK Demo</a>
+        </nav>
+    </div>
+
+    <div class="page">
+        <section class="card">
+            <h2>Home Promotions</h2>
+            <p class="card-subtext">Up to <code id="maxBannersText">10</code> banner placements, each
+                independently controlled by its own <code>enable</code> / <code>image_url</code> /
+                <code>position</code> Product Experience variables — not a fixed count of 5. Add more by
+                configuring further slots on the dashboard, no redeploy needed (only raising the slot
+                ceiling itself requires a code change — see the comment in the script).</p>
+        </section>
+
+        <section class="card" id="sequenceCard">
+            <h2>Banner Order &amp; Visibility</h2>
+            <p class="card-subtext">Each banner's own <code>position</code> variable decides where it lands
+                (lower shows first); its <code>enable</code> variable decides whether it shows at all. Change
+                either on the dashboard to reorder, add, or drop a banner — no single shared sequence
+                variable to hand-edit.</p>
+            <div class="seq-readout" id="seqReadout">Loading banner slots…</div>
+            <button type="button" onclick="refreshBanners()">Refresh Banners (fetchVariables)</button>
+            <span class="seq-status" id="seqStatus"></span>
+        </section>
+
+        <section class="card carousel-card">
+            <div class="carousel-viewport" id="carouselViewport">
+                <div class="carousel-track" id="carouselTrack"></div>
+                <button type="button" class="carousel-arrow carousel-arrow-prev" id="carouselPrev" aria-label="Previous banner">&#8249;</button>
+                <button type="button" class="carousel-arrow carousel-arrow-next" id="carouselNext" aria-label="Next banner">&#8250;</button>
+            </div>
+            <div class="carousel-dots" id="carouselDots"></div>
+        </section>
+    </div>
+
+    <script>
+        // Initialize CleverTap SDK (same account/setup as index.html and learning.html).
+        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
+        clevertap.account.push({ "id": "TEST-468-W87-546Z" });
+        clevertap.enablePersonalization = true;
+        clevertap.privacy.push({ optOut: false });
+        clevertap.privacy.push({ useIP: true });
+        (function () {
+            var wzrk = document.createElement('script');
+            wzrk.type = 'text/javascript';
+            wzrk.async = true;
+            wzrk.src = 'https://static.clevertap.com/js/clevertap.min.js';
+            // defineVariable/syncVariables/fetchVariables only exist once this
+            // script has actually loaded and executed — calling them any
+            // earlier throws, since the stub object above has no queue for
+            // them (unlike event/profile/account, which are plain arrays the
+            // real SDK drains once ready). Gate Product Experience setup on
+            // this script's own load event rather than guessing at timing.
+            wzrk.onload = function () { initProductExperience(); };
+            wzrk.onerror = function () {
+                var status = document.getElementById("seqStatus");
+                if (status) status.textContent = "Product Experience SDK failed to load — showing defaults.";
+            };
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wzrk, s);
+        })();
+
+        // ---------------------------------------------------------------
+        // The Web SDK has no API to list "all defined variables" — every
+        // variable name it can ever read must be declared up front via
+        // defineVariable(). So "arbitrary number of banners" is really
+        // "however many slots we pre-declare, up to this ceiling". Raise
+        // MAX_BANNERS (and add the matching dashboard variables) any time
+        // you need more than this many banner placements.
+        // ---------------------------------------------------------------
+        const MAX_BANNERS = 10;
+
+        // Default category text per slot — used ONLY as the defineVariable()
+        // default, so it's what renders before any Product Experience value
+        // has been received for that slot. Once the dashboard sets
+        // home_banner.banner<N>.category, getValue() returns that instead and
+        // this default is never shown again for that slot.
+        const DEFAULT_CATEGORY_BY_SLOT = {
+            1: "MTF", 2: "Equity", 3: "MF", 4: "Commodities", 5: "Insurance"
+        };
+
+        function defaultCategoryForSlot(slot) {
+            return DEFAULT_CATEGORY_BY_SLOT[slot] || ("Banner " + slot);
+        }
+
+        // Gradient is chosen by the banner's CATEGORY VALUE, not its slot
+        // number — so styling follows the content even if banners get
+        // reordered via `position` or a new category is typed in on the
+        // dashboard. Unrecognized category strings fall back to a neutral
+        // gradient rather than breaking.
+        const CATEGORY_STYLE = {
+            "MTF": "banner-cat-mtf",
+            "Equity": "banner-cat-equity",
+            "MF": "banner-cat-mf",
+            "Commodities": "banner-cat-commodities",
+            "Insurance": "banner-cat-insurance"
+        };
+
+        function catClassForCategory(category) {
+            return CATEGORY_STYLE[category] || "banner-cat-generic";
+        }
+
+        // Holds the defineVariable() handles for every banner, keyed by
+        // slot number (1..MAX_BANNERS).
+        const bannerVars = {};
+
+        function defineBannerVariables() {
+            for (let slot = 1; slot <= MAX_BANNERS; slot++) {
+                // First 5 slots are enabled by default (the sample fintech
+                // banners); the rest are extra capacity, off until configured.
+                const defaultEnabled = slot <= 5;
+                bannerVars[slot] = {
+                    enable: clevertap.defineVariable("home_banner.banner" + slot + ".enable", defaultEnabled),
+                    image_url: clevertap.defineVariable("home_banner.banner" + slot + ".image_url", ""),
+                    position: clevertap.defineVariable("home_banner.banner" + slot + ".position", slot),
+                    category: clevertap.defineVariable("home_banner.banner" + slot + ".category", defaultCategoryForSlot(slot))
+                };
+            }
+        }
+
+        function readBannerSlot(slot) {
+            const vars = bannerVars[slot];
+            return {
+                slot: slot,
+                enabled: vars ? vars.enable.getValue() : slot <= 5,
+                imageUrl: vars ? vars.image_url.getValue() : "",
+                position: vars ? vars.position.getValue() : slot,
+                category: vars ? vars.category.getValue() : defaultCategoryForSlot(slot)
+            };
+        }
+
+        // Carousel state. Re-created every renderBanners() call (e.g. a
+        // dashboard push via addVariablesChangedCallback, or a manual
+        // "Refresh Banners" click), so the old auto-advance timer must be
+        // cleared before a new one is started — otherwise every refresh
+        // would stack another interval on top of the last.
+        let carouselSlides = [];
+        let currentSlide = 0;
+        let carouselTimer = null;
+        const AUTO_ADVANCE_MS = 4000;
+
+        function buildSlideElement(s) {
+            const el = document.createElement("div");
+            el.setAttribute("data-slot", s.slot);
+            el.className = "banner-slot " + catClassForCategory(s.category);
+            el.innerHTML = `
+        <div class="banner-top-row">
+          <span class="banner-pill">${s.category}</span>
+          <span class="banner-slot-tag">banner${s.slot} · pos ${s.position}</span>
+        </div>
+        <div class="banner-bottom-row">
+          <span class="banner-key-hint">home_banner.banner${s.slot}.* via Product Experience</span>
+        </div>
+      `;
+
+            if (s.imageUrl) {
+                const probe = new Image();
+                probe.onload = () => {
+                    el.classList.add("has-image");
+                    el.style.backgroundImage = 'url("' + s.imageUrl + '")';
+                };
+                probe.onerror = () => {
+                    // image_url set but unreachable/broken — stay on the
+                    // placeholder design rather than showing a broken image.
+                };
+                probe.src = s.imageUrl;
+            }
+
+            el.addEventListener("click", () => {
+                clevertap.event.push("Banner Clicked", {
+                    "Slot": s.slot,
+                    "Category": s.category,
+                    "Position": s.position,
+                    "Image Url": s.imageUrl
+                });
+            });
+
+            return el;
+        }
+
+        function goToSlide(index) {
+            const total = carouselSlides.length;
+            if (!total) return;
+            currentSlide = ((index % total) + total) % total;
+
+            const track = document.getElementById("carouselTrack");
+            track.style.transform = "translateX(-" + (currentSlide * 100) + "%)";
+
+            document.querySelectorAll("#carouselDots .carousel-dot").forEach((dot, i) => {
+                dot.classList.toggle("is-active", i === currentSlide);
+            });
+
+            const s = carouselSlides[currentSlide];
+            clevertap.event.push("Banner Viewed", {
+                "Slot": s.slot,
+                "Category": s.category,
+                "Position": s.position,
+                "Image Url": s.imageUrl
+            });
+        }
+
+        function nextSlide() { goToSlide(currentSlide + 1); }
+        function prevSlide() { goToSlide(currentSlide - 1); }
+
+        // Restarts the auto-advance timer, including after a manual
+        // next/prev/dot interaction so the carousel doesn't immediately
+        // jump again a moment later.
+        function restartAutoAdvance() {
+            if (carouselTimer) clearInterval(carouselTimer);
+            carouselTimer = carouselSlides.length > 1 ? setInterval(nextSlide, AUTO_ADVANCE_MS) : null;
+        }
+
+        function renderBanners() {
+            const slots = [];
+            for (let slot = 1; slot <= MAX_BANNERS; slot++) slots.push(readBannerSlot(slot));
+            const enabledSlots = slots.filter((s) => s.enabled)
+                .sort((a, b) => (a.position - b.position) || (a.slot - b.slot));
+
+            document.getElementById("seqReadout").textContent =
+                enabledSlots.length + " of " + MAX_BANNERS + " slots enabled\n" +
+                "order (by position): " + enabledSlots.map((s) => "banner" + s.slot + "(pos " + s.position + ")").join(" → ");
+
+            carouselSlides = enabledSlots;
+            currentSlide = 0;
+
+            const track = document.getElementById("carouselTrack");
+            track.innerHTML = "";
+            track.style.transform = "translateX(0%)";
+
+            const dots = document.getElementById("carouselDots");
+            dots.innerHTML = "";
+
+            if (!enabledSlots.length) {
+                const empty = document.createElement("div");
+                empty.className = "banner-slot is-disabled";
+                empty.textContent = "No banners enabled — toggle on a home_banner.banner<N>.enable key.";
+                track.appendChild(empty);
+                if (carouselTimer) clearInterval(carouselTimer);
+                carouselTimer = null;
+                return;
+            }
+
+            enabledSlots.forEach((s, i) => {
+                track.appendChild(buildSlideElement(s));
+
+                const dot = document.createElement("button");
+                dot.type = "button";
+                dot.className = "carousel-dot" + (i === 0 ? " is-active" : "");
+                dot.setAttribute("aria-label", "Go to banner " + (i + 1));
+                dot.addEventListener("click", () => { goToSlide(i); restartAutoAdvance(); });
+                dots.appendChild(dot);
+            });
+
+            // First slide's own "Banner Viewed" fire.
+            const first = carouselSlides[0];
+            clevertap.event.push("Banner Viewed", {
+                "Slot": first.slot,
+                "Category": first.category,
+                "Position": first.position,
+                "Image Url": first.imageUrl
+            });
+
+            restartAutoAdvance();
+
+            const maxText = document.getElementById("maxBannersText");
+            if (maxText) maxText.textContent = MAX_BANNERS;
+        }
+
+        function refreshBanners() {
+            const status = document.getElementById("seqStatus");
+            if (typeof clevertap.fetchVariables !== "function") {
+                if (status) status.textContent = "Product Experience not ready yet — still showing defaults.";
+                return;
+            }
+            if (status) status.textContent = "Fetching latest banners…";
+            clevertap.fetchVariables(() => {
+                if (status) status.textContent = "Banners refreshed";
+                renderBanners();
+            });
+        }
+
+        function trackPageBrowsed() {
+            clevertap.event.push("Page Browsed", {
+                "Page": document.location.pathname || "NA",
+                "Title": document.title || "NA",
+                "URL": window.location.href || "NA"
+            });
+        }
+
+        // Runs once the CleverTap script above has actually loaded (see
+        // wzrk.onload). Registers the Product Experience variables, syncs
+        // their definitions to the dashboard, and re-renders with the real
+        // (dashboard-backed) values in place of the hard-coded defaults.
+        function initProductExperience() {
+            defineBannerVariables();
+            clevertap.syncVariables();
+            clevertap.enableLocalStorageEncryption(true);
+            clevertap.setLogLevel(4);
+            renderBanners();
+
+            clevertap.addVariablesChangedCallback(() => {
+                renderBanners();
+            });
+            clevertap.addOneTimeVariablesChangedCallback(() => {
+                renderBanners();
+            });
+        }
+
+        document.getElementById("carouselPrev").addEventListener("click", () => { prevSlide(); restartAutoAdvance(); });
+        document.getElementById("carouselNext").addEventListener("click", () => { nextSlide(); restartAutoAdvance(); });
+
+        // Render with the hard-coded defaults (first 5 slots enabled, rest
+        // off) immediately — every rendered banner always has this default
+        // placeholder design, with no dependency on the SDK having loaded yet.
+        renderBanners();
+        trackPageBrowsed();
+    </script>
+</body>
+
+</html>
