@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleverTap Web SDK Integration</title>
+    <style>
+        :root {
+            /* Fintech palette: deep navy chrome, a single teal action color,
+               and buy/sell reserved exclusively for trading semantics. */
+            --fin-navy: #0B1F3A;
+            --fin-navy-light: #16324F;
+            --fin-teal: #0F9D8E;
+            --fin-teal-dark: #0B7A6E;
+            --fin-buy: #16A34A;
+            --fin-buy-dark: #15803D;
+            --fin-sell: #DC2626;
+            --fin-sell-dark: #B91C1C;
+            --fin-gold: #C9A227;
+            --fin-bg: #F3F5F8;
+            --fin-card: #FFFFFF;
+            --fin-border: #E2E6EC;
+            --fin-text: #10192B;
+            --fin-muted: #5B6472;
+            --fin-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background-color: var(--fin-bg);
+            color: var(--fin-text);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background-color: var(--fin-navy);
+            color: #fff;
+            border-bottom: 3px solid var(--fin-gold);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .topbar-badge {
+            padding: 3px 9px;
+            border-radius: 999px;
+            background-color: rgba(201, 162, 39, 0.18);
+            border: 1px solid var(--fin-gold);
+            color: var(--fin-gold);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .bell-icon {
+            font-size: 22px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--fin-card);
+            border: 1px solid var(--fin-border);
+            border-left: 4px solid var(--fin-navy);
+            border-radius: var(--fin-radius);
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(11, 31, 58, 0.08);
+        }
+
+        .card.accent-teal {
+            border-left-color: var(--fin-teal);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--fin-navy);
+        }
+
+        .card-subtext {
+            margin-top: -8px;
+            color: var(--fin-muted);
+            font-size: 0.85rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 720px) {
+            .two-col {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--fin-muted);
+        }
+
+        input,
+        select {
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            padding: 8px 10px;
+            border: 1px solid var(--fin-border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #fff;
+            color: var(--fin-text);
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--fin-teal);
+            box-shadow: 0 0 0 3px rgba(15, 157, 142, 0.15);
+        }
+
+        button {
+            margin-top: 14px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--fin-teal);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        button:hover {
+            background-color: var(--fin-teal-dark);
+        }
+
+        button.secondary {
+            background-color: var(--fin-navy);
+        }
+
+        button.secondary:hover {
+            background-color: var(--fin-navy-light);
+        }
+
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--fin-radius);
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .slide img {
+            display: block;
+            width: 100%;
+        }
+
+        .key-value-pair {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .key-value-pair input,
+        .key-value-pair select {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .remove-btn {
+            flex: 0 0 auto;
+            margin-top: 0;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            line-height: 1;
+            font-size: 1.1rem;
+            background-color: var(--fin-sell);
+        }
+
+        .remove-btn:hover {
+            background-color: var(--fin-sell-dark);
+        }
+
+        .trading-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .trading-buttons button {
+            flex: 1;
+            max-width: 150px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 0.9rem;
+        }
+
+        .trading-buttons .buy-btn {
+            background-color: var(--fin-buy);
+        }
+
+        .trading-buttons .buy-btn:hover {
+            background-color: var(--fin-buy-dark);
+        }
+
+        .trading-buttons .sell-btn {
+            background-color: var(--fin-sell);
+        }
+
+        .trading-buttons .sell-btn:hover {
+            background-color: var(--fin-sell-dark);
+        }
+
+        /* Product Experiences — styled like a ticker/quote readout */
+        .pe-vars {
+            display: grid;
+            gap: 6px;
+            margin-top: 12px;
+            font-family: ui-monospace, Consolas, monospace;
+            font-size: 0.85rem;
+            font-variant-numeric: tabular-nums;
+            background-color: var(--fin-navy);
+            border: 1px solid var(--fin-navy-light);
+            border-radius: 8px;
+            padding: 12px;
+            color: #7FE8D4;
+        }
+
+        .pe-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--fin-muted);
+        }
+
+        .pe-banner {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background-color: #FBF3DC;
+            border: 1px solid var(--fin-gold);
+            color: var(--fin-navy);
+            font-weight: 600;
+            display: none;
+        }
+
+        .pe-banner.is-visible {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-brand">
+            <h1>CleverTap Web SDK Integration</h1>
+            <span class="topbar-badge">Fintech Demo</span>
+        </div>
+        <nav style="display:flex; align-items:center; gap:16px;">
+            <a href="banners.html" style="color:#fff; text-decoration:none; font-size:0.85rem; font-weight:600; opacity:0.85;">Banner Placements &rarr;</a>
+            <a href="learning.html" style="color:#fff; text-decoration:none; font-size:0.85rem; font-weight:600; opacity:0.85;">Learning Academy &rarr;</a>
+            <div class="bell-icon" id="btnInbox" title="Inbox">🔔</div>
+        </nav>
+    </div>
+
+    <div class="page">
+        <div class="card carousel">
+            <div class="slides">
+                <div class="slide"><img src="https://picsum.photos/id/230/600/200.jpg" alt="Image 1"></div>
+                <div class="slide"><img src="https://picsum.photos/id/231/600/200.jpg" alt="Image 2"></div>
+                <div class="slide"><img src="https://picsum.photos/id/232/600/200.jpg" alt="Image 3"></div>
+                <div class="slide"><img src="https://picsum.photos/id/233/600/200.jpg" alt="Image 4"></div>
+            </div>
+        </div>
+
+        <!-- Section: CleverTap Product Experiences (Web Remote Config) -->
+        <div class="card accent-teal" id="productExperienceCard">
+            <h2>Product Experiences</h2>
+            <p class="card-subtext">Remote-config variables defined and synced via the Web SDK
+                (<code>defineVariable</code> / <code>syncVariables</code>), used here to drive UI without a redeploy.</p>
+
+            <div class="pe-banner" id="peBanner"></div>
+
+            <div class="pe-vars" id="peVarsDisplay">Loading variables…</div>
+
+            <button onclick="syncProductExperience()">Sync Product Experience</button>
+            <button class="secondary" onclick="fetchProductExperienceKeys()">Fetch PE Keys</button>
+            <span class="pe-status" id="peStatus"></span>
+        </div>
+
+        <div class="two-col">
+            <!-- Section to initialize user profile -->
+            <div class="card">
+                <h2>Initialize User Profile</h2>
+                <label for="profileId">Profile ID:</label>
+                <input type="text" id="profileId" placeholder="Enter Profile ID" />
+
+                <button onclick="addUserProperty()">Add User Property</button>
+                <div id="userPropertiesContainer"></div>
+                <button onclick="uploadProfile()">Upload Profile</button>
+            </div>
+
+            <!-- Section to upload events -->
+            <div class="card">
+                <h2>Upload Event</h2>
+                <label for="eventName">Event Name:</label>
+                <input type="text" id="eventName" placeholder="Enter Event Name" />
+
+                <button onclick="addEventProperty()">Add Event Property</button>
+                <div id="eventPropertiesContainer"></div>
+                <button onclick="uploadEvent()">Upload Event</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Native Bridge</h2>
+            <button class="secondary" onclick="getDataFromAndroid()">CTA for PE1</button>
+
+            <div class="trading-buttons" style="margin-top: 20px;">
+                <button class="buy-btn" onclick="handleBuy()">Buy</button>
+                <button class="sell-btn" onclick="handleSell()">Sell</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        // Initialize CleverTap SDK
+        var clevertap = { event: [], profile: [], account: [], onUserLogin: [], notifications: [], privacy: [] };
+        // replace with the CLEVERTAP_ACCOUNT_ID with the actual ACCOUNT ID value from your Dashboard -> Settings page
+        clevertap.account.push({ "id": "468-W87-546Z" });
+        clevertap.enablePersonalization = true;
+      
+
+
+        clevertap.privacy.push({ optOut: false }); //set the flag to true, if the user of the device opts out of sharing their data
+        clevertap.privacy.push({ useIP: true }); //set the flag to true, if the user agrees to share their IP data
+        (function () {
+            var wzrk = document.createElement('script');
+            wzrk.type = 'text/javascript';
+            wzrk.async = true;
+            wzrk.src = 'https://static.clevertap.com/js/clevertap.min.js'; 
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wzrk, s);
+        })();
+        
+        // Request push permission on page load
+        window.onload = function () {
+            
+            clevertap.notifications.push({
+                "titleText": 'Would you like to receive Push Notifications?',
+                "bodyText": 'We promise to only send you relevant content and give you updates on your transactions',
+                "okButtonText": 'Sign me up!',
+                "rejectButtonText": 'No thanks',
+                "okButtonColor": '#0F9D8E',
+                "serviceWorkerPath": "./clevertap_sw.js"
+
+            });
+            clevertap.enableLocalStorageEncryption(true);
+            clevertap.setLogLevel(4);
+
+            // Product Experience (Web Remote Config) variables.
+            // Values are set on the CleverTap dashboard; these are the defaults
+            // used until a synced value arrives.
+            peVars.showPromoBanner = clevertap.defineVariable("show_promo_banner", false);
+            peVars.promoMessage = clevertap.defineVariable("promo_message", "Welcome!");
+            peVars.promoDiscount = clevertap.defineVariable("promo_discount_pct", 0);
+
+            clevertap.syncVariables();
+
+            clevertap.addVariablesChangedCallback(() => {
+                console.log("CleverTap addVariablesChangedCallback");
+                renderProductExperience();
+            });
+
+            clevertap.addOneTimeVariablesChangedCallback(() => {
+                console.log("CleverTap addOneTimeVariablesChangedCallback");
+                renderProductExperience();
+            });
+
+            // Track Page Browsed event on page load
+            trackPageBrowsed();
+        };
+
+        // Holds the CleverTap remote-config variable handles once defined.
+        const peVars = {};
+
+        // Renders the current Product Experience variable values into the UI
+        // and toggles the promo banner based on the boolean flag.
+        function renderProductExperience() {
+            const display = document.getElementById("peVarsDisplay");
+            const banner = document.getElementById("peBanner");
+            if (!display || !peVars.showPromoBanner) return;
+
+            const showBanner = peVars.showPromoBanner.getValue();
+            const message = peVars.promoMessage.getValue();
+            const discount = peVars.promoDiscount.getValue();
+
+            display.textContent =
+                "show_promo_banner: " + showBanner + "\n" +
+                "promo_message: " + message + "\n" +
+                "promo_discount_pct: " + discount;
+
+            banner.textContent = message + (discount ? " (" + discount + "% off)" : "");
+            banner.classList.toggle("is-visible", !!showBanner);
+        }
+
+        // Re-syncs Product Experience variables against the dashboard on demand.
+        function syncProductExperience() {
+            const status = document.getElementById("peStatus");
+            if (status) status.textContent = "Syncing…";
+            clevertap.syncVariables(
+                () => {
+                    if (status) status.textContent = "Synced";
+                    renderProductExperience();
+                },
+                () => {
+                    if (status) status.textContent = "Sync failed";
+                }
+            );
+        }
+
+        // Fetches the latest Product Experience variable values from the
+        // server (as opposed to syncVariables, which pushes definitions to
+        // the dashboard) and loads the refreshed values into the UI.
+        function fetchProductExperienceKeys() {
+            const status = document.getElementById("peStatus");
+            if (status) status.textContent = "Fetching PE keys…";
+            clevertap.fetchVariables(() => {
+                if (status) status.textContent = "PE keys loaded";
+                renderProductExperience();
+            });
+        }
+
+        let currentIndex = 0;
+        const slides = document.querySelector(".slides");
+        const totalSlides = document.querySelectorAll(".slide").length;
+
+        function showSlide(index) {
+            slides.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            showSlide(currentIndex);
+        }
+        
+
+        setInterval(nextSlide, 3000); // Change image every 3 seconds
+
+        // Function to track Page Browsed event with dynamic properties
+        function trackPageBrowsed() {
+            // Get dynamic values from the website
+            const pageTitle = document.title || "NA";
+            const pageUrl = window.location.href || "NA";
+            const pageName = document.location.pathname || "NA";
+
+            // Create event properties object
+            const eventProperties = {
+                "Page": pageName !== "" ? pageName : "NA",
+                "Title": pageTitle !== "" ? pageTitle : "NA",
+                "URL": pageUrl !== "" ? pageUrl : "NA"
+            };
+
+            // Push the Page Browsed event to CleverTap
+            // clevertap.event.push("Page Browsed", eventProperties);
+
+            // Log the event for debugging
+            console.log("Page Browsed event tracked with properties:", eventProperties);
+        }
+
+        function getDataFromAndroid() {
+        // Call the Android method
+            const data = SDKBridge.callSDKMethod();
+            console.log("CleverTap Received from Android:" + data);
+        }
+
+        // Trading button handlers
+        function handleBuy() {
+            alert("Buy action triggered!");
+            console.log("Buy button clicked");
+        }
+
+        function handleSell() {
+            alert("Sell action triggered!");
+            console.log("Sell button clicked");
+        }
+
+        // Add additional profile and event property functions, omitted for brevity
+
+        // ... Add the rest of your event property and profile initialization code here
+
+
+        // Function to add user property with type selection
+        function addUserProperty() {
+            const container = document.getElementById("userPropertiesContainer");
+            const div = document.createElement("div");
+            div.className = "key-value-pair";
+            div.innerHTML = `
+        <input type="text" placeholder="Property Key" class="user-key" />
+        <select class="user-type" onchange="handleTypeChange(this)">
+          <option value="string">String</option>
+          <option value="integer">Integer</option>
+          <option value="boolean">Boolean</option>
+          <option value="date">Date</option>
+        </select>
+        <input type="text" placeholder="Property Value" class="user-value" />
+        <button type="button" class="remove-btn" onclick="removeProperty(this)" aria-label="Remove property">&times;</button>
+      `;
+            container.appendChild(div);
+        }
+
+        // Function to add event property with type selection
+        function addEventProperty() {
+            const container = document.getElementById("eventPropertiesContainer");
+            const div = document.createElement("div");
+            div.className = "key-value-pair";
+            div.innerHTML = `
+        <input type="text" placeholder="Event Property Key" class="event-key" />
+        <select class="event-type" onchange="handleTypeChange(this)">
+          <option value="string">String</option>
+          <option value="integer">Integer</option>
+          <option value="boolean">Boolean</option>
+          <option value="date">Date</option>
+        </select>
+        <input type="text" placeholder="Event Property Value" class="event-value" />
+        <button type="button" class="remove-btn" onclick="removeProperty(this)" aria-label="Remove property">&times;</button>
+      `;
+            container.appendChild(div);
+        }
+
+        // Removes the property row (key/type/value/remove-button group) containing the clicked remove button
+        function removeProperty(button) {
+            button.closest(".key-value-pair").remove();
+        }
+
+        // Handler to adjust input type based on selection
+        function handleTypeChange(selectElement) {
+            const input = selectElement.nextElementSibling;
+            switch (selectElement.value) {
+                case "integer":
+                    input.type = "number";
+                    input.placeholder = "Enter Integer Value";
+                    input.className = input.className.replace("checkbox", "");
+                    break;
+                case "boolean":
+                    input.type = "checkbox";
+                    input.className = "checkbox";
+                    input.placeholder = "";
+                    break;
+                case "date":
+                    input.type = "date";
+                    input.placeholder = "Select Date";
+                    input.className = input.className.replace("checkbox", "");
+                    break;
+                default:
+                    input.type = "text";
+                    input.placeholder = "Enter String Value";
+                    input.className = input.className.replace("checkbox", "");
+            }
+        }
+
+        // Function to upload user profile
+        function uploadProfile() {
+            const profileId = document.getElementById("profileId").value;
+            const userKeys = document.querySelectorAll(".user-key");
+            const userValues = document.querySelectorAll(".user-value");
+            const userTypes = document.querySelectorAll(".user-type");
+
+            const profileData = { "Identity": profileId };
+
+            userKeys.forEach((key, index) => {
+                const valueElement = userValues[index];
+                const type = userTypes[index].value;
+
+                if (key.value) {
+                    profileData[key.value] = parseValue(valueElement, type);
+                }
+            });
+
+            clevertap.onUserLogin.push({ "Site": profileData });
+            alert("User profile uploaded!");
+        }
+
+        // Function to upload event with key-value pairs
+        function uploadEvent() {
+            const eventName = document.getElementById("eventName").value;
+            const eventKeys = document.querySelectorAll(".event-key");
+            const eventValues = document.querySelectorAll(".event-value");
+            const eventTypes = document.querySelectorAll(".event-type");
+
+            const eventData = {};
+
+            eventKeys.forEach((key, index) => {
+                const valueElement = eventValues[index];
+                const type = eventTypes[index].value;
+
+                if (key.value) {
+                    eventData[key.value] = parseValue(valueElement, type);
+                }
+            });
+
+            // clevertap.event.push(eventName, eventData);
+            alert("Event uploaded!");
+        }
+
+        // Helper function to parse value based on selected type
+        function parseValue(valueElement, type) {
+            switch (type) {
+                case "integer":
+                    return parseInt(valueElement.value, 10);
+                case "boolean":
+                    return valueElement.checked;
+                case "date":
+                    return new Date(valueElement.value); // Return as Date object
+                default:
+                    return valueElement.value; // Treat as string by default
+            }
+        }
+    </script>
+</body>
+
+</html>
